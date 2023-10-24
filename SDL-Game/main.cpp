@@ -6,7 +6,7 @@
 //
 
 #include <SDL2_image/SDL_image.h>
-#include <stdio.h>
+#include <iostream>
 #include <SDL2/SDL.h>
 #include <string>
 
@@ -51,6 +51,7 @@ SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
 
 
 //Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
+// SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to renderingijop-[-
 
 bool init()
 {
@@ -119,21 +120,42 @@ bool init()
     return success;
 }
 
+//We can load a texture withouth creating a surface and using SDL_CreateTextureFromSurface through the following:
 
-SDL_Texture* load_texture(std::string path, unsigned char file_type)
+SDL_Texture* load_IMG_texture(const std::string& path)
+{
+    SDL_Texture* loaded_texture = nullptr;
+    
+    loaded_texture = IMG_LoadTexture(my_renderer, path.c_str());
+    // function requires a const char pointer
+    // no file type required, only rendered and path of file
+    if (loaded_texture == NULL)
+    {
+        printf("Error loading texture with path %s, ERROR: %s\n", path.c_str(), IMG_GetError());
+        
+    }
+    
+    return loaded_texture;
+}
+
+
+
+
+SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
 
 {
     
     SDL_Texture* loaded_texture = nullptr;
     SDL_Surface* loaded_surface = nullptr;
     
-    // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimiced_surface and SDL_ConvertSurface)
-    
+    // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimized_surface and SDL_ConvertSurface)
+    // We still need the file path using this method since we nead to load the surface into memory first
     switch (file_type)
     {
         case TYPE_BMP:
             loaded_surface = SDL_LoadBMP(path.c_str());
             //.c_str() converts string to array with \0 (c-style string)
+            // we use it whenever we want a const char* from an std::string type
             break;
             
         case TYPE_PNG:
@@ -211,32 +233,33 @@ SDL_Surface* load_surface(std::string path, FileType file_type)
 bool load_media() //can be used for textures or surfaces
 {
     bool success = true;
-    key_press_surfaces[DEFAULT_SURFACE] = load_texture("loaded.png", TYPE_PNG);
+    key_press_surfaces[DEFAULT_SURFACE] = load_IMG_texture("loaded.png");
+    // remember that string literals are of type const char* not just char*
     if (key_press_surfaces[DEFAULT_SURFACE] == NULL)
     {
         printf("Failed to load default image");
         success = false;
     }
-    key_press_surfaces[PRESS_KEYBOARD_UP] = load_texture("up.bmp", TYPE_BMP);
+    key_press_surfaces[PRESS_KEYBOARD_UP] = load_IMG_texture("up.bmp");
     if (key_press_surfaces[PRESS_KEYBOARD_UP] == NULL)
     {
         printf("Failed to load up image");
         success = false;
     }
     
-    key_press_surfaces[PRESS_KEYBOARD_DOWN] = load_texture("down.bmp", TYPE_BMP);
+    key_press_surfaces[PRESS_KEYBOARD_DOWN] = load_IMG_texture("down.bmp");
     if ( key_press_surfaces[PRESS_KEYBOARD_DOWN] == NULL)
     {
         printf("Failed to load down image");
         success = false;
     }
-    key_press_surfaces[PRESS_KEYBOARD_LEFT] = load_texture("left.bmp", TYPE_BMP);
+    key_press_surfaces[PRESS_KEYBOARD_LEFT] = load_IMG_texture("left.bmp");
     if (key_press_surfaces[PRESS_KEYBOARD_LEFT] == NULL)
     {
         printf("Failed to load left image");
         success = false;
     }
-    key_press_surfaces[PRESS_KEYBOARD_RIGHT] = load_texture("right.bmp", TYPE_BMP);
+    key_press_surfaces[PRESS_KEYBOARD_RIGHT] = load_IMG_texture("right.bmp");
     if (key_press_surfaces[PRESS_KEYBOARD_RIGHT] == NULL)
     {
         printf("Failed to load right image");
