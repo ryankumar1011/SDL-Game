@@ -14,6 +14,7 @@
 
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
+const int SCREEN_DIAGONAL = sqrt((SCREEN_WIDTH*SCREEN_WIDTH) + (SCREEN_HEIGHT*SCREEN_HEIGHT));
 
 //variables all caps because they store constants
 
@@ -358,10 +359,34 @@ int main(int argc, char* args[])
                        }
                        
                    }
+                  
+                   //primative rendering allows for drawing basic shapes withouth loading textures
                    
+                   SDL_SetRenderDrawColor(my_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                    SDL_RenderClear(my_renderer);
                    //clears target to set colour
-                   SDL_RenderCopy(my_renderer, current_texture_display, &crop_rect, &stretch_rect);
+                   
+                   SDL_SetRenderDrawColor(my_renderer, 0xFF, 0x00, 0x00, 0xFF);
+                   SDL_Rect rectangle_filled = {(SCREEN_WIDTH/2) - 100, (SCREEN_HEIGHT/2) - 100, 200, 200};
+                   // can initialize a struct my listing and initializing its variables
+                   SDL_RenderFillRect(my_renderer, &rectangle_filled);
+                   // takes in a rectangle shape and fills it on the current rendering target
+                   
+                   SDL_SetRenderDrawColor(my_renderer, 0x00, 0xFF, 0xFF, 0xFF);
+                   SDL_Rect rectangle_drawed = {(SCREEN_WIDTH/2) - 50, (SCREEN_HEIGHT/2) - 50, 100, 100};
+                   SDL_RenderDrawRect(my_renderer, &rectangle_drawed);
+                   
+                   SDL_SetRenderDrawColor(my_renderer, 0x00, 0x20, 0x00, 0xFF);
+                   SDL_RenderDrawLine(my_renderer, 0, SCREEN_HEIGHT, SCREEN_WIDTH, 0);
+                   
+                   SDL_SetRenderDrawColor(my_renderer, 0x00, 0x00, 0xF0, 0xFF);
+                   for (int i = 0; i < SCREEN_DIAGONAL; i += 2)
+                   {
+                       SDL_RenderDrawPoint(my_renderer, i, i);
+                   }
+                   //What is SDL_SetRenderTarget?
+            
+                  // SDL_RenderCopy(my_renderer, current_texture_display, &crop_rect, &stretch_rect);
                    //draws texture to hidden target (according to associated rendering settings and the crop and stretch set)
                    SDL_RenderPresent(my_renderer);
                    //draws content of hidden target onto window associated to renderer
