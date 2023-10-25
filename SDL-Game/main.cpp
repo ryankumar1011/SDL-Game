@@ -360,15 +360,35 @@ int main(int argc, char* args[])
                        
                    }
                   
-                   //primative rendering allows for drawing basic shapes withouth loading textures
+                   //primative rendering allows for drawing basic shapes withouth loading textures. So you don't need RenderCopy to draw texture on target
+                   
+                   
                    
                    SDL_SetRenderDrawColor(my_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                    SDL_RenderClear(my_renderer);
-                   //clears target to set colour
+                   //clears target to set colour (fills target with the colour set)
+                   //Errors in colouting occur withouth initializing background colour to this
+                
+                   SDL_Rect top_left_viewport = {0,0,SCREEN_WIDTH/2,SCREEN_HEIGHT/2};
+                   SDL_Rect top_right_viewport = {SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2};
+                   
+                   
+                   SDL_RenderSetViewport(my_renderer, &top_left_viewport);
+                   SDL_RenderCopy(my_renderer, current_texture_display, NULL, NULL);
+                   SDL_RenderSetViewport(my_renderer, &top_right_viewport);
+                   SDL_RenderCopy(my_renderer, current_texture_display, NULL, NULL);
+                   
+                   SDL_Rect bottom_viewport = {0, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT/2};
+                   //unspecified members will be initialized as zero
+                   //can also use designated initiliazers. It is same as:
+                   //SDL_Rect bottom_viewport = {.y = SCREEN_WIDTH/2, .h = SCREEN_HEIGHT/2, .w = SCREEN_WIDTH};
+                   
+                   SDL_RenderSetViewport(my_renderer, &bottom_viewport);
                    
                    SDL_SetRenderDrawColor(my_renderer, 0xFF, 0x00, 0x00, 0xFF);
                    SDL_Rect rectangle_filled = {(SCREEN_WIDTH/2) - 100, (SCREEN_HEIGHT/2) - 100, 200, 200};
                    // can initialize a struct my listing and initializing its variables
+                   
                    SDL_RenderFillRect(my_renderer, &rectangle_filled);
                    // takes in a rectangle shape and fills it on the current rendering target
                    
@@ -384,7 +404,9 @@ int main(int argc, char* args[])
                    {
                        SDL_RenderDrawPoint(my_renderer, i, i);
                    }
+                   
                    //What is SDL_SetRenderTarget?
+                   //SDL_RenderGetViewport?
             
                   // SDL_RenderCopy(my_renderer, current_texture_display, &crop_rect, &stretch_rect);
                    //draws texture to hidden target (according to associated rendering settings and the crop and stretch set)
