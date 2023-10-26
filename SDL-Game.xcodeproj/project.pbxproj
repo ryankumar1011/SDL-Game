@@ -29,6 +29,8 @@
 		0EAA2BAC2AE5334B0034B5E8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0EAA2BB42AE533760034B5E8 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = /Library/Frameworks/SDL2_image.framework; sourceTree = "<absolute>"; };
+		0EE4F58E2AEAB5880069B47C /* texture_class.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture_class.h; sourceTree = "<group>"; };
+		0EE4F58F2AEAB68C0069B47C /* my_enums.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = my_enums.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,8 @@
 			isa = PBXGroup;
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
+				0EE4F58F2AEAB68C0069B47C /* my_enums.h */,
+				0EE4F58E2AEAB5880069B47C /* texture_class.h */,
 			);
 			path = "SDL-Game";
 			sourceTree = "<group>";
