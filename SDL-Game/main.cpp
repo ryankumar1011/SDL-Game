@@ -302,27 +302,30 @@ int main(int argc, char* args[])
                     }
                    
                    SDL_RenderClear(my_renderer);
-                   default_texture.render_texture();
                    
-
-                   switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
-               
+                   if(event.type != SDL_KEYUP) default_texture.render_texture();
+                   
+                   else
                    {
-                       case SDLK_UP:
-                           up_texture.render_texture();
-                           break;
+                       switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
                            
-                       case SDLK_DOWN:
-                           down_texture.render_texture();
-                           break;
-                           
-                       case SDLK_LEFT:
-                           left_texture.render_texture();
-                           break;
-                           
-                       case SDLK_RIGHT:
-                           right_texture.render_texture();
-                           break;
+                       {
+                           case SDLK_UP:
+                               up_texture.render_texture();
+                               break;
+                               
+                           case SDLK_DOWN:
+                               down_texture.render_texture();
+                               break;
+                               
+                           case SDLK_LEFT:
+                               left_texture.render_texture();
+                               break;
+                               
+                           case SDLK_RIGHT:
+                               right_texture.render_texture();
+                               break;
+                       }
                    }
 
                    SDL_RenderPresent(my_renderer);
