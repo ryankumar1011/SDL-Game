@@ -30,7 +30,10 @@ SDL_Surface* current_surface_display = nullptr;
 
 SDL_Texture* current_texture_display = nullptr;
 SDL_Renderer* my_renderer = nullptr;
-SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
+//SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
+
+SDL_Rect dot_clips[4];
+
 
 
 //Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
@@ -38,20 +41,21 @@ SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
 
 //Instantiating objects:
 
-
+Texture* current_texture;
 Texture default_texture("press.bmp");
 Texture up_texture("up.bmp");
 Texture down_texture("down.bmp");
 Texture left_texture("left.bmp");
 Texture right_texture("right.bmp");
+Texture dots_texture("dots.png");
 
 
-Texture::Texture(std::string path)
+Texture::Texture(const std::string& texture_path)
     {
         m_height = 0;
         m_width = 0;
         m_texture = nullptr;
-        m_texture_path = path;
+        m_texture_path = texture_path;
     
     }
 
@@ -117,12 +121,25 @@ std::string Texture::get_path()
     return m_texture_path;
 }
 
-void Texture::render_texture(int x = 0, int y = 0)
+void Texture::render_texture(int x, int y, SDL_Rect* crop_image)
 {
-    SDL_Rect render_area = {x, y, m_width, m_height};
-    SDL_RenderCopy(my_renderer, m_texture, NULL, &render_area);
-    //Third parameter is portion of texture to crop
-    //Fourth parameter is portion of target to copy into
+    
+    if (crop_image == nullptr)
+        
+    {
+        
+        SDL_RenderCopy(my_renderer, m_texture, NULL, NULL);
+        
+        //printf("Error pointer crop_image for texture with path %s is null", get_path().c_str());
+    }
+    else
+    {
+        SDL_Rect render_area = {x, y, crop_image->w, crop_image->h};
+        
+        SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
+        //Third parameter is portion of texture to crop
+        //Fourth parameter is portion of target to copy into
+    }
 }
 
 void Texture::free()
@@ -243,9 +260,20 @@ bool load_media()
         success = false;
         printf("Failed to load right image");
     }
+    
+    if (!dots_texture.load_from_file())
+    {
+        success = false;
+        printf("Failed to load dots image");
+    }
       
+    dot_clips[0] = {0, 0, 100, 100};
+    dot_clips[1] = {100, 0, 100, 100};
+    dot_clips[2] = {0, 100, 100, 100};
+    dot_clips[3] = {100, 100, 100, 100};
+    
     return success;
-     
+    
 }
 
 void close()
@@ -285,53 +313,55 @@ int main(int argc, char* args[])
        }
        else
        {
+           
            bool quit = false; //Main loop flag
            SDL_Event event;
+           current_texture = &default_texture;
            
           while (quit != true)
+              
            {
+               
                SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+               SDL_RenderClear(my_renderer);
+               dots_texture.render_texture(0, 0, &dot_clips[0]);
+               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
+               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
+               dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
 
-               while (SDL_WaitEvent(&event) != 0)
+               while (SDL_PollEvent(&event) != 0)
                    
                {
                    if (event.type == SDL_QUIT)
                        
-                    {
-                        quit = true;
-                    }
-                   
-                   SDL_RenderClear(my_renderer);
-                   
-                   if(event.type != SDL_KEYUP) default_texture.render_texture();
-                   
-                   else
                    {
-                       switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+                       quit = true;
+                   } 
+                   
+                
+                    switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
                            
                        {
                            case SDLK_UP:
-                               up_texture.render_texture();
+                               current_texture = &up_texture;
                                break;
                                
                            case SDLK_DOWN:
-                               down_texture.render_texture();
+                               current_texture = &down_texture;
                                break;
                                
                            case SDLK_LEFT:
-                               left_texture.render_texture();
+                               current_texture = &left_texture;
                                break;
                                
                            case SDLK_RIGHT:
-                               right_texture.render_texture();
+                               current_texture = &right_texture;
                                break;
                        }
-                   }
-
-                   SDL_RenderPresent(my_renderer);
-                   
                }
-            
+               
+                current_texture->render_texture(0, 0, nullptr);
+                SDL_RenderPresent(my_renderer);
            }
        }
    }
@@ -621,3 +651,29 @@ SDL_RenderPresent(my_renderer);
 //Note: there can't be more than one renderer
 
 */
+/*
+ if(event.type != SDL_KEYUP) default_texture.render_texture();
+ 
+ else
+ {
+     switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+         
+     {
+         case SDLK_UP:
+             up_texture.render_texture();
+             break;
+             
+         case SDLK_DOWN:
+             down_texture.render_texture();
+             break;
+             
+         case SDLK_LEFT:
+             left_texture.render_texture();
+             break;
+             
+         case SDLK_RIGHT:
+             right_texture.render_texture();
+             break;
+     }
+ }
+ */

@@ -67,8 +67,8 @@
 			isa = PBXGroup;
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
-				0EE4F58F2AEAB68C0069B47C /* my_enums.h */,
 				0EE4F58E2AEAB5880069B47C /* texture_class.h */,
+				0EE4F58F2AEAB68C0069B47C /* my_enums.h */,
 			);
 			path = "SDL-Game";
 			sourceTree = "<group>";
