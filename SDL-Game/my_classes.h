@@ -9,8 +9,10 @@
 #define texture_class
 
 #include <string>
+#include <chrono>
 
 class Texture;
+class Timer;
 
 class Texture
 {
@@ -47,7 +49,29 @@ int get_width();
     
 std::string get_path();
     
+};
 
+struct Timer
+{
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    std::chrono::duration<float> duration;
+    int timer_number;
+
+    Timer(int number)
+    {
+        start = std::chrono::high_resolution_clock::now();
+        timer_number = number;
+    
+    }
+    
+    ~Timer()
+    {
+        end = std::chrono::high_resolution_clock::now();
+        duration = end - start;
+        std::cout << "Time for timer number" << timer_number << " is " << duration.count()*1000000000 << "ns\n";
+        
+    }
+    
 };
 
 

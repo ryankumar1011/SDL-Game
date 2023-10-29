@@ -10,10 +10,10 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <string>
-
 //header files:
-#include "texture_class.h"
+#include "my_classes.h"
 #include "my_enums.h"
+#include <chrono>
 
 static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
@@ -197,7 +197,6 @@ bool init()
             success = false;
             printf("Error creating window. ERROR: %s\n", SDL_GetError());
             success = false;
-            
         }
         /*
          
@@ -354,17 +353,22 @@ int main(int argc, char* args[])
               current_texture->render_texture();
               //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
               
-               SDL_RenderPresent(my_renderer);
+              SDL_RenderPresent(my_renderer);
               
-               SDL_WaitEvent(&event);
-                   
+              auto start = std::chrono::high_resolution_clock::now();
+              
+              SDL_WaitEvent(&event);
+              
+              auto end = std::chrono::high_resolution_clock::now();
+              std::chrono::duration<float> duration = end - start;
+              if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
+              
                if (event.type == SDL_QUIT)
                        
                    {
                        quit = true;
                    } 
                    
-                
                 switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
                            
                        {
