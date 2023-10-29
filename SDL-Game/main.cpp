@@ -56,7 +56,6 @@ Texture::Texture(const std::string& texture_path)
         m_width = 0;
         m_texture = nullptr;
         m_texture_path = texture_path;
-    
     }
 
 bool Texture::load_from_file()
@@ -125,6 +124,18 @@ void Texture::set_color_mod(uint8_t& red, uint8_t& green, uint8_t& blue)
 {
     SDL_SetTextureColorMod(m_texture, red, green, blue);
     
+}
+
+void Texture::set_alpha_mod(uint8_t& alpha)
+
+{
+    SDL_SetTextureAlphaMod(m_texture, alpha);
+}
+
+void Texture::set_blend_mode(SDL_BlendMode blendmode)
+
+{
+    SDL_SetTextureBlendMode(m_texture, blendmode);
 }
 
 void Texture::render_texture(int x, int y, SDL_Rect* crop_image)
@@ -277,6 +288,7 @@ bool load_media()
     dot_clips[1] = {100, 0, 100, 100};
     dot_clips[2] = {0, 100, 100, 100};
     dot_clips[3] = {100, 100, 100, 100};
+    dots_texture.set_blend_mode();
     
     return success;
     
@@ -326,6 +338,7 @@ int main(int argc, char* args[])
            uint8_t red {255};
            uint8_t green {255};
            uint8_t blue {255};
+           uint8_t alpha {255};
            
           while (quit != true)
               
@@ -333,6 +346,7 @@ int main(int argc, char* args[])
               SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(my_renderer);
               dots_texture.set_color_mod(red, green, blue);
+              dots_texture.set_alpha_mod(alpha);
               dots_texture.render_texture(0, 0, &dot_clips[0]);
               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
@@ -381,6 +395,17 @@ int main(int argc, char* args[])
                            case SDLK_b:
                                blue += 25;
                                break;
+                               
+                           case SDLK_l:
+                               if ((alpha - 10)>= 0) alpha -= 10;
+                               else alpha = 0;
+                               break;
+                               
+                           case SDLK_a:
+                               if ((alpha + 10) <= 255) alpha += 10;
+                               else alpha = 255;
+                               break;
+                               
                         }
                
            }
