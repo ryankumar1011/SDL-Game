@@ -29,6 +29,8 @@ Texture(const std::string& texture_path);
     
 bool load_from_file();
     
+void set_color_mod(uint8_t& red, uint8_t& green, uint8_t& blue);
+    
 void render_texture(int x = 0, int y = 0, SDL_Rect* render_area = nullptr);
     
 void free();

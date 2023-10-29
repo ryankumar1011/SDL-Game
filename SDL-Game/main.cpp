@@ -121,6 +121,12 @@ std::string Texture::get_path()
     return m_texture_path;
 }
 
+void Texture::set_color_mod(uint8_t& red, uint8_t& green, uint8_t& blue)
+{
+    SDL_SetTextureColorMod(m_texture, red, green, blue);
+    
+}
+
 void Texture::render_texture(int x, int y, SDL_Rect* crop_image)
 {
     
@@ -317,29 +323,35 @@ int main(int argc, char* args[])
            bool quit = false; //Main loop flag
            SDL_Event event;
            current_texture = &default_texture;
+           uint8_t red {255};
+           uint8_t green {255};
+           uint8_t blue {255};
            
           while (quit != true)
               
-           {
-               
-               SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
-               SDL_RenderClear(my_renderer);
-               dots_texture.render_texture(0, 0, &dot_clips[0]);
-               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
-               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
-               dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
-
-               while (SDL_PollEvent(&event) != 0)
+          {
+              SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+              SDL_RenderClear(my_renderer);
+              dots_texture.set_color_mod(red, green, blue);
+              dots_texture.render_texture(0, 0, &dot_clips[0]);
+              dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
+              dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
+              dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
+              current_texture->render_texture();
+              //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
+              
+               SDL_RenderPresent(my_renderer);
+              
+               SDL_WaitEvent(&event);
                    
-               {
-                   if (event.type == SDL_QUIT)
+               if (event.type == SDL_QUIT)
                        
                    {
                        quit = true;
                    } 
                    
                 
-                    switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+                switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
                            
                        {
                            case SDLK_UP:
@@ -357,11 +369,20 @@ int main(int argc, char* args[])
                            case SDLK_RIGHT:
                                current_texture = &right_texture;
                                break;
-                       }
-               }
+                               
+                           case SDLK_r:
+                               red += 25;
+                               break;
+                               
+                           case SDLK_g:
+                               green += 25;
+                               break;
+                               
+                           case SDLK_b:
+                               blue += 25;
+                               break;
+                        }
                
-                current_texture->render_texture(0, 0, nullptr);
-                SDL_RenderPresent(my_renderer);
            }
        }
    }
