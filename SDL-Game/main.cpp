@@ -33,6 +33,7 @@ SDL_Renderer* my_renderer = nullptr;
 //SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
 
 SDL_Rect dot_clips[4];
+SDL_Rect smiles_clips[4];
 
 
 
@@ -48,6 +49,7 @@ Texture down_texture("down.bmp");
 Texture left_texture("left.bmp");
 Texture right_texture("right.bmp");
 Texture dots_texture("dots.png");
+Texture smiles_texture("smiles.png");
 
 
 Texture::Texture(const std::string& texture_path)
@@ -171,7 +173,6 @@ void Texture::free()
 Texture::~Texture()
 {
     free();
-    
 }
 
 bool init()
@@ -186,18 +187,28 @@ bool init()
         success = false;
         printf("Error initializing everything. ERROR: %s\n", SDL_GetError());
     }
+    
     else
+        
     {
+        if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+       
+        {
+            printf("Warning: linear texture filtering not enabled\n");
+        }
+         
         my_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         
         //my_window already created when pointer was initiliazed as NULL
         
         if (my_window == NULL)
+        
         {
             success = false;
             printf("Error creating window. ERROR: %s\n", SDL_GetError());
             success = false;
         }
+        
         /*
          
          //When using surfaces instead of textures, we have to also get surface when intializing
@@ -213,34 +224,38 @@ bool init()
          */
             
             else
+           
             {
-               my_renderer = SDL_CreateRenderer(my_window, -1, SDL_RENDERER_ACCELERATED);
+               my_renderer = SDL_CreateRenderer(my_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
                 
                 if (my_renderer == NULL)
+                
                 {
                     success = false;
                     printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
                     
                 }
+               
                 else
+                
                 {
                     SDL_SetRenderDrawColor(my_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     int sdl_image_flags = IMG_INIT_PNG;
                     // can use | (or bitwise operator) for multiple flags
                     // !(IMG_Init(sdl_image_flags) & sdl_image_flags) is only used to check is Init for PNG failed
                     if (!(IMG_Init(sdl_image_flags) == sdl_image_flags))
+                    
                     {
                         printf("Error initializing SDL_Image. ERROR: %s\n", IMG_GetError());
                         success = false;
                     }
+                    
                 }
             }
         }
     
     return success;
 }
-
-//We can load a texture withouth creating a surface and using SDL_CreateTextureFromSurface through the following:
 
 bool load_media()
 {
@@ -289,6 +304,12 @@ bool load_media()
     dot_clips[3] = {100, 100, 100, 100};
     dots_texture.set_blend_mode();
     
+    smiles_texture.load_from_file();
+    smiles_clips[0] = {40, 90, 65, 65};
+    smiles_clips[1] = {30, 160, 80, 80};
+    smiles_clips[2] = {20, 250, 105, 75};
+    smiles_clips[3] = {10, 350, 150, 100};
+    
     return success;
     
 }
@@ -334,11 +355,11 @@ int main(int argc, char* args[])
            bool quit = false; //Main loop flag
            SDL_Event event;
            current_texture = &default_texture;
-           uint8_t red {255};
-           uint8_t green {255};
-           uint8_t blue {255};
+           uint8_t red {1};
+           uint8_t green {1};
+           uint8_t blue {1};
            uint8_t alpha {255};
-           
+           int frame = 0;
           while (quit != true)
               
           {
@@ -351,66 +372,71 @@ int main(int argc, char* args[])
               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
               dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
               current_texture->render_texture();
+              smiles_texture.render_texture(SCREEN_WIDTH/2, 100, &smiles_clips[frame/10]);
               //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
+              ++frame;
+              if (frame/10 >= 4) frame = 0;
               
               SDL_RenderPresent(my_renderer);
               
-              auto start = std::chrono::high_resolution_clock::now();
-              
-              SDL_WaitEvent(&event);
-              
-              auto end = std::chrono::high_resolution_clock::now();
-              std::chrono::duration<float> duration = end - start;
-              if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
-              
-               if (event.type == SDL_QUIT)
-                       
-                   {
-                       quit = true;
-                   } 
-                   
-                switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
-                           
-                       {
-                           case SDLK_UP:
-                               current_texture = &up_texture;
-                               break;
-                               
-                           case SDLK_DOWN:
-                               current_texture = &down_texture;
-                               break;
-                               
-                           case SDLK_LEFT:
-                               current_texture = &left_texture;
-                               break;
-                               
-                           case SDLK_RIGHT:
-                               current_texture = &right_texture;
-                               break;
-                               
-                           case SDLK_r:
-                               red += 25;
-                               break;
-                               
-                           case SDLK_g:
-                               green += 25;
-                               break;
-                               
-                           case SDLK_b:
-                               blue += 25;
-                               break;
-                               
-                           case SDLK_l:
-                               if ((alpha - 10)>= 0) alpha -= 10;
-                               else alpha = 0;
-                               break;
-                               
-                           case SDLK_a:
-                               if ((alpha + 10) <= 255) alpha += 10;
-                               else alpha = 255;
-                               break;
-                               
-                        }
+             // auto start = std::chrono::high_resolution_clock::now();
+             // SDL_WaitEvent(&event);
+                  while (SDL_PollEvent(&event) != 0)
+                  {
+                      
+                      //auto end = std::chrono::high_resolution_clock::now();
+                      //std::chrono::duration<float> duration = end - start;
+                     // if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
+                  
+                  if (event.type == SDL_QUIT)
+                      
+                  {
+                      quit = true;
+                  }
+                  
+                  switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+                      
+                  {
+                      case SDLK_UP:
+                          current_texture = &up_texture;
+                          break;
+                          
+                      case SDLK_DOWN:
+                          current_texture = &down_texture;
+                          break;
+                          
+                      case SDLK_LEFT:
+                          current_texture = &left_texture;
+                          break;
+                          
+                      case SDLK_RIGHT:
+                          current_texture = &right_texture;
+                          break;
+                          
+                      case SDLK_r:
+                          if (red + 25 <= 255) red += 25;
+                          break;
+                          
+                      case SDLK_g:
+                          if (green + 25 <= 255) green += 25;
+                          break;
+                          
+                      case SDLK_b:
+                          if (blue + 25 <= 255) blue += 25;
+                          break;
+                          
+                      case SDLK_l:
+                          if ((alpha - 10)>= 0) alpha -= 10;
+                          else alpha = 0;
+                          break;
+                          
+                      case SDLK_a:
+                          if ((alpha + 10) <= 255) alpha += 10;
+                          else alpha = 255;
+                          break;
+                          
+                  }
+              }
                
            }
        }
