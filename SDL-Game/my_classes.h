@@ -26,10 +26,10 @@ private:
 public:
 
 Texture();
-
-Texture(const std::string& texture_path);
     
-bool load_from_file();
+bool load_from_file(const std::string&);
+    
+bool load_from_font_file(const std::string&, SDL_Color text_color);
     
 void set_color_mod(uint8_t& red, uint8_t& green, uint8_t& blue);
 

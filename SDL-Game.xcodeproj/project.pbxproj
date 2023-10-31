@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */; };
 		0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EAA2BAC2AE5334B0034B5E8 /* main.cpp */; };
 		0EAA2BB52AE533760034B5E8 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB42AE533760034B5E8 /* SDL2.framework */; };
 		0EAA2BB72AE533870034B5E8 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */; };
@@ -25,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		0EAA2BA92AE5334B0034B5E8 /* SDL-Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "SDL-Game"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EAA2BAC2AE5334B0034B5E8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0EAA2BB42AE533760034B5E8 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
@@ -38,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */,
 				0EAA2BB72AE533870034B5E8 /* SDL2_image.framework in Frameworks */,
 				0EAA2BB52AE533760034B5E8 /* SDL2.framework in Frameworks */,
 			);
@@ -76,6 +79,7 @@
 		0EAA2BB32AE533760034B5E8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */,
 				0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */,
 				0EAA2BB42AE533760034B5E8 /* SDL2.framework */,
 			);

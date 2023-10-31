@@ -7,9 +7,11 @@
 
 //libraries:
 #include <SDL2_image/SDL_image.h>
-#include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2_ttf/SDL_ttf.h>
+#include <iostream>
 #include <string>
+#include <cmath>
 //header files:
 #include "my_classes.h"
 #include "my_enums.h"
@@ -19,53 +21,55 @@ static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
 static const int SCREEN_DIAGONAL = sqrt((SCREEN_WIDTH*SCREEN_WIDTH) + (SCREEN_HEIGHT*SCREEN_HEIGHT));
 
-SDL_Window* my_window = nullptr;
+SDL_Window* g_window = nullptr;
 
 //SDL_Window and SDL_Surface are types defined by SDL
 
-SDL_Surface* my_surface = nullptr;
-SDL_Surface* current_surface_display = nullptr;
+SDL_Surface* g_surface = nullptr;
+SDL_Surface* g_current_surface_display = nullptr;
 
 // Image that will load is alse of type SDL_Surface, its pointer also needs to be initialized to zero
 
-SDL_Texture* current_texture_display = nullptr;
-SDL_Renderer* my_renderer = nullptr;
+SDL_Texture* g_current_texture_display = nullptr;
+SDL_Renderer* g_renderer = nullptr;
 //SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
 
 SDL_Rect dot_clips[4];
 SDL_Rect smiles_clips[4];
 SDL_Rect stick_figure_clips[3];
 SDL_Rect arrow_crop = {15, 15, 26, 54};
+TTF_Font* g_font = nullptr;
 
 
 //Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
 // SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
 //Instantiating objects:
-
 Texture* current_texture;
-Texture default_texture("press.bmp");
-Texture up_texture("up.bmp");
-Texture down_texture("down.bmp");
-Texture left_texture("left.bmp");
-Texture right_texture("right.bmp");
-Texture dots_texture("dots.png");
-Texture smiles_texture("smiles.png");
-Texture arrow_texture("arrow.png");
+Texture default_texture;
+Texture up_texture;
+Texture down_texture;
+Texture left_texture;
+Texture right_texture;
+Texture dots_texture;
+Texture smiles_texture;
+Texture arrow_texture;
+Texture font_texture;
 
 
-Texture::Texture(const std::string& texture_path)
+Texture::Texture()
     {
         m_height = 0;
         m_width = 0;
         m_texture = nullptr;
-        m_texture_path = texture_path;
     }
 
-bool Texture::load_from_file()
+bool Texture::load_from_file(const std::string& texture_path)
 {
         SDL_Texture* loaded_texture = nullptr;
         SDL_Surface* loaded_surface = nullptr;
+        m_texture_path = texture_path;
+
         
         // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimized_surface and SDL_ConvertSurface)
         // We still need the file path using this method since we nead to load the surface into memory first
@@ -73,7 +77,7 @@ bool Texture::load_from_file()
     
         if (loaded_surface == NULL)
             {
-                printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", m_texture_path.c_str(), SDL_GetError(), IMG_GetError());
+                printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", texture_path.c_str(), SDL_GetError(), IMG_GetError());
   
             }
     
@@ -83,7 +87,7 @@ bool Texture::load_from_file()
            SDL_SetColorKey(loaded_surface, SDL_TRUE, SDL_MapRGB(loaded_surface->format, 0xFF, 0xFF, 0xFF));
            //MapRGB generates pixel colour to be made transperent, which is in the format of the used surface
            
-           loaded_texture = SDL_CreateTextureFromSurface(my_renderer, loaded_surface);
+           loaded_texture = SDL_CreateTextureFromSurface(g_renderer, loaded_surface);
            
            if (loaded_texture == NULL)
                
@@ -102,11 +106,53 @@ bool Texture::load_from_file()
             SDL_FreeSurface(loaded_surface);
            
         }
-    
+
     m_texture = loaded_texture;
 
     return (loaded_texture != nullptr);
                 
+}
+
+bool Texture::load_from_font_file(const std::string& font_path, SDL_Color text_color)
+{
+    
+    SDL_Surface* loaded_surface = nullptr;
+    SDL_Texture* loaded_texture = nullptr;
+    m_texture_path = font_path;
+
+    loaded_surface = TTF_RenderText_Solid(g_font, font_path.c_str(), text_color);
+    
+    if (loaded_surface == nullptr)
+    {
+        printf("Error loading texture of fontn with path %s. ERROR: %s\n", font_path.c_str(), TTF_GetError());
+    }
+    
+    else
+    {
+    loaded_texture = SDL_CreateTextureFromSurface(g_renderer, loaded_surface);
+    
+    if (loaded_texture == NULL)
+        
+    {
+        printf("Error loading texture with path %s, ERROR: %s\n",m_texture_path.c_str(), SDL_GetError());
+        
+    }
+    else
+     {
+        
+        m_width = loaded_surface->w;
+        m_height = loaded_surface->h;
+        
+     }
+
+     SDL_FreeSurface(loaded_surface);
+    
+ }
+
+ m_texture = loaded_texture;
+
+ return (loaded_texture != nullptr);
+    
 }
 
 int Texture::get_height()
@@ -145,6 +191,7 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
 void Texture::render_texture(int x, int y, SDL_Rect* crop_image, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
     SDL_Rect render_area;
+   
     if (crop_image == nullptr)
         
     {
@@ -157,10 +204,11 @@ void Texture::render_texture(int x, int y, SDL_Rect* crop_image, double angle, S
     {
         render_area = {x, y, crop_image->w, crop_image->h};
     }
-        SDL_RenderCopyEx(my_renderer, m_texture, crop_image, &render_area, angle, center, flip_state);
-       // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
-        //Third parameter is portion of texture to crop
-        //Fourth parameter is portion of target to copy into
+    
+    SDL_RenderCopyEx(g_renderer, m_texture, crop_image, &render_area, angle, center, flip_state);
+    // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
+    //Third parameter is portion of texture to crop
+    //Fourth parameter is portion of target to copy into
 }
 
 void Texture::free()
@@ -193,70 +241,169 @@ bool init()
     else
         
     {
+        
         if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
-       
+            
         {
             printf("Warning: linear texture filtering not enabled\n");
         }
-         
-        my_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         
-        //my_window already created when pointer was initiliazed as NULL
-        
-        if (my_window == NULL)
-        
-        {
-            success = false;
-            printf("Error creating window. ERROR: %s\n", SDL_GetError());
-            success = false;
-        }
-        
-        /*
-         
-         //When using surfaces instead of textures, we have to also get surface when intializing
-         
         else
         {
-            my_surface = SDL_GetWindowSurface(my_window);
+            g_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
             
-            if (my_surface == NULL)
+            if (TTF_Init() == -1)
             {
-                printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
+                printf("Error initializing TTF. ERROR: %s\n", TTF_GetError());
             }
-         */
-            
             else
-           
             {
-               my_renderer = SDL_CreateRenderer(my_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
                 
-                if (my_renderer == NULL)
-                
+                if (g_window == NULL)
+                    
                 {
                     success = false;
-                    printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
-                    
+                    printf("Error creating window. ERROR: %s\n", SDL_GetError());
                 }
-               
                 else
-                
                 {
-                    SDL_SetRenderDrawColor(my_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     int sdl_image_flags = IMG_INIT_PNG;
                     // can use | (or bitwise operator) for multiple flags
                     // !(IMG_Init(sdl_image_flags) & sdl_image_flags) is only used to check is Init for PNG failed
                     if (!(IMG_Init(sdl_image_flags) == sdl_image_flags))
-                    
+                        
                     {
                         printf("Error initializing SDL_Image. ERROR: %s\n", IMG_GetError());
                         success = false;
                     }
+                    /*
+                     
+                     //When using surfaces instead of textures, we have to also get surface when intializing
+                     
+                     else
+                     {
+                     my_surface = SDL_GetWindowSurface(my_window);
+                     
+                     if (my_surface == NULL)
+                     {
+                     printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
+                     }
+                     */
                     
+                    else
+                        
+                    {
+                        g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+                        
+                        if (g_renderer == NULL)
+                            
+                        {
+                            success = false;
+                            printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
+                            
+                        }
+                        
+                        SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                    }
                 }
             }
         }
+    }
     
     return success;
+}
+
+void set_texture_clips()
+{
+    
+    dot_clips[0] = {0, 0, 100, 100};
+    dot_clips[1] = {100, 0, 100, 100};
+    dot_clips[2] = {0, 100, 100, 100};
+    dot_clips[3] = {100, 100, 100, 100};
+    dots_texture.set_blend_mode();
+    
+    smiles_clips[0] = {40, 90, 65, 65};
+    smiles_clips[1] = {30, 160, 80, 80};
+    smiles_clips[2] = {20, 250, 105, 75};
+    smiles_clips[3] = {10, 350, 150, 100};
+    
+    stick_figure_clips[0] = {54, 21, 14, 33};
+    stick_figure_clips[1] = {67, 18, 13, 31};
+    stick_figure_clips[2] = {78, 19, 22, 26};
+    
+}
+
+void load_textures(bool& success)
+{
+    if (!default_texture.load_from_file("press.bmp"))
+    {
+        success = false;
+        printf("Failed to load default image");
+    }
+    
+    if (!up_texture.load_from_file("up.bmp"))
+    {
+        success = false;
+        printf("Failed to load up image");
+    }
+    
+    if (!down_texture.load_from_file("down.bmp"))
+    {
+        success = false;
+        printf("Failed to load down image");
+    }
+    
+    if (!left_texture.load_from_file("left.bmp"))
+    {
+        success = false;
+        printf("Failed to load left image");
+    }
+    
+    if (!right_texture.load_from_file("right.bmp"))
+    {
+        success = false;
+        printf("Failed to load right image");
+    }
+    
+    if (!dots_texture.load_from_file("dots.png"))
+    {
+        success = false;
+        printf("Failed to load dots image");
+    }
+        
+    if (!arrow_texture.load_from_file("arrow.png"))
+    {
+        success = false;
+        printf("Failed to load dots image");
+    }
+    if (!smiles_texture.load_from_file("smiles.png"))
+
+    {
+        success = false;
+    }
+}
+
+void load_fonts(bool& success)
+{
+    g_font = TTF_OpenFont("Arial.ttf", 18);
+   
+    if (g_font == nullptr)
+    {
+        success = false;
+        printf("Failed to load font from font file");
+        
+    }
+    
+    SDL_Color text_color = {0x20, 0x20, 0x20};
+    
+    if (!font_texture.load_from_font_file("I am using ARIAL font", text_color))
+    {
+        success = false;
+        printf("Failed to load fonts texture");
+    }
+    
+    set_texture_clips();
+
 }
 
 bool load_media()
@@ -264,60 +411,9 @@ bool load_media()
     
     bool success = true;
     
-    if (!default_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load default image");
-    }
+    load_textures(success);
+    load_fonts(success);
     
-    if (!up_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load up image");
-    }
-    
-    if (!down_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load down image");
-    }
-    
-    if (!left_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load left image");
-    }
-    
-    if (!right_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load right image");
-    }
-    
-    if (!dots_texture.load_from_file())
-    {
-        success = false;
-        printf("Failed to load dots image");
-    }
-      
-    dot_clips[0] = {0, 0, 100, 100};
-    dot_clips[1] = {100, 0, 100, 100};
-    dot_clips[2] = {0, 100, 100, 100};
-    dot_clips[3] = {100, 100, 100, 100};
-    dots_texture.set_blend_mode();
-    
-    smiles_texture.load_from_file();
-    smiles_clips[0] = {40, 90, 65, 65};
-    smiles_clips[1] = {30, 160, 80, 80};
-    smiles_clips[2] = {20, 250, 105, 75};
-    smiles_clips[3] = {10, 350, 150, 100};
-    
-    arrow_texture.load_from_file();
-    SDL_Rect my_arrow_crop = {15, 15, 26, 54};
-    stick_figure_clips[0] = {54, 21, 14, 33};
-    stick_figure_clips[1] = {67, 18, 13, 31};
-    stick_figure_clips[2] = {78, 19, 22, 26};
-
     return success;
     
 }
@@ -325,20 +421,26 @@ bool load_media()
 void close()
 {
     // Destroyed all LOADED surfaces and textures
-    default_texture.free();
-    up_texture.free();
-    down_texture.free();
-    left_texture.free();
-    right_texture.free();
+     default_texture.free();
+     up_texture.free();
+     down_texture.free();
+     left_texture.free();
+     right_texture.free();
+     dots_texture.free();
+     smiles_texture.free();
+     arrow_texture.free();
+     TTF_CloseFont(g_font); //we need to close a font that is opened from TTF_OpenFont
+
     
     // Destroy Windows and Renderer, set pointers to NULL
-    SDL_DestroyWindow(my_window);
+    SDL_DestroyWindow(g_window);
     //Takes care of destroying my_screen_surface/my_current_texture
-    SDL_DestroyRenderer(my_renderer);
-    my_window = NULL;
-    my_renderer = NULL;
+    SDL_DestroyRenderer(g_renderer);
+    g_window = NULL;
+    g_renderer = NULL;
     
     //Just like you initialize them, you have to quit SDL subsystems
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -362,7 +464,8 @@ int main(int argc, char* args[])
            
            bool quit = false; //Main loop flag
            SDL_Event event;
-           current_texture = &default_texture;
+           //current_texture = &default_texture;
+           current_texture = &font_texture;
            uint8_t red {1};
            uint8_t green {1};
            uint8_t blue {1};
@@ -374,12 +477,12 @@ int main(int argc, char* args[])
            while (quit != true)
               
           {
-              SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
-              SDL_RenderClear(my_renderer);
+              SDL_SetRenderDrawColor(g_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+              SDL_RenderClear(g_renderer);
               dots_texture.set_color_mod(red, green, blue);
               dots_texture.set_alpha_mod(alpha);
               
-              current_texture->render_texture();
+              current_texture->render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
               
               dots_texture.render_texture(0, 0, &dot_clips[0]);
               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
@@ -406,7 +509,7 @@ int main(int argc, char* args[])
               
               if (frame/10 >= 4) frame = 0;
               
-              SDL_RenderPresent(my_renderer);
+              SDL_RenderPresent(g_renderer);
               
              // auto start = std::chrono::high_resolution_clock::now();
              // SDL_WaitEvent(&event);
