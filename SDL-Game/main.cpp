@@ -11,7 +11,8 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <iostream>
 #include <string>
-#include <cmath>
+//#include <cmath>
+
 //header files:
 #include "my_classes.h"
 #include "my_enums.h"
@@ -38,6 +39,7 @@ SDL_Rect dot_clips[4];
 SDL_Rect smiles_clips[4];
 SDL_Rect stick_figure_clips[3];
 SDL_Rect arrow_crop = {15, 15, 26, 54};
+SDL_Rect stick_figure_backflip_clips[4];
 TTF_Font* g_font = nullptr;
 
 
@@ -55,7 +57,7 @@ Texture dots_texture;
 Texture smiles_texture;
 Texture arrow_texture;
 Texture font_texture;
-
+Texture stick_figure_backflip;
 
 Texture::Texture()
     {
@@ -120,7 +122,7 @@ bool Texture::load_from_font_file(const std::string& font_path, SDL_Color text_c
     SDL_Texture* loaded_texture = nullptr;
     m_texture_path = font_path;
 
-    loaded_surface = TTF_RenderText_Solid(g_font, font_path.c_str(), text_color);
+    loaded_surface = TTF_RenderText_Blended(g_font, font_path.c_str(), text_color);
     
     if (loaded_surface == nullptr)
     {
@@ -331,6 +333,12 @@ void set_texture_clips()
     stick_figure_clips[1] = {67, 18, 13, 31};
     stick_figure_clips[2] = {78, 19, 22, 26};
     
+    stick_figure_backflip_clips[0] = {113, 184, 100, 175};
+    stick_figure_backflip_clips[1] = {213, 184, 100, 175};
+    stick_figure_backflip_clips[2] = {313, 184, 100, 175};
+    stick_figure_backflip_clips[3] = {413, 184, 100, 175};
+
+    
 }
 
 void load_textures(bool& success)
@@ -381,6 +389,10 @@ void load_textures(bool& success)
     {
         success = false;
     }
+    if (!stick_figure_backflip.load_from_file("stick_figure_backflip2.png"))
+    {
+        success = false;
+    }
 }
 
 void load_fonts(bool& success)
@@ -394,9 +406,9 @@ void load_fonts(bool& success)
         
     }
     
-    SDL_Color text_color = {0x20, 0x20, 0x20};
+    SDL_Color text_color = {0x50, 0x00, 0x00};
     
-    if (!font_texture.load_from_font_file("I am using ARIAL font", text_color))
+    if (!font_texture.load_from_font_file("Don't do backflips", text_color))
     {
         success = false;
         printf("Failed to load fonts texture");
@@ -464,7 +476,7 @@ int main(int argc, char* args[])
            
            bool quit = false; //Main loop flag
            SDL_Event event;
-           //current_texture = &default_texture;
+           current_texture = &default_texture;
            current_texture = &font_texture;
            uint8_t red {1};
            uint8_t green {1};
@@ -482,38 +494,59 @@ int main(int argc, char* args[])
               dots_texture.set_color_mod(red, green, blue);
               dots_texture.set_alpha_mod(alpha);
               
-              current_texture->render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
+              font_texture.render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
               
+              /*
               dots_texture.render_texture(0, 0, &dot_clips[0]);
               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
               dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
+              current_texture.render_texture();
+               */
   
-              smiles_texture.render_texture(SCREEN_WIDTH/2, 100, &smiles_clips[frame/10]);
+              smiles_texture.render_texture(415, 325, &smiles_clips[frame/15]);
               //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
               //flip_state = SDL_FLIP_VERTICAL;
               //if ((frame % 10) == 0) flip_state = SDL_FLIP_NONE;
               
-              if (frame < 10)
-              arrow_texture.render_texture(30, 400, &stick_figure_clips[0]);
-              else if (frame < 20)
-              arrow_texture.render_texture(50, 400, &stick_figure_clips[1]);
+              if (frame < 15)
+              {
+                  arrow_texture.render_texture(30, 400, &stick_figure_clips[0]);
+                  stick_figure_backflip.render_texture(100, 400, &stick_figure_backflip_clips[0]);
+              }
               else if (frame < 30)
-              arrow_texture.render_texture(80, 400, &stick_figure_clips[2]);
+              {
+                  arrow_texture.render_texture(50, 400, &stick_figure_clips[1]);
+                  stick_figure_backflip.render_texture(200, 400, &stick_figure_backflip_clips[1]);
+
+              }
               
-              arrow_texture.render_texture( 200, 200, &arrow_crop, angle, nullptr, flip_state);
-            
-              angle += 1;
+              else if (frame < 45)
+              {
+                  arrow_texture.render_texture(80, 400, &stick_figure_clips[2]);
+                  stick_figure_backflip.render_texture(300, 400, &stick_figure_backflip_clips[2]);
+              }
+              
+              else if (frame < 60)
+              {
+                  stick_figure_backflip.render_texture(400, 400, &stick_figure_backflip_clips[3]);
+              }
+              
+              arrow_texture.render_texture( 500, 500, &arrow_crop, angle, nullptr, flip_state);
+
+              angle += 3;
+              if (angle == 180) angle = 0;
               
               ++frame;
               
-              if (frame/10 >= 4) frame = 0;
+              if (frame == 60) frame = 0;
               
               SDL_RenderPresent(g_renderer);
               
              // auto start = std::chrono::high_resolution_clock::now();
              // SDL_WaitEvent(&event);
-                  while (SDL_PollEvent(&event) != 0)
+            
+              while (SDL_PollEvent(&event) != 0)
                   {
                       
                       //auto end = std::chrono::high_resolution_clock::now();
