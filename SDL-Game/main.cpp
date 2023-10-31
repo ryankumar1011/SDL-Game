@@ -34,7 +34,8 @@ SDL_Renderer* my_renderer = nullptr;
 
 SDL_Rect dot_clips[4];
 SDL_Rect smiles_clips[4];
-
+SDL_Rect stick_figure_clips[3];
+SDL_Rect arrow_crop = {15, 15, 26, 54};
 
 
 //Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
@@ -50,6 +51,7 @@ Texture left_texture("left.bmp");
 Texture right_texture("right.bmp");
 Texture dots_texture("dots.png");
 Texture smiles_texture("smiles.png");
+Texture arrow_texture("arrow.png");
 
 
 Texture::Texture(const std::string& texture_path)
@@ -140,25 +142,25 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
     SDL_SetTextureBlendMode(m_texture, blendmode);
 }
 
-void Texture::render_texture(int x, int y, SDL_Rect* crop_image)
+void Texture::render_texture(int x, int y, SDL_Rect* crop_image, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
-    
+    SDL_Rect render_area;
     if (crop_image == nullptr)
         
     {
+        render_area = {x, y, m_width, m_height};
+       // SDL_RenderCopy(my_renderer, m_texture, NULL, &render_area);
         
-        SDL_RenderCopy(my_renderer, m_texture, NULL, NULL);
-        
-        //printf("Error pointer crop_image for texture with path %s is null", get_path().c_str());
     }
+    
     else
     {
-        SDL_Rect render_area = {x, y, crop_image->w, crop_image->h};
-        
-        SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
+        render_area = {x, y, crop_image->w, crop_image->h};
+    }
+        SDL_RenderCopyEx(my_renderer, m_texture, crop_image, &render_area, angle, center, flip_state);
+       // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
         //Third parameter is portion of texture to crop
         //Fourth parameter is portion of target to copy into
-    }
 }
 
 void Texture::free()
@@ -310,6 +312,12 @@ bool load_media()
     smiles_clips[2] = {20, 250, 105, 75};
     smiles_clips[3] = {10, 350, 150, 100};
     
+    arrow_texture.load_from_file();
+    SDL_Rect my_arrow_crop = {15, 15, 26, 54};
+    stick_figure_clips[0] = {54, 21, 14, 33};
+    stick_figure_clips[1] = {67, 18, 13, 31};
+    stick_figure_clips[2] = {78, 19, 22, 26};
+
     return success;
     
 }
@@ -359,22 +367,43 @@ int main(int argc, char* args[])
            uint8_t green {1};
            uint8_t blue {1};
            uint8_t alpha {255};
+           double angle{0};
            int frame = 0;
-          while (quit != true)
+           SDL_RendererFlip flip_state{SDL_FLIP_NONE};
+           
+           while (quit != true)
               
           {
               SDL_SetRenderDrawColor(my_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(my_renderer);
               dots_texture.set_color_mod(red, green, blue);
               dots_texture.set_alpha_mod(alpha);
+              
+              current_texture->render_texture();
+              
               dots_texture.render_texture(0, 0, &dot_clips[0]);
               dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
               dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
               dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
-              current_texture->render_texture();
+  
               smiles_texture.render_texture(SCREEN_WIDTH/2, 100, &smiles_clips[frame/10]);
               //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
+              //flip_state = SDL_FLIP_VERTICAL;
+              //if ((frame % 10) == 0) flip_state = SDL_FLIP_NONE;
+              
+              if (frame < 10)
+              arrow_texture.render_texture(30, 400, &stick_figure_clips[0]);
+              else if (frame < 20)
+              arrow_texture.render_texture(50, 400, &stick_figure_clips[1]);
+              else if (frame < 30)
+              arrow_texture.render_texture(80, 400, &stick_figure_clips[2]);
+              
+              arrow_texture.render_texture( 200, 200, &arrow_crop, angle, nullptr, flip_state);
+            
+              angle += 1;
+              
               ++frame;
+              
               if (frame/10 >= 4) frame = 0;
               
               SDL_RenderPresent(my_renderer);
@@ -753,3 +782,4 @@ SDL_RenderPresent(my_renderer);
      }
  }
  */
+

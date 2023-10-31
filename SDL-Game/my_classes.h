@@ -37,7 +37,7 @@ void set_alpha_mod(uint8_t& alpha);
 
 void set_blend_mode(SDL_BlendMode blendmode = SDL_BLENDMODE_BLEND);
     
-void render_texture(int x = 0, int y = 0, SDL_Rect* render_area = nullptr);
+void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
     
 void free();
     
