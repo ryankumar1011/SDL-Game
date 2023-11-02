@@ -29,13 +29,13 @@ class MouseButton
     
     void set_position (int x, int y);
     
-    void set_color (uint8_t red, uint8_t green, uint8_t blue);
-    
-    void render_texture();
+    void render_button();
     
     void set_width(int width);
     
     void set_height(int height);
+    
+    int get_current_clip();
     
     private:
     
@@ -44,8 +44,6 @@ class MouseButton
     int m_height;
     
     SDL_Point m_position;
-    
-    SDL_Color m_color;
     
     MouseClipState m_current_clip;
     

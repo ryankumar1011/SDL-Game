@@ -59,8 +59,8 @@ Texture dots_texture;
 Texture smiles_texture;
 Texture arrow_texture;
 Texture font_texture;
-Texture stick_figure_backflip;
-Texture mouse_buttons;
+Texture stick_figure_backflip_texture;
+Texture buttons_texture;
 
 MouseButton g_buttons[4];
 
@@ -69,6 +69,8 @@ Texture::Texture()
         m_height = 0;
         m_width = 0;
         m_texture = nullptr;
+        m_color_key = 0;
+
     }
 
 bool Texture::load_from_file(const std::string& texture_path)
@@ -90,8 +92,11 @@ bool Texture::load_from_file(const std::string& texture_path)
     
        else
        {
+           m_format = (loaded_surface->format);
            
-           SDL_SetColorKey(loaded_surface, SDL_TRUE, SDL_MapRGB(loaded_surface->format, 0xFF, 0xFF, 0xFF));
+           if (m_color_key == 0) m_color_key = SDL_MapRGB(m_format, 0xFF, 0xFF, 0xFF);
+           SDL_SetColorKey(loaded_surface, SDL_TRUE, m_color_key);
+           
            //MapRGB generates pixel colour to be made transperent, which is in the format of the used surface
            
            loaded_texture = SDL_CreateTextureFromSurface(g_renderer, loaded_surface);
@@ -172,18 +177,25 @@ int Texture::get_width()
   return m_width;
     
 }
+
+void Texture::set_color_key(uint8_t red, uint8_t green, uint8_t blue)
+{
+    m_color_key = SDL_MapRGB(m_format, red, green, blue);
+    
+}
+
 std::string Texture::get_path()
 {
     return m_texture_path;
 }
 
-void Texture::set_color_mod(uint8_t& red, uint8_t& green, uint8_t& blue)
+void Texture::set_color_mod(uint8_t red, uint8_t green, uint8_t blue)
 {
     SDL_SetTextureColorMod(m_texture, red, green, blue);
     
 }
 
-void Texture::set_alpha_mod(uint8_t& alpha)
+void Texture::set_alpha_mod(uint8_t alpha)
 
 {
     SDL_SetTextureAlphaMod(m_texture, alpha);
@@ -289,13 +301,12 @@ void MouseButton::handle_mouse_event (SDL_Event* event)
                     m_current_clip = MOUSE_CLIP_PRESS_UP;
                     break;
                     
-                /*case SDL_MOUSEMOTION:
+                case SDL_MOUSEMOTION:
                     m_current_clip = MOUSE_CLIP_MOVE_OVER;
                     break;
                  case SDL_MOUSEWHEEL:
                     m_current_clip = MOUSE_CLIP_SCROLL_OVER;
                     break;
-                */
             }
         }
     }
@@ -310,11 +321,6 @@ void MouseButton::set_position (int x, int y)
     
 }
 
-void MouseButton::set_color (uint8_t red, uint8_t green, uint8_t blue)
-{
-    m_color = {red, green, blue};
-    
-}
 void MouseButton::set_width(int width)
 {
     m_width = width;
@@ -325,12 +331,27 @@ void MouseButton::set_height(int height)
     m_height = height;
 }
 
-void MouseButton::render_texture()
+void MouseButton::render_button()
 
 {
-    mouse_buttons.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
-}
+    buttons_texture.set_color_mod(0xFF, 0xFF, 0xFF);
+    if (m_current_clip == 4)
+    {
+        buttons_texture.set_color_mod(0x00, 0x70, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
+    if (m_current_clip == 5) 
+    {
+        buttons_texture.set_color_mod(0x00, 0x70, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
 
+    buttons_texture.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+}
+int MouseButton::get_current_clip()
+{
+    return m_current_clip;
+}
 
 bool init()
 {
@@ -503,12 +524,12 @@ void load_textures(bool& success)
         success = false;
         printf("Failed to load dots image");
     }
-    if (!stick_figure_backflip.load_from_file("stick_figure_backflip2.png"))
+    if (!stick_figure_backflip_texture.load_from_file("stick_figure_backflip2.png"))
     {
         success = false;
         printf("Failed to load stick figure backflip image");
     }
-    if (!mouse_buttons.load_from_file("press_location.png"))
+    if (!buttons_texture.load_from_file("press_location.png"))
     {
         success = false;
         printf("Failed to load press location image");
@@ -614,9 +635,9 @@ int main(int argc, char* args[])
            SDL_Event event;
            current_texture = &default_texture;
            current_texture = &font_texture;
-           uint8_t red {1};
-           uint8_t green {1};
-           uint8_t blue {1};
+           uint8_t red {200};
+           uint8_t green {200};
+           uint8_t blue {200};
            uint8_t alpha {255};
            double angle{0};
            int frame = 0;
@@ -631,7 +652,9 @@ int main(int argc, char* args[])
               for (int i = 0; i < 4; i++)
                       
                       {
-                          g_buttons[i].render_texture();
+                          
+                        g_buttons[i].render_button();
+                          
                       }
                   
               SDL_RenderPresent(g_renderer);
