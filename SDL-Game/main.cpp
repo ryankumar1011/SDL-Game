@@ -283,15 +283,18 @@ void MouseButton::handle_mouse_event (SDL_Event* event)
                     
                 case SDL_MOUSEBUTTONDOWN:
                     m_current_clip = MOUSE_CLIP_PRESS_DOWN;
+                    break;
                     
                 case SDL_MOUSEBUTTONUP:
                     m_current_clip = MOUSE_CLIP_PRESS_UP;
+                    break;
                     
                 /*case SDL_MOUSEMOTION:
                     m_current_clip = MOUSE_CLIP_MOVE_OVER;
-                   */
-                /*case SDL_MOUSEWHEEL:
+                    break;
+                 case SDL_MOUSEWHEEL:
                     m_current_clip = MOUSE_CLIP_SCROLL_OVER;
+                    break;
                 */
             }
         }
