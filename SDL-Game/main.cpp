@@ -178,7 +178,7 @@ int Texture::get_width()
     
 }
 
-void Texture::set_color_key(uint8_t red, uint8_t green, uint8_t blue)
+void Texture::set_color_key(const uint8_t &red, const uint8_t &green, const uint8_t &blue)
 {
     m_color_key = SDL_MapRGB(m_format, red, green, blue);
     
@@ -189,13 +189,13 @@ std::string Texture::get_path()
     return m_texture_path;
 }
 
-void Texture::set_color_mod(uint8_t red, uint8_t green, uint8_t blue)
+void Texture::set_color_mod(const uint8_t& red, const uint8_t& green, const uint8_t& blue)
 {
     SDL_SetTextureColorMod(m_texture, red, green, blue);
     
 }
 
-void Texture::set_alpha_mod(uint8_t alpha)
+void Texture::set_alpha_mod(const uint8_t& alpha)
 
 {
     SDL_SetTextureAlphaMod(m_texture, alpha);
@@ -337,12 +337,12 @@ void MouseButton::render_button()
     buttons_texture.set_color_mod(0xFF, 0xFF, 0xFF);
     if (m_current_clip == 4)
     {
-        buttons_texture.set_color_mod(0x00, 0x70, 0x00);
+        buttons_texture.set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
     if (m_current_clip == 5) 
     {
-        buttons_texture.set_color_mod(0x00, 0x70, 0x00);
+        buttons_texture.set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
 
@@ -553,7 +553,7 @@ void initialize_buttons()
 
 void load_fonts(bool& success)
 {
-    g_font = TTF_OpenFont("Arial.ttf", 18);
+    g_font = TTF_OpenFont("Arial.ttf", 20);
    
     if (g_font == nullptr)
     {
@@ -564,7 +564,7 @@ void load_fonts(bool& success)
     
     SDL_Color text_color = {0x50, 0x00, 0x00};
     
-    if (!font_texture.load_from_font_file("Don't do backflips", text_color))
+    if (!font_texture.load_from_font_file("Move over buttons to change color!", text_color))
     {
         success = false;
         printf("Failed to load fonts texture");
@@ -656,10 +656,7 @@ int main(int argc, char* args[])
                         g_buttons[i].render_button();
                           
                       }
-                  
-              SDL_RenderPresent(g_renderer);
-              
-            
+
               while (SDL_PollEvent(&event) != 0)
                   {
                       
@@ -680,6 +677,8 @@ int main(int argc, char* args[])
                       }
     
               }
+              font_texture.render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
+              SDL_RenderPresent(g_renderer);
            }
        }
    }
