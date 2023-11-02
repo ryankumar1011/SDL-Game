@@ -5,9 +5,7 @@
 //  Created by Ryan Kumar on 26/10/23.
 //
 
-//#pragma once
-#ifndef my_enums
-#define my_enums
+#pragma once
 
 //variables all caps because they store constants
 
@@ -22,11 +20,11 @@ enum KeyboardEvents : unsigned char
     
 };
 
-enum FileType : unsigned char
+enum FileTypes : unsigned char
 {
     TYPE_PNG,
     TYPE_BMP,
     TYPE_JPG
     
 };
-#endif
+

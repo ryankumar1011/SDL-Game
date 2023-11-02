@@ -11,12 +11,11 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <iostream>
 #include <string>
-//#include <cmath>
-
-//header files:
-#include "my_classes.h"
-#include "my_enums.h"
 #include <chrono>
+//header files:
+#include "textures.h"
+#include "mouse_button.h"
+#include "timer.h"
 
 static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
@@ -33,13 +32,16 @@ SDL_Surface* g_current_surface_display = nullptr;
 
 SDL_Texture* g_current_texture_display = nullptr;
 SDL_Renderer* g_renderer = nullptr;
-//SDL_Texture* key_press_surfaces[PRESS_KEYBOARD_TOTAL];
 
-SDL_Rect dot_clips[4];
-SDL_Rect smiles_clips[4];
-SDL_Rect stick_figure_clips[3];
-SDL_Rect arrow_crop = {15, 15, 26, 54};
-SDL_Rect stick_figure_backflip_clips[4];
+//clips definition
+SDL_Rect g_dot_clips[4];
+SDL_Rect g_smiles_clips[4];
+SDL_Rect g_stick_figure_clips[3];
+SDL_Rect g_arrow_clip = {15, 15, 26, 54};
+SDL_Rect g_stick_figure_backflip_clips[4];
+SDL_Rect g_button_clips [4];
+
+//font definition
 TTF_Font* g_font = nullptr;
 
 
@@ -58,6 +60,9 @@ Texture smiles_texture;
 Texture arrow_texture;
 Texture font_texture;
 Texture stick_figure_backflip;
+Texture mouse_buttons;
+
+MouseButton g_buttons[4];
 
 Texture::Texture()
     {
@@ -190,11 +195,11 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
     SDL_SetTextureBlendMode(m_texture, blendmode);
 }
 
-void Texture::render_texture(int x, int y, SDL_Rect* crop_image, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+void Texture::render_texture(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
     SDL_Rect render_area;
    
-    if (crop_image == nullptr)
+    if (clip == nullptr)
         
     {
         render_area = {x, y, m_width, m_height};
@@ -204,10 +209,10 @@ void Texture::render_texture(int x, int y, SDL_Rect* crop_image, double angle, S
     
     else
     {
-        render_area = {x, y, crop_image->w, crop_image->h};
+        render_area = {x, y, clip->w, clip->h};
     }
     
-    SDL_RenderCopyEx(g_renderer, m_texture, crop_image, &render_area, angle, center, flip_state);
+    SDL_RenderCopyEx(g_renderer, m_texture, clip, &render_area, angle, center, flip_state);
     // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
     //Third parameter is portion of texture to crop
     //Fourth parameter is portion of target to copy into
@@ -226,6 +231,103 @@ Texture::~Texture()
 {
     free();
 }
+
+
+MouseButton::MouseButton()
+{
+    m_position = {0,0};
+    
+    m_width = 0;
+    m_height = 0;
+    
+    m_current_clip = MOUSE_CLIP_OUT;
+    
+}
+
+void MouseButton::handle_mouse_event (SDL_Event* event)
+{
+    if ((event->type == SDL_MOUSEBUTTONDOWN) || (event->type == SDL_MOUSEBUTTONUP) || (event->type == SDL_MOUSEMOTION))
+    {
+        m_current_clip = MOUSE_CLIP_OUT;
+        
+        int x, y;
+        
+        SDL_GetMouseState(&x, &y);
+        
+        bool inside_button = true;
+        
+        
+        if (x < m_position.x)
+            
+            inside_button = false;
+        
+        else if (x > (m_position.x + m_width))
+            
+            inside_button = false;
+        
+        else if (y < m_position.y)
+            
+            inside_button = false;
+        
+        
+        else if (y > (m_position.y + m_height))
+            
+            inside_button = false;
+        
+        if (inside_button)
+        {
+            m_current_clip = MOUSE_CLIP_OVER;
+            
+            switch (event->type)
+            {
+                    
+                case SDL_MOUSEBUTTONDOWN:
+                    m_current_clip = MOUSE_CLIP_PRESS_DOWN;
+                    
+                case SDL_MOUSEBUTTONUP:
+                    m_current_clip = MOUSE_CLIP_PRESS_UP;
+                    
+                /*case SDL_MOUSEMOTION:
+                    m_current_clip = MOUSE_CLIP_MOVE_OVER;
+                   */
+                /*case SDL_MOUSEWHEEL:
+                    m_current_clip = MOUSE_CLIP_SCROLL_OVER;
+                */
+            }
+        }
+    }
+}
+    
+    
+void MouseButton::set_position (int x, int y)
+{
+    
+    m_position.x = x;
+    m_position.y = y;
+    
+}
+
+void MouseButton::set_color (uint8_t red, uint8_t green, uint8_t blue)
+{
+    m_color = {red, green, blue};
+    
+}
+void MouseButton::set_width(int width)
+{
+    m_width = width;
+}
+
+void MouseButton::set_height(int height)
+{
+    m_height = height;
+}
+
+void MouseButton::render_texture()
+
+{
+    mouse_buttons.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+}
+
 
 bool init()
 {
@@ -318,25 +420,33 @@ bool init()
 void set_texture_clips()
 {
     
-    dot_clips[0] = {0, 0, 100, 100};
-    dot_clips[1] = {100, 0, 100, 100};
-    dot_clips[2] = {0, 100, 100, 100};
-    dot_clips[3] = {100, 100, 100, 100};
+    g_dot_clips[0] = {0, 0, 100, 100};
+    g_dot_clips[1] = {100, 0, 100, 100};
+    g_dot_clips[2] = {0, 100, 100, 100};
+    g_dot_clips[3] = {100, 100, 100, 100};
     dots_texture.set_blend_mode();
     
-    smiles_clips[0] = {40, 90, 65, 65};
-    smiles_clips[1] = {30, 160, 80, 80};
-    smiles_clips[2] = {20, 250, 105, 75};
-    smiles_clips[3] = {10, 350, 150, 100};
+    g_smiles_clips[0] = {40, 90, 65, 65};
+    g_smiles_clips[1] = {30, 160, 80, 80};
+    g_smiles_clips[2] = {20, 250, 105, 75};
+    g_smiles_clips[3] = {10, 350, 150, 100};
     
-    stick_figure_clips[0] = {54, 21, 14, 33};
-    stick_figure_clips[1] = {67, 18, 13, 31};
-    stick_figure_clips[2] = {78, 19, 22, 26};
+    g_stick_figure_clips[0] = {54, 21, 14, 33};
+    g_stick_figure_clips[1] = {67, 18, 13, 31};
+    g_stick_figure_clips[2] = {78, 19, 22, 26};
     
-    stick_figure_backflip_clips[0] = {113, 184, 100, 175};
-    stick_figure_backflip_clips[1] = {213, 184, 100, 175};
-    stick_figure_backflip_clips[2] = {313, 184, 100, 175};
-    stick_figure_backflip_clips[3] = {413, 184, 100, 175};
+    g_arrow_clip = {15, 15, 26, 54};
+    
+    g_stick_figure_backflip_clips[0] = {113, 184, 100, 175};
+    g_stick_figure_backflip_clips[1] = {213, 184, 100, 175};
+    g_stick_figure_backflip_clips[2] = {313, 184, 100, 175};
+    g_stick_figure_backflip_clips[3] = {413, 184, 100, 175};
+    
+    
+    g_button_clips[0] = {0, 0, 300, 300};
+    g_button_clips[1] = {300, 0, 300, 300};
+    g_button_clips[2] = {0, 300, 300, 300};
+    g_button_clips[3] = {300, 300, 300, 300};
 
     
 }
@@ -388,11 +498,33 @@ void load_textures(bool& success)
 
     {
         success = false;
+        printf("Failed to load dots image");
     }
     if (!stick_figure_backflip.load_from_file("stick_figure_backflip2.png"))
     {
         success = false;
+        printf("Failed to load stick figure backflip image");
     }
+    if (!mouse_buttons.load_from_file("press_location.png"))
+    {
+        success = false;
+        printf("Failed to load press location image");
+    }
+    
+}
+
+void initialize_buttons()
+{
+    for (int i = 0; i < 4; i++)
+    {
+       g_buttons[i].set_width(300);
+       g_buttons[i].set_height(300);
+    }
+    g_buttons[0].set_position(0, 0);
+    g_buttons[1].set_position(300, 0);
+    g_buttons[2].set_position(0, 300);
+    g_buttons[3].set_position(300, 300);
+     
 }
 
 void load_fonts(bool& success)
@@ -413,8 +545,6 @@ void load_fonts(bool& success)
         success = false;
         printf("Failed to load fonts texture");
     }
-    
-    set_texture_clips();
 
 }
 
@@ -425,6 +555,8 @@ bool load_media()
     
     load_textures(success);
     load_fonts(success);
+    initialize_buttons();
+    set_texture_clips();
     
     return success;
     
@@ -441,6 +573,7 @@ void close()
      dots_texture.free();
      smiles_texture.free();
      arrow_texture.free();
+     
      TTF_CloseFont(g_font); //we need to close a font that is opened from TTF_OpenFont
 
     
@@ -491,60 +624,15 @@ int main(int argc, char* args[])
           {
               SDL_SetRenderDrawColor(g_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(g_renderer);
-              dots_texture.set_color_mod(red, green, blue);
-              dots_texture.set_alpha_mod(alpha);
               
-              font_texture.render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
-              
-              /*
-              dots_texture.render_texture(0, 0, &dot_clips[0]);
-              dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
-              dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
-              dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
-              current_texture.render_texture();
-               */
-  
-              smiles_texture.render_texture(415, 325, &smiles_clips[frame/15]);
-              //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
-              //flip_state = SDL_FLIP_VERTICAL;
-              //if ((frame % 10) == 0) flip_state = SDL_FLIP_NONE;
-              
-              if (frame < 15)
-              {
-                  arrow_texture.render_texture(30, 400, &stick_figure_clips[0]);
-                  stick_figure_backflip.render_texture(100, 400, &stick_figure_backflip_clips[0]);
-              }
-              else if (frame < 30)
-              {
-                  arrow_texture.render_texture(50, 400, &stick_figure_clips[1]);
-                  stick_figure_backflip.render_texture(200, 400, &stick_figure_backflip_clips[1]);
-
-              }
-              
-              else if (frame < 45)
-              {
-                  arrow_texture.render_texture(80, 400, &stick_figure_clips[2]);
-                  stick_figure_backflip.render_texture(300, 400, &stick_figure_backflip_clips[2]);
-              }
-              
-              else if (frame < 60)
-              {
-                  stick_figure_backflip.render_texture(400, 400, &stick_figure_backflip_clips[3]);
-              }
-              
-              arrow_texture.render_texture( 500, 500, &arrow_crop, angle, nullptr, flip_state);
-
-              angle += 3;
-              if (angle == 180) angle = 0;
-              
-              ++frame;
-              
-              if (frame == 60) frame = 0;
-              
+              for (int i = 0; i < 4; i++)
+                      
+                      {
+                          g_buttons[i].render_texture();
+                      }
+                  
               SDL_RenderPresent(g_renderer);
               
-             // auto start = std::chrono::high_resolution_clock::now();
-             // SDL_WaitEvent(&event);
             
               while (SDL_PollEvent(&event) != 0)
                   {
@@ -558,51 +646,14 @@ int main(int argc, char* args[])
                   {
                       quit = true;
                   }
-                  
-                  switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+                    
+                  for (int i = 0; i < 4; i++)
                       
-                  {
-                      case SDLK_UP:
-                          current_texture = &up_texture;
-                          break;
-                          
-                      case SDLK_DOWN:
-                          current_texture = &down_texture;
-                          break;
-                          
-                      case SDLK_LEFT:
-                          current_texture = &left_texture;
-                          break;
-                          
-                      case SDLK_RIGHT:
-                          current_texture = &right_texture;
-                          break;
-                          
-                      case SDLK_r:
-                          if (red + 25 <= 255) red += 25;
-                          break;
-                          
-                      case SDLK_g:
-                          if (green + 25 <= 255) green += 25;
-                          break;
-                          
-                      case SDLK_b:
-                          if (blue + 25 <= 255) blue += 25;
-                          break;
-                          
-                      case SDLK_l:
-                          if ((alpha - 10)>= 0) alpha -= 10;
-                          else alpha = 0;
-                          break;
-                          
-                      case SDLK_a:
-                          if ((alpha + 10) <= 255) alpha += 10;
-                          else alpha = 255;
-                          break;
-                          
-                  }
+                      {
+                          g_buttons[i].handle_mouse_event(&event);
+                      }
+    
               }
-               
            }
        }
    }
@@ -611,7 +662,7 @@ int main(int argc, char* args[])
     return 0;
 }
 
-// Emmited code for practice, can be used later:
+// Emmited code written during practice, can be used later:
 
 /*
 SDL_Surface* load_surface(std::string path, FileType file_type)
@@ -918,4 +969,108 @@ SDL_RenderPresent(my_renderer);
      }
  }
  */
+/*
+ case SDLK_UP:
+     current_texture = &up_texture;
+     break;
+     
+ case SDLK_DOWN:
+     current_texture = &down_texture;
+     break;
+     
+ case SDLK_LEFT:
+     current_texture = &left_texture;
+     break;
+     
+ case SDLK_RIGHT:
+     current_texture = &right_texture;
+     break;
+ */
+/*
 
+dots_texture.set_color_mod(red, green, blue);
+dots_texture.set_alpha_mod(alpha);
+
+//font_texture.render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
+
+dots_texture.render_texture(0, 0, &dot_clips[0]);
+dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
+dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
+dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
+current_texture.render_texture();
+ */
+
+//smiles_texture.render_texture(415, 325, &g_smiles_clips[frame/15]);
+
+//we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
+//flip_state = SDL_FLIP_VERTICAL;
+//if ((frame % 10) == 0) flip_state = SDL_FLIP_NONE;
+/*
+
+if (frame < 15)
+{
+    arrow_texture.render_texture(30, 400, &g_stick_figure_clips[0]);
+    stick_figure_backflip.render_texture(100, 400, &g_stick_figure_backflip_clips[0]);
+}
+else if (frame < 30)
+{
+    arrow_texture.render_texture(50, 400, &g_stick_figure_clips[1]);
+    stick_figure_backflip.render_texture(200, 400, &g_stick_figure_backflip_clips[1]);
+
+}
+
+else if (frame < 45)
+{
+    arrow_texture.render_texture(80, 400, &g_stick_figure_clips[2]);
+    stick_figure_backflip.render_texture(300, 400, &g_stick_figure_backflip_clips[2]);
+}
+
+else if (frame < 60)
+{
+    stick_figure_backflip.render_texture(400, 400, &g_stick_figure_backflip_clips[3]);
+}
+
+arrow_texture.render_texture( 500, 500, &g_arrow_clip, angle, nullptr, flip_state);
+
+angle += 3;
+if (angle == 180) angle = 0;
+
+++frame;
+
+if (frame == 60) frame = 0;
+
+SDL_RenderPresent(g_renderer);
+
+// auto start = std::chrono::high_resolution_clock::now();
+// SDL_WaitEvent(&event);
+*/
+/*
+ switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
+      
+  {
+        
+      case SDLK_r:
+          if (red + 25 <= 255) red += 25;
+          break;
+          
+      case SDLK_g:
+          if (green + 25 <= 255) green += 25;
+          break;
+          
+      case SDLK_b:
+          if (blue + 25 <= 255) blue += 25;
+          break;
+          
+      case SDLK_l:
+          if ((alpha - 10)>= 0) alpha -= 10;
+          else alpha = 0;
+          break;
+          
+      case SDLK_a:
+          if ((alpha + 10) <= 255) alpha += 10;
+          else alpha = 255;
+          break;
+          
+  }
+ */
+ 
