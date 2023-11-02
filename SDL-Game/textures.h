@@ -18,7 +18,7 @@ public:
     
     bool load_from_file(const std::string& texture_path);
     
-    bool load_from_font_file(const std::string&, SDL_Color text_color);
+    bool load_from_font_file(const std::string& texture_path, const SDL_Color& text_color);
         
     void set_color_mod(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
 

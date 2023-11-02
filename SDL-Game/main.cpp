@@ -21,17 +21,17 @@ static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
 static const int SCREEN_DIAGONAL = sqrt((SCREEN_WIDTH*SCREEN_WIDTH) + (SCREEN_HEIGHT*SCREEN_HEIGHT));
 
-SDL_Window* g_window = nullptr;
+SDL_Window* g_ptr_window = nullptr;
 
 //SDL_Window and SDL_Surface are types defined by SDL
 
-SDL_Surface* g_surface = nullptr;
-SDL_Surface* g_current_surface_display = nullptr;
+SDL_Surface* g_ptr_surface = nullptr;
+SDL_Surface* g_ptr_current_surface_display = nullptr;
 
 // Image that will load is alse of type SDL_Surface, its pointer also needs to be initialized to zero
 
-SDL_Texture* g_current_texture_display = nullptr;
-SDL_Renderer* g_renderer = nullptr;
+SDL_Texture* g_ptr_current_texture_display = nullptr;
+SDL_Renderer* g_ptr_renderer = nullptr;
 
 //clips definition
 SDL_Rect g_dot_clips[4];
@@ -42,25 +42,25 @@ SDL_Rect g_stick_figure_backflip_clips[4];
 SDL_Rect g_button_clips [4];
 
 //font definition
-TTF_Font* g_font = nullptr;
+TTF_Font* g_ptr_font = nullptr;
 
 
 //Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
 // SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
 //Instantiating objects:
-Texture* current_texture;
+Texture* ptr_current_texture;
 Texture default_texture;
 Texture up_texture;
 Texture down_texture;
 Texture left_texture;
 Texture right_texture;
-Texture dots_texture;
-Texture smiles_texture;
-Texture arrow_texture;
+Texture dots_sprite;
+Texture smiles_sprite;
+Texture arrow_sprite; //for some reason I have drawn the arrow and the first backflip animation in this png file.
 Texture font_texture;
-Texture stick_figure_backflip_texture;
-Texture buttons_texture;
+Texture stick_figure_backflips_sprite;
+Texture buttons_sprite;
 
 MouseButton g_buttons[4];
 
@@ -75,16 +75,16 @@ Texture::Texture()
 
 bool Texture::load_from_file(const std::string& texture_path)
 {
-        SDL_Texture* loaded_texture = nullptr;
-        SDL_Surface* loaded_surface = nullptr;
+        SDL_Texture* ptr_loaded_texture = nullptr;
+        SDL_Surface* ptr_loaded_surface = nullptr;
         m_texture_path = texture_path;
 
         
         // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimized_surface and SDL_ConvertSurface)
         // We still need the file path using this method since we nead to load the surface into memory first
-        loaded_surface = IMG_Load(m_texture_path.c_str());
+        ptr_loaded_surface = IMG_Load(m_texture_path.c_str());
     
-        if (loaded_surface == NULL)
+        if (ptr_loaded_surface == nullptr)
             {
                 printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", texture_path.c_str(), SDL_GetError(), IMG_GetError());
   
@@ -92,16 +92,16 @@ bool Texture::load_from_file(const std::string& texture_path)
     
        else
        {
-           m_format = (loaded_surface->format);
+           m_format = (ptr_loaded_surface->format);
            
            if (m_color_key == 0) m_color_key = SDL_MapRGB(m_format, 0xFF, 0xFF, 0xFF);
-           SDL_SetColorKey(loaded_surface, SDL_TRUE, m_color_key);
+           SDL_SetColorKey(ptr_loaded_surface, SDL_TRUE, m_color_key);
            
            //MapRGB generates pixel colour to be made transperent, which is in the format of the used surface
            
-           loaded_texture = SDL_CreateTextureFromSurface(g_renderer, loaded_surface);
+           ptr_loaded_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
            
-           if (loaded_texture == NULL)
+           if (ptr_loaded_texture == NULL)
                
            {
                printf("Error loading texture with path %s, ERROR: %s\n",m_texture_path.c_str(), SDL_GetError());
@@ -110,40 +110,40 @@ bool Texture::load_from_file(const std::string& texture_path)
            else
             {
                
-               m_width = loaded_surface->w;
-               m_height = loaded_surface->h;
+               m_width = ptr_loaded_surface->w;
+               m_height = ptr_loaded_surface->h;
                
             }
     
-            SDL_FreeSurface(loaded_surface);
+           SDL_FreeSurface(ptr_loaded_surface);
            
         }
 
-    m_texture = loaded_texture;
+    m_texture = ptr_loaded_texture;
 
-    return (loaded_texture != nullptr);
+    return (ptr_loaded_texture != nullptr);
                 
 }
 
-bool Texture::load_from_font_file(const std::string& font_path, SDL_Color text_color)
+bool Texture::load_from_font_file(const std::string& font_path, const SDL_Color& text_color)
 {
     
-    SDL_Surface* loaded_surface = nullptr;
-    SDL_Texture* loaded_texture = nullptr;
+    SDL_Surface* ptr_loaded_surface = nullptr;
+    SDL_Texture* ptr_loaded_texture = nullptr;
     m_texture_path = font_path;
 
-    loaded_surface = TTF_RenderText_Blended(g_font, font_path.c_str(), text_color);
+    ptr_loaded_surface = TTF_RenderText_Blended(g_ptr_font, font_path.c_str(), text_color);
     
-    if (loaded_surface == nullptr)
+    if (ptr_loaded_surface == nullptr)
     {
         printf("Error loading texture of fontn with path %s. ERROR: %s\n", font_path.c_str(), TTF_GetError());
     }
     
     else
     {
-    loaded_texture = SDL_CreateTextureFromSurface(g_renderer, loaded_surface);
+    ptr_loaded_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
     
-    if (loaded_texture == NULL)
+    if (ptr_loaded_texture == nullptr)
         
     {
         printf("Error loading texture with path %s, ERROR: %s\n",m_texture_path.c_str(), SDL_GetError());
@@ -152,18 +152,18 @@ bool Texture::load_from_font_file(const std::string& font_path, SDL_Color text_c
     else
      {
         
-        m_width = loaded_surface->w;
-        m_height = loaded_surface->h;
+        m_width = ptr_loaded_surface->w;
+        m_height = ptr_loaded_surface->h;
         
      }
 
-     SDL_FreeSurface(loaded_surface);
+     SDL_FreeSurface(ptr_loaded_surface);
     
  }
 
- m_texture = loaded_texture;
+ m_texture = ptr_loaded_texture;
 
- return (loaded_texture != nullptr);
+ return (ptr_loaded_texture != nullptr);
     
 }
 
@@ -207,11 +207,11 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
     SDL_SetTextureBlendMode(m_texture, blendmode);
 }
 
-void Texture::render_texture(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
     SDL_Rect render_area;
    
-    if (clip == nullptr)
+    if (ptr_clip == nullptr)
         
     {
         render_area = {x, y, m_width, m_height};
@@ -221,10 +221,10 @@ void Texture::render_texture(int x, int y, SDL_Rect* clip, double angle, SDL_Poi
     
     else
     {
-        render_area = {x, y, clip->w, clip->h};
+        render_area = {x, y, ptr_clip->w, ptr_clip->h};
     }
     
-    SDL_RenderCopyEx(g_renderer, m_texture, clip, &render_area, angle, center, flip_state);
+    SDL_RenderCopyEx(g_ptr_renderer, m_texture, ptr_clip, &render_area, angle, center, flip_state);
     // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
     //Third parameter is portion of texture to crop
     //Fourth parameter is portion of target to copy into
@@ -256,9 +256,9 @@ MouseButton::MouseButton()
     
 }
 
-void MouseButton::handle_mouse_event (SDL_Event* event)
+void MouseButton::handle_mouse_event (SDL_Event* ptr_event)
 {
-    if ((event->type == SDL_MOUSEBUTTONDOWN) || (event->type == SDL_MOUSEBUTTONUP) || (event->type == SDL_MOUSEMOTION))
+    if ((ptr_event->type == SDL_MOUSEBUTTONDOWN) || (ptr_event->type == SDL_MOUSEBUTTONUP) || (ptr_event->type == SDL_MOUSEMOTION))
     {
         m_current_clip = MOUSE_CLIP_OUT;
         
@@ -290,7 +290,7 @@ void MouseButton::handle_mouse_event (SDL_Event* event)
         {
             m_current_clip = MOUSE_CLIP_OVER;
             
-            switch (event->type)
+            switch (ptr_event->type)
             {
                     
                 case SDL_MOUSEBUTTONDOWN:
@@ -334,19 +334,19 @@ void MouseButton::set_height(int height)
 void MouseButton::render_button()
 
 {
-    buttons_texture.set_color_mod(0xFF, 0xFF, 0xFF);
+    buttons_sprite.set_color_mod(0xFF, 0xFF, 0xFF);
     if (m_current_clip == 4)
     {
-        buttons_texture.set_color_mod(0x00, 0x60, 0x00);
+        buttons_sprite.set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
     if (m_current_clip == 5) 
     {
-        buttons_texture.set_color_mod(0x00, 0x60, 0x00);
+        buttons_sprite.set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
 
-    buttons_texture.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+    buttons_sprite.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
 }
 int MouseButton::get_current_clip()
 {
@@ -378,7 +378,7 @@ bool init()
         
         else
         {
-            g_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+            g_ptr_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
             
             if (TTF_Init() == -1)
             {
@@ -387,7 +387,7 @@ bool init()
             else
             {
                 
-                if (g_window == NULL)
+                if (g_ptr_window == nullptr)
                     
                 {
                     success = false;
@@ -412,7 +412,7 @@ bool init()
                      {
                      my_surface = SDL_GetWindowSurface(my_window);
                      
-                     if (my_surface == NULL)
+                     if (my_surface == nullptr)
                      {
                      printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
                      }
@@ -421,9 +421,9 @@ bool init()
                     else
                         
                     {
-                        g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+                        g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
                         
-                        if (g_renderer == NULL)
+                        if (g_ptr_renderer == nullptr)
                             
                         {
                             success = false;
@@ -431,7 +431,7 @@ bool init()
                             
                         }
                         
-                        SDL_SetRenderDrawColor(g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                        SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     }
                 }
             }
@@ -448,7 +448,7 @@ void set_texture_clips()
     g_dot_clips[1] = {100, 0, 100, 100};
     g_dot_clips[2] = {0, 100, 100, 100};
     g_dot_clips[3] = {100, 100, 100, 100};
-    dots_texture.set_blend_mode();
+    dots_sprite.set_blend_mode();
     
     g_smiles_clips[0] = {40, 90, 65, 65};
     g_smiles_clips[1] = {30, 160, 80, 80};
@@ -477,64 +477,85 @@ void set_texture_clips()
 
 void load_textures(bool& success)
 {
-    if (!default_texture.load_from_file("press.bmp"))
+    if (!default_texture.load_from_file("Images/press.bmp"))
     {
         success = false;
-        printf("Failed to load default image");
+        printf("Failed to load default image\n");
     }
     
-    if (!up_texture.load_from_file("up.bmp"))
+    if (!up_texture.load_from_file("Images/up.bmp"))
     {
         success = false;
-        printf("Failed to load up image");
+        printf("Failed to load up image\n");
     }
     
-    if (!down_texture.load_from_file("down.bmp"))
+    if (!down_texture.load_from_file("Images/down.bmp"))
     {
         success = false;
-        printf("Failed to load down image");
+        printf("Failed to load down image\n");
     }
     
-    if (!left_texture.load_from_file("left.bmp"))
+    if (!left_texture.load_from_file("Images/left.bmp"))
     {
         success = false;
-        printf("Failed to load left image");
+        printf("Failed to load left image\n");
     }
     
-    if (!right_texture.load_from_file("right.bmp"))
+    if (!right_texture.load_from_file("Images/right.bmp"))
     {
         success = false;
-        printf("Failed to load right image");
+        printf("Failed to load right image\n");
     }
     
-    if (!dots_texture.load_from_file("dots.png"))
+    if (!dots_sprite.load_from_file("Images/dots.png"))
     {
         success = false;
-        printf("Failed to load dots image");
+        printf("Failed to load dots image\n");
     }
         
-    if (!arrow_texture.load_from_file("arrow.png"))
+    if (!arrow_sprite.load_from_file("Images/arrow.png"))
     {
         success = false;
-        printf("Failed to load dots image");
+        printf("Failed to load dots image\n");
     }
-    if (!smiles_texture.load_from_file("smiles.png"))
+    if (!smiles_sprite.load_from_file("Images/smiles.png"))
 
     {
         success = false;
-        printf("Failed to load dots image");
+        printf("Failed to load dots image\n");
     }
-    if (!stick_figure_backflip_texture.load_from_file("stick_figure_backflip2.png"))
+    if (!stick_figure_backflips_sprite.load_from_file("Images/stick_figure_backflip2.png"))
     {
         success = false;
-        printf("Failed to load stick figure backflip image");
+        printf("Failed to load stick figure backflip image\n");
     }
-    if (!buttons_texture.load_from_file("press_location.png"))
+    if (!buttons_sprite.load_from_file("Images/buttons.png"))
     {
         success = false;
-        printf("Failed to load press location image");
+        printf("Failed to load buttons image\n");
     }
     
+}
+
+void load_fonts(bool& success)
+{
+    g_ptr_font = TTF_OpenFont("Fonts/Arial.ttf", 20);
+   
+    if (g_ptr_font == nullptr)
+    {
+        success = false;
+        printf("Failed to load font from font file\n");
+        
+    }
+    
+    SDL_Color text_color = {0x50, 0x00, 0x00};
+    
+    if (!font_texture.load_from_font_file("Move over buttons to change color!", text_color))
+    {
+        success = false;
+        printf("Failed to load fonts texture\n");
+    }
+
 }
 
 void initialize_buttons()
@@ -551,26 +572,6 @@ void initialize_buttons()
      
 }
 
-void load_fonts(bool& success)
-{
-    g_font = TTF_OpenFont("Arial.ttf", 20);
-   
-    if (g_font == nullptr)
-    {
-        success = false;
-        printf("Failed to load font from font file");
-        
-    }
-    
-    SDL_Color text_color = {0x50, 0x00, 0x00};
-    
-    if (!font_texture.load_from_font_file("Move over buttons to change color!", text_color))
-    {
-        success = false;
-        printf("Failed to load fonts texture");
-    }
-
-}
 
 bool load_media()
 {
@@ -594,19 +595,19 @@ void close()
      down_texture.free();
      left_texture.free();
      right_texture.free();
-     dots_texture.free();
-     smiles_texture.free();
-     arrow_texture.free();
+     dots_sprite.free();
+     smiles_sprite.free();
+     arrow_sprite.free();
      
-     TTF_CloseFont(g_font); //we need to close a font that is opened from TTF_OpenFont
+     TTF_CloseFont(g_ptr_font); //we need to close a font that is opened from TTF_OpenFont
 
     
     // Destroy Windows and Renderer, set pointers to NULL
-    SDL_DestroyWindow(g_window);
+    SDL_DestroyWindow(g_ptr_window);
     //Takes care of destroying my_screen_surface/my_current_texture
-    SDL_DestroyRenderer(g_renderer);
-    g_window = NULL;
-    g_renderer = NULL;
+    SDL_DestroyRenderer(g_ptr_renderer);
+    g_ptr_window = nullptr;
+    g_ptr_renderer = nullptr;
     
     //Just like you initialize them, you have to quit SDL subsystems
     TTF_Quit();
@@ -633,21 +634,14 @@ int main(int argc, char* args[])
            
            bool quit = false; //Main loop flag
            SDL_Event event;
-           current_texture = &default_texture;
-           current_texture = &font_texture;
-           uint8_t red {200};
-           uint8_t green {200};
-           uint8_t blue {200};
-           uint8_t alpha {255};
-           double angle{0};
-           int frame = 0;
-           SDL_RendererFlip flip_state{SDL_FLIP_NONE};
+           ptr_current_texture = &default_texture;
+           ptr_current_texture = &font_texture;
            
            while (quit != true)
               
           {
-              SDL_SetRenderDrawColor(g_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
-              SDL_RenderClear(g_renderer);
+              SDL_SetRenderDrawColor(g_ptr_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+              SDL_RenderClear(g_ptr_renderer);
               
               for (int i = 0; i < 4; i++)
                       
@@ -677,8 +671,8 @@ int main(int argc, char* args[])
                       }
     
               }
-              font_texture.render_texture((SCREEN_WIDTH - current_texture->get_width())/2, (SCREEN_HEIGHT - current_texture->get_height())/2);
-              SDL_RenderPresent(g_renderer);
+              font_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
+              SDL_RenderPresent(g_ptr_renderer);
            }
        }
    }
@@ -1098,4 +1092,12 @@ SDL_RenderPresent(g_renderer);
           
   }
  */
- 
+ /*
+  uint8_t red {200};
+  uint8_t green {200};
+  uint8_t blue {200};
+  uint8_t alpha {255};
+  double angle{0};
+  int frame = 0;
+  SDL_RendererFlip flip_state{SDL_FLIP_NONE};
+  */
