@@ -5,13 +5,17 @@
 //  Created by Ryan Kumar on 22/10/23.
 //
 
-//libraries:
+//SDL libraries:
 #include <SDL2_image/SDL_image.h>
 #include <SDL2/SDL.h>
 #include <SDL2_ttf/SDL_ttf.h>
+#include <SDL2_mixer/SDL_mixer.h>
+
+//C libraries:
 #include <iostream>
 #include <string>
 #include <chrono>
+
 //header files:
 #include "textures.h"
 #include "mouse_button.h"
@@ -22,18 +26,12 @@ static const int SCREEN_HEIGHT = 600;
 static const int SCREEN_DIAGONAL = sqrt((SCREEN_WIDTH*SCREEN_WIDTH) + (SCREEN_HEIGHT*SCREEN_HEIGHT));
 
 SDL_Window* g_ptr_window = nullptr;
-
-//SDL_Window and SDL_Surface are types defined by SDL
-
-SDL_Surface* g_ptr_surface = nullptr;
-SDL_Surface* g_ptr_current_surface_display = nullptr;
-
-// Image that will load is alse of type SDL_Surface, its pointer also needs to be initialized to zero
-
 SDL_Texture* g_ptr_current_texture_display = nullptr;
 SDL_Renderer* g_ptr_renderer = nullptr;
+//Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
+// SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
-//clips definition
+//clips
 SDL_Rect g_dot_clips[4];
 SDL_Rect g_smiles_clips[4];
 SDL_Rect g_stick_figure_clips[3];
@@ -41,12 +39,13 @@ SDL_Rect g_arrow_clip = {15, 15, 26, 54};
 SDL_Rect g_stick_figure_backflip_clips[4];
 SDL_Rect g_button_clips [4];
 
-//font definition
+//fonts
 TTF_Font* g_ptr_font = nullptr;
 
-
-//Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
-// SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
+//chunks and music from SDL mixer
+Mix_Music* g_ptr_background_music = nullptr;
+Mix_Chunk* g_ptr_shuriken_sound = nullptr;
+Mix_Chunk* g_ptr_apple_hit_sound = nullptr;
 
 //Instantiating objects:
 Texture* ptr_current_texture;
@@ -398,40 +397,38 @@ bool init()
                     int sdl_image_flags = IMG_INIT_PNG;
                     // can use | (or bitwise operator) for multiple flags
                     // !(IMG_Init(sdl_image_flags) & sdl_image_flags) is only used to check is Init for PNG failed
+                    
                     if (!(IMG_Init(sdl_image_flags) == sdl_image_flags))
                         
                     {
                         printf("Error initializing SDL_Image. ERROR: %s\n", IMG_GetError());
                         success = false;
                     }
-                    /*
-                     
-                     //When using surfaces instead of textures, we have to also get surface when intializing
-                     
-                     else
-                     {
-                     my_surface = SDL_GetWindowSurface(my_window);
-                     
-                     if (my_surface == nullptr)
-                     {
-                     printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
-                     }
-                     */
                     
                     else
                         
                     {
-                        g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-                        
-                        if (g_ptr_renderer == nullptr)
-                            
+                        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
                         {
-                            success = false;
-                            printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
+                            printf("Error initializing SDL_Mixer. ERROR: %s\n", Mix_GetError());
                             
                         }
                         
-                        SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                        else
+                        {
+                            
+                            g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+                            
+                            if (g_ptr_renderer == nullptr)
+                                
+                            {
+                                success = false;
+                                printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
+                                
+                            }
+                            
+                            SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                        }
                     }
                 }
             }
@@ -558,6 +555,35 @@ void load_fonts(bool& success)
 
 }
 
+void load_audio(bool& success)
+{
+   
+    g_ptr_background_music = Mix_LoadMUS("Audio/background_music.mp3");
+   
+    if (g_ptr_background_music == nullptr)
+    {
+        success = false;
+        printf("Failed to load background music\n");
+    }
+    
+    g_ptr_shuriken_sound = Mix_LoadWAV("Audio/shuriken2.wav");
+    
+    if (g_ptr_shuriken_sound == nullptr)
+    {
+        success = false;
+        printf("Failed to load shuriken audio\n");
+    }
+    g_ptr_apple_hit_sound = Mix_LoadWAV("Audio/apple_hit2.wav");
+    
+    if (g_ptr_apple_hit_sound == nullptr)
+    {
+        success = false;
+        printf("Failed to load apple hit audio\n");
+    }
+    
+    
+}
+
 void initialize_buttons()
 {
     for (int i = 0; i < 4; i++)
@@ -582,6 +608,7 @@ bool load_media()
     load_fonts(success);
     initialize_buttons();
     set_texture_clips();
+    load_audio(success);
     
     return success;
     
@@ -601,6 +628,9 @@ void close()
      
      TTF_CloseFont(g_ptr_font); //we need to close a font that is opened from TTF_OpenFont
 
+    Mix_FreeMusic(g_ptr_background_music);
+    Mix_FreeChunk(g_ptr_shuriken_sound);
+    Mix_FreeChunk(g_ptr_apple_hit_sound);
     
     // Destroy Windows and Renderer, set pointers to NULL
     SDL_DestroyWindow(g_ptr_window);
@@ -611,6 +641,7 @@ void close()
     
     //Just like you initialize them, you have to quit SDL subsystems
     TTF_Quit();
+    Mix_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -646,7 +677,6 @@ int main(int argc, char* args[])
               for (int i = 0; i < 4; i++)
                       
                       {
-                          
                         g_buttons[i].render_button();
                           
                       }
@@ -662,6 +692,33 @@ int main(int argc, char* args[])
                       
                   {
                       quit = true;
+                  }
+                  
+                  if (event.type == SDL_KEYUP)
+                  {
+                      switch (event.key.keysym.sym)
+                      {
+                              
+                          case SDLK_m:
+        
+                              if (Mix_PlayingMusic() == 0) Mix_PlayMusic(g_ptr_background_music, -1);
+                              
+                              else if (Mix_PausedMusic() == 1) Mix_ResumeMusic();
+                              
+                              else Mix_PauseMusic();
+                              
+                              break;
+                              
+                          case SDLK_d:
+                              Mix_PlayChannel(-1, g_ptr_shuriken_sound, 0);
+                              break;
+                              
+                          case SDLK_r:
+                              Mix_PlayChannel(-1, g_ptr_apple_hit_sound, 0);
+                              break;
+            
+                      }
+                      
                   }
                     
                   for (int i = 0; i < 4; i++)
@@ -1101,3 +1158,16 @@ SDL_RenderPresent(g_renderer);
   int frame = 0;
   SDL_RendererFlip flip_state{SDL_FLIP_NONE};
   */
+/*
+ 
+ //When using surfaces instead of textures, we have to also get surface when intializing
+ 
+ else
+ {
+ my_surface = SDL_GetWindowSurface(my_window);
+ 
+ if (my_surface == nullptr)
+ {
+ printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
+ }
+ */
