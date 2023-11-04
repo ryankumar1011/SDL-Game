@@ -18,7 +18,7 @@ public:
     
     bool load_from_file(const std::string& texture_path);
     
-    bool load_from_font_file(const std::string& texture_path, const SDL_Color& text_color);
+    bool load_texture_from_font(TTF_Font* ptr_loaded_font, const std::string& text, const SDL_Color& font_color);
         
     void set_color_mod(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
 
@@ -28,11 +28,7 @@ public:
     
     void set_color_key(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
     
-    void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
-    
-    void free();
-    
-    ~Texture();
+    void set_font_color(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
     
     int get_height();
         
@@ -40,11 +36,20 @@ public:
     
     std::string get_path();
     
+    void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    
+    void free();
+    
+    ~Texture();
+    
+    
 private:
     
-    SDL_Texture* m_texture;
+    SDL_Texture* m_ptr_texture;
     
-    const SDL_PixelFormat* m_format;
+    const SDL_PixelFormat* m_ptr_format;
+    
+    SDL_Color m_font_color;
     
     int m_height;
     

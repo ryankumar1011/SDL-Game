@@ -15,8 +15,10 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <sstream>
 
 //header files:
+#include "function_declarations.h"
 #include "textures.h"
 #include "mouse_button.h"
 #include "timer.h"
@@ -32,15 +34,10 @@ SDL_Renderer* g_ptr_renderer = nullptr;
 // SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
 //clips
-SDL_Rect g_dot_clips[4];
-SDL_Rect g_smiles_clips[4];
-SDL_Rect g_stick_figure_clips[3];
-SDL_Rect g_arrow_clip = {15, 15, 26, 54};
-SDL_Rect g_stick_figure_backflip_clips[4];
 SDL_Rect g_button_clips [4];
 
 //fonts
-TTF_Font* g_ptr_font = nullptr;
+TTF_Font* g_ptr_arial_font = nullptr;
 
 //chunks and music from SDL mixer
 Mix_Music* g_ptr_background_music = nullptr;
@@ -49,17 +46,9 @@ Mix_Chunk* g_ptr_apple_hit_sound = nullptr;
 
 //Instantiating objects:
 Texture* ptr_current_texture;
-Texture default_texture;
-Texture up_texture;
-Texture down_texture;
-Texture left_texture;
-Texture right_texture;
-Texture dots_sprite;
-Texture smiles_sprite;
-Texture arrow_sprite; //for some reason I have drawn the arrow and the first backflip animation in this png file.
-Texture font_texture;
-Texture stick_figure_backflips_sprite;
-Texture buttons_sprite;
+Texture button_sprite_texture;
+Texture text_texture;
+Texture text_time_texture;
 
 MouseButton g_buttons[4];
 
@@ -67,33 +56,35 @@ Texture::Texture()
     {
         m_height = 0;
         m_width = 0;
-        m_texture = nullptr;
+        m_ptr_texture = nullptr;
         m_color_key = 0;
 
     }
 
 bool Texture::load_from_file(const std::string& texture_path)
 {
-        SDL_Texture* ptr_loaded_texture = nullptr;
-        SDL_Surface* ptr_loaded_surface = nullptr;
-        m_texture_path = texture_path;
+    free();
+    
+    SDL_Texture* ptr_loaded_texture = nullptr;
+    SDL_Surface* ptr_loaded_surface = nullptr;
+    m_texture_path = texture_path;
 
         
         // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimized_surface and SDL_ConvertSurface)
         // We still need the file path using this method since we nead to load the surface into memory first
-        ptr_loaded_surface = IMG_Load(m_texture_path.c_str());
+    ptr_loaded_surface = IMG_Load(m_texture_path.c_str());
     
-        if (ptr_loaded_surface == nullptr)
-            {
-                printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", texture_path.c_str(), SDL_GetError(), IMG_GetError());
-  
-            }
+    if (ptr_loaded_surface == nullptr)
+        {
+            printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", texture_path.c_str(), SDL_GetError(), IMG_GetError());
+        }
     
-       else
+    else
        {
-           m_format = (ptr_loaded_surface->format);
+           m_ptr_format = (ptr_loaded_surface->format);
            
-           if (m_color_key == 0) m_color_key = SDL_MapRGB(m_format, 0xFF, 0xFF, 0xFF);
+           if (m_color_key == 0) m_color_key = SDL_MapRGB(m_ptr_format, 0xFF, 0xFF, 0xFF);
+           
            SDL_SetColorKey(ptr_loaded_surface, SDL_TRUE, m_color_key);
            
            //MapRGB generates pixel colour to be made transperent, which is in the format of the used surface
@@ -118,34 +109,34 @@ bool Texture::load_from_file(const std::string& texture_path)
            
         }
 
-    m_texture = ptr_loaded_texture;
+    m_ptr_texture = ptr_loaded_texture;
 
     return (ptr_loaded_texture != nullptr);
                 
 }
 
-bool Texture::load_from_font_file(const std::string& font_path, const SDL_Color& text_color)
+bool Texture::load_texture_from_font(TTF_Font* ptr_loaded_font, const std::string& text, const SDL_Color& font_color)
 {
+    free();
     
     SDL_Surface* ptr_loaded_surface = nullptr;
-    SDL_Texture* ptr_loaded_texture = nullptr;
-    m_texture_path = font_path;
+    SDL_Texture* ptr_font_texture = nullptr;
 
-    ptr_loaded_surface = TTF_RenderText_Blended(g_ptr_font, font_path.c_str(), text_color);
+    ptr_loaded_surface = TTF_RenderText_Blended(ptr_loaded_font, text.c_str(), font_color);
     
     if (ptr_loaded_surface == nullptr)
     {
-        printf("Error loading texture of fontn with path %s. ERROR: %s\n", font_path.c_str(), TTF_GetError());
+        printf("Error loading texture of font with text %s. ERROR: %s\n", text.c_str(), TTF_GetError());
     }
     
     else
     {
-    ptr_loaded_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
+    ptr_font_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
     
-    if (ptr_loaded_texture == nullptr)
+    if (ptr_font_texture == nullptr)
         
     {
-        printf("Error loading texture with path %s, ERROR: %s\n",m_texture_path.c_str(), SDL_GetError());
+        printf("Error loading texture with text %s, ERROR: %s\n", text.c_str(), SDL_GetError());
         
     }
     else
@@ -160,9 +151,10 @@ bool Texture::load_from_font_file(const std::string& font_path, const SDL_Color&
     
  }
 
- m_texture = ptr_loaded_texture;
+ m_ptr_texture = ptr_font_texture;
+ m_font_color = font_color;
 
- return (ptr_loaded_texture != nullptr);
+ return (ptr_font_texture != nullptr);
     
 }
 
@@ -177,9 +169,14 @@ int Texture::get_width()
     
 }
 
+void Texture::set_font_color(const uint8_t &red, const uint8_t &green, const uint8_t &blue)
+{
+    m_font_color = {red, green, blue};
+}
+
 void Texture::set_color_key(const uint8_t &red, const uint8_t &green, const uint8_t &blue)
 {
-    m_color_key = SDL_MapRGB(m_format, red, green, blue);
+    m_color_key = SDL_MapRGB(m_ptr_format, red, green, blue);
     
 }
 
@@ -190,20 +187,20 @@ std::string Texture::get_path()
 
 void Texture::set_color_mod(const uint8_t& red, const uint8_t& green, const uint8_t& blue)
 {
-    SDL_SetTextureColorMod(m_texture, red, green, blue);
+    SDL_SetTextureColorMod(m_ptr_texture, red, green, blue);
     
 }
 
 void Texture::set_alpha_mod(const uint8_t& alpha)
 
 {
-    SDL_SetTextureAlphaMod(m_texture, alpha);
+    SDL_SetTextureAlphaMod(m_ptr_texture, alpha);
 }
 
 void Texture::set_blend_mode(SDL_BlendMode blendmode)
 
 {
-    SDL_SetTextureBlendMode(m_texture, blendmode);
+    SDL_SetTextureBlendMode(m_ptr_texture, blendmode);
 }
 
 void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
@@ -223,7 +220,7 @@ void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL
         render_area = {x, y, ptr_clip->w, ptr_clip->h};
     }
     
-    SDL_RenderCopyEx(g_ptr_renderer, m_texture, ptr_clip, &render_area, angle, center, flip_state);
+    SDL_RenderCopyEx(g_ptr_renderer, m_ptr_texture, ptr_clip, &render_area, angle, center, flip_state);
     // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
     //Third parameter is portion of texture to crop
     //Fourth parameter is portion of target to copy into
@@ -231,8 +228,8 @@ void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL
 
 void Texture::free()
 {
-    m_texture = nullptr;
-    SDL_DestroyTexture(m_texture);
+    SDL_DestroyTexture(m_ptr_texture);
+    m_ptr_texture = nullptr;
     m_width = 0;
     m_height = 0;
     
@@ -303,6 +300,7 @@ void MouseButton::handle_mouse_event (SDL_Event* ptr_event)
                 case SDL_MOUSEMOTION:
                     m_current_clip = MOUSE_CLIP_MOVE_OVER;
                     break;
+                    
                  case SDL_MOUSEWHEEL:
                     m_current_clip = MOUSE_CLIP_SCROLL_OVER;
                     break;
@@ -330,26 +328,39 @@ void MouseButton::set_height(int height)
     m_height = height;
 }
 
-void MouseButton::render_button()
-
+void MouseButton::set_button_sprite_texture(Texture* ptr_button_sprite_texture)
 {
-    buttons_sprite.set_color_mod(0xFF, 0xFF, 0xFF);
-    if (m_current_clip == 4)
-    {
-        buttons_sprite.set_color_mod(0x00, 0x60, 0x00);
-        m_current_clip = MOUSE_CLIP_OVER;
-    }
-    if (m_current_clip == 5) 
-    {
-        buttons_sprite.set_color_mod(0x00, 0x60, 0x00);
-        m_current_clip = MOUSE_CLIP_OVER;
-    }
-
-    buttons_sprite.render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+    m_ptr_button_sprite_texture = ptr_button_sprite_texture;
 }
+
 int MouseButton::get_current_clip()
 {
     return m_current_clip;
+    
+}
+
+void MouseButton::handle_extra_clip_states()
+
+{
+    m_ptr_button_sprite_texture->set_color_mod(0xFF, 0xFF, 0xFF);
+    
+    if (m_current_clip == MOUSE_CLIP_MOVE_OVER)
+    {
+        m_ptr_button_sprite_texture->set_color_mod(0x00, 0x60, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
+    if (m_current_clip == MOUSE_CLIP_SCROLL_OVER)
+    {
+        m_ptr_button_sprite_texture->set_color_mod(0x00, 0x60, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
+
+}
+
+void MouseButton::render_button()
+{
+    handle_extra_clip_states();
+    m_ptr_button_sprite_texture->render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
 }
 
 bool init()
@@ -368,7 +379,7 @@ bool init()
     else
         
     {
-        
+        Mix_Init(MIX_INIT_FLAC|MIX_INIT_MP3);
         if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
             
         {
@@ -438,126 +449,80 @@ bool init()
     return success;
 }
 
-void set_texture_clips()
+bool load_media()
 {
     
-    g_dot_clips[0] = {0, 0, 100, 100};
-    g_dot_clips[1] = {100, 0, 100, 100};
-    g_dot_clips[2] = {0, 100, 100, 100};
-    g_dot_clips[3] = {100, 100, 100, 100};
-    dots_sprite.set_blend_mode();
+    bool success = true;
     
-    g_smiles_clips[0] = {40, 90, 65, 65};
-    g_smiles_clips[1] = {30, 160, 80, 80};
-    g_smiles_clips[2] = {20, 250, 105, 75};
-    g_smiles_clips[3] = {10, 350, 150, 100};
+    if (!load_image_textures()) success = false;
+    if (!load_fonts()) success = false;
+    if (!load_text_textures()) success = false;
+    if (!load_audio()) success = false;
     
-    g_stick_figure_clips[0] = {54, 21, 14, 33};
-    g_stick_figure_clips[1] = {67, 18, 13, 31};
-    g_stick_figure_clips[2] = {78, 19, 22, 26};
+    initialize_media();
     
-    g_arrow_clip = {15, 15, 26, 54};
-    
-    g_stick_figure_backflip_clips[0] = {113, 184, 100, 175};
-    g_stick_figure_backflip_clips[1] = {213, 184, 100, 175};
-    g_stick_figure_backflip_clips[2] = {313, 184, 100, 175};
-    g_stick_figure_backflip_clips[3] = {413, 184, 100, 175};
-    
-    
-    g_button_clips[0] = {0, 0, 300, 300};
-    g_button_clips[1] = {300, 0, 300, 300};
-    g_button_clips[2] = {0, 300, 300, 300};
-    g_button_clips[3] = {300, 300, 300, 300};
-
+    return success;
     
 }
 
-void load_textures(bool& success)
+bool load_image_textures()
 {
-    if (!default_texture.load_from_file("Images/press.bmp"))
-    {
-        success = false;
-        printf("Failed to load default image\n");
-    }
+    bool success = true;
     
-    if (!up_texture.load_from_file("Images/up.bmp"))
-    {
-        success = false;
-        printf("Failed to load up image\n");
-    }
-    
-    if (!down_texture.load_from_file("Images/down.bmp"))
-    {
-        success = false;
-        printf("Failed to load down image\n");
-    }
-    
-    if (!left_texture.load_from_file("Images/left.bmp"))
-    {
-        success = false;
-        printf("Failed to load left image\n");
-    }
-    
-    if (!right_texture.load_from_file("Images/right.bmp"))
-    {
-        success = false;
-        printf("Failed to load right image\n");
-    }
-    
-    if (!dots_sprite.load_from_file("Images/dots.png"))
-    {
-        success = false;
-        printf("Failed to load dots image\n");
-    }
-        
-    if (!arrow_sprite.load_from_file("Images/arrow.png"))
-    {
-        success = false;
-        printf("Failed to load dots image\n");
-    }
-    if (!smiles_sprite.load_from_file("Images/smiles.png"))
-
-    {
-        success = false;
-        printf("Failed to load dots image\n");
-    }
-    if (!stick_figure_backflips_sprite.load_from_file("Images/stick_figure_backflip2.png"))
-    {
-        success = false;
-        printf("Failed to load stick figure backflip image\n");
-    }
-    if (!buttons_sprite.load_from_file("Images/buttons.png"))
+    if (!button_sprite_texture.load_from_file("Images/buttons.png"))
     {
         success = false;
         printf("Failed to load buttons image\n");
     }
     
+    return success;
 }
 
-void load_fonts(bool& success)
+bool load_fonts()
 {
-    g_ptr_font = TTF_OpenFont("Fonts/Arial.ttf", 20);
-   
-    if (g_ptr_font == nullptr)
+    bool success = true;
+    
+    g_ptr_arial_font = load_font_from_file("Fonts/Arial.ttf", 20);
+    
+    if (g_ptr_arial_font == nullptr) success = false;
+    
+    return success;
+
+}
+
+TTF_Font* load_font_from_file(const std::string& font_path, int font_size)
+{
+    
+    TTF_Font* ptr_font;
+    
+    ptr_font = (TTF_OpenFont(font_path.c_str(), font_size));
+    
+    if (ptr_font == nullptr)
     {
-        success = false;
-        printf("Failed to load font from font file\n");
+        printf("Failed to load font from font file with font_path %s\n", font_path.c_str());
         
     }
     
-    SDL_Color text_color = {0x50, 0x00, 0x00};
+    return ptr_font;
     
-    if (!font_texture.load_from_font_file("Move over buttons to change color!", text_color))
-    {
-        success = false;
-        printf("Failed to load fonts texture\n");
-    }
-
 }
 
-void load_audio(bool& success)
+bool load_text_textures()
 {
-   
+    bool success = true;
+    
+    SDL_Color text_color = {0x50, 0x00, 0x00};
+    
+    if (!text_texture.load_texture_from_font(g_ptr_arial_font, "Move over buttons to change color!", text_color)) success = false;
+    
+    return success;
+    
+}
+
+bool load_audio()
+{
+    bool success = true;
+    
     g_ptr_background_music = Mix_LoadMUS("Audio/background_music.mp3");
    
     if (g_ptr_background_music == nullptr)
@@ -581,13 +546,20 @@ void load_audio(bool& success)
         printf("Failed to load apple hit audio\n");
     }
     
-    
+    return success;
 }
 
-void initialize_buttons()
+void initialize_media()
+{
+    set_up_buttons();
+    set_texture_clips();
+}
+
+void set_up_buttons()
 {
     for (int i = 0; i < 4; i++)
     {
+       g_buttons[i].set_button_sprite_texture(&button_sprite_texture);
        g_buttons[i].set_width(300);
        g_buttons[i].set_height(300);
     }
@@ -598,35 +570,24 @@ void initialize_buttons()
      
 }
 
-
-bool load_media()
+void set_texture_clips()
 {
-    
-    bool success = true;
-    
-    load_textures(success);
-    load_fonts(success);
-    initialize_buttons();
-    set_texture_clips();
-    load_audio(success);
-    
-    return success;
+    g_button_clips[0] = {0, 0, 300, 300};
+    g_button_clips[1] = {300, 0, 300, 300};
+    g_button_clips[2] = {0, 300, 300, 300};
+    g_button_clips[3] = {300, 300, 300, 300};
     
 }
 
 void close()
 {
     // Destroyed all LOADED surfaces and textures
-     default_texture.free();
-     up_texture.free();
-     down_texture.free();
-     left_texture.free();
-     right_texture.free();
-     dots_sprite.free();
-     smiles_sprite.free();
-     arrow_sprite.free();
+    
+    button_sprite_texture.free();
+    text_texture.free();
+    text_time_texture.free();
      
-     TTF_CloseFont(g_ptr_font); //we need to close a font that is opened from TTF_OpenFont
+    TTF_CloseFont(g_ptr_arial_font); //we need to close a font that is opened from TTF_OpenFont
 
     Mix_FreeMusic(g_ptr_background_music);
     Mix_FreeChunk(g_ptr_shuriken_sound);
@@ -665,29 +626,15 @@ int main(int argc, char* args[])
            
            bool quit = false; //Main loop flag
            SDL_Event event;
-           ptr_current_texture = &default_texture;
-           ptr_current_texture = &font_texture;
-           
+           ptr_current_texture = &text_texture;
+           uint64_t time_after_last_reset {0};
+           std::stringstream time_to_print;
            while (quit != true)
               
           {
-              SDL_SetRenderDrawColor(g_ptr_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
-              SDL_RenderClear(g_ptr_renderer);
-              
-              for (int i = 0; i < 4; i++)
-                      
-                      {
-                        g_buttons[i].render_button();
-                          
-                      }
-
               while (SDL_PollEvent(&event) != 0)
                   {
-                      
-                      //auto end = std::chrono::high_resolution_clock::now();
-                      //std::chrono::duration<float> duration = end - start;
-                     // if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
-                  
+        
                   if (event.type == SDL_QUIT)
                       
                   {
@@ -713,10 +660,13 @@ int main(int argc, char* args[])
                               Mix_PlayChannel(-1, g_ptr_shuriken_sound, 0);
                               break;
                               
-                          case SDLK_r:
+                          case SDLK_f:
                               Mix_PlayChannel(-1, g_ptr_apple_hit_sound, 0);
                               break;
-            
+                              
+                          case SDLK_r:
+                              time_after_last_reset = SDL_GetTicks64();
+                              break;
                       }
                       
                   }
@@ -728,7 +678,28 @@ int main(int argc, char* args[])
                       }
     
               }
-              font_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
+              
+              SDL_SetRenderDrawColor(g_ptr_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+              SDL_RenderClear(g_ptr_renderer);
+              
+              for (int i = 0; i < 4; i++)
+                      
+                {
+                    g_buttons[i].render_button();
+                          
+                }
+              
+              text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
+              
+              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
+              
+              time_to_print << "The time is " << (SDL_GetTicks64() - time_after_last_reset);
+              
+              text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+              //.str() here converts copies stringstream into a string object and returns that
+              
+              text_time_texture.render_texture(240, 270);
+              
               SDL_RenderPresent(g_ptr_renderer);
            }
        }
@@ -1170,4 +1141,133 @@ SDL_RenderPresent(g_renderer);
  {
  printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
  }
+ */
+/*
+ Texture default_texture;
+ Texture up_texture;
+ Texture down_texture;
+ Texture left_texture;
+ Texture right_texture;
+ Texture dots_sprite;
+ Texture smiles_sprite;
+ Texture stick_figure_backflips_sprite;
+ Texture arrow_sprite; //for some reason I have drawn the arrow and the first backflip animation in this png file.
+ 
+ if (!default_texture.load_from_file("Images/press.bmp"))
+ {
+     success = false;
+     printf("Failed to load default image\n");
+ }
+ 
+ if (!up_texture.load_from_file("Images/up.bmp"))
+ {
+     success = false;
+     printf("Failed to load up image\n");
+ }
+ 
+ if (!down_texture.load_from_file("Images/down.bmp"))
+ {
+     success = false;
+     printf("Failed to load down image\n");
+ }
+ 
+ if (!left_texture.load_from_file("Images/left.bmp"))
+ {
+     success = false;
+     printf("Failed to load left image\n");
+ }
+ 
+ if (!right_texture.load_from_file("Images/right.bmp"))
+ {
+     success = false;
+     printf("Failed to load right image\n");
+ }
+ 
+ if (!dots_sprite.load_from_file("Images/dots.png"))
+ {
+     success = false;
+     printf("Failed to load dots image\n");
+ }
+     
+ if (!arrow_sprite.load_from_file("Images/arrow.png"))
+ {
+     success = false;
+     printf("Failed to load dots image\n");
+ }
+ if (!smiles_sprite.load_from_file("Images/smiles.png"))
+
+ {
+     success = false;
+     printf("Failed to load dots image\n");
+ }
+ if (!stick_figure_backflips_sprite.load_from_file("Images/stick_figure_backflip2.png"))
+ {
+     success = false;
+     printf("Failed to load stick figure backflip image\n");
+ }
+ 
+default_texture.free();
+up_texture.free();
+down_texture.free();
+left_texture.free();
+right_texture.free();
+dots_sprite.free();
+smiles_sprite.free();
+arrow_sprite.free();
+ 
+ SDL_Rect g_dot_clips[4];
+ SDL_Rect g_smiles_clips[4];
+ SDL_Rect g_stick_figure_clips[3];
+ SDL_Rect g_arrow_clip = {15, 15, 26, 54};
+ SDL_Rect g_stick_figure_backflip_clips[4];
+
+ g_dot_clips[0] = {0, 0, 100, 100};
+ g_dot_clips[1] = {100, 0, 100, 100};
+ g_dot_clips[2] = {0, 100, 100, 100};
+ g_dot_clips[3] = {100, 100, 100, 100};
+ dots_sprite.set_blend_mode();
+
+ g_smiles_clips[0] = {40, 90, 65, 65};
+ g_smiles_clips[1] = {30, 160, 80, 80};
+ g_smiles_clips[2] = {20, 250, 105, 75};
+ g_smiles_clips[3] = {10, 350, 150, 100};
+
+ g_stick_figure_clips[0] = {54, 21, 14, 33};
+ g_stick_figure_clips[1] = {67, 18, 13, 31};
+ g_stick_figure_clips[2] = {78, 19, 22, 26};
+
+ g_arrow_clip = {15, 15, 26, 54};
+
+ g_stick_figure_backflip_clips[0] = {113, 184, 100, 175};
+ g_stick_figure_backflip_clips[1] = {213, 184, 100, 175};
+ g_stick_figure_backflip_clips[2] = {313, 184, 100, 175};
+ g_stick_figure_backflip_clips[3] = {413, 184, 100, 175};
+ */
+
+//auto end = std::chrono::high_resolution_clock::now();
+//std::chrono::duration<float> duration = end - start;
+// if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
+/*
+ #pragma once
+
+ //variables all caps because they store constants
+
+ enum KeyboardEvents
+ {
+     DEFAULT_SURFACE,
+     PRESS_KEYBOARD_UP,
+     PRESS_KEYBOARD_DOWN,
+     PRESS_KEYBOARD_LEFT,
+     PRESS_KEYBOARD_RIGHT,
+     PRESS_KEYBOARD_TOTAL
+     
+ };
+
+ enum FileTypes
+ {
+     TYPE_PNG,
+     TYPE_BMP,
+     TYPE_JPG
+     
+ };
  */

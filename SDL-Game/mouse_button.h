@@ -7,7 +7,7 @@
 
 #pragma once 
 
-enum MouseClipState : unsigned char
+enum MouseClipState
 {
     MOUSE_CLIP_OUT,
     MOUSE_CLIP_OVER,
@@ -25,17 +25,24 @@ class MouseButton
     
     MouseButton();
     
-    void handle_mouse_event (SDL_Event* event);
+    void handle_mouse_event (SDL_Event* ptr_event);
+    
+    void set_button_sprite_texture(Texture* ptr_button_sprite_texture);
+    
+    Texture* get_button_sprite_texture();
     
     void set_position (int x, int y);
-    
-    void render_button();
     
     void set_width(int width);
     
     void set_height(int height);
     
     int get_current_clip();
+    
+    void handle_extra_clip_states();
+    
+    void render_button();
+    
     
     private:
     
@@ -46,6 +53,8 @@ class MouseButton
     SDL_Point m_position;
     
     MouseClipState m_current_clip;
+    
+    Texture* m_ptr_button_sprite_texture;
     
 };
 
