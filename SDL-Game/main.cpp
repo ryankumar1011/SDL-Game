@@ -35,6 +35,7 @@ SDL_Renderer* g_ptr_renderer = nullptr;
 
 //clips
 SDL_Rect g_button_clips [4];
+SDL_Rect g_player_animation_clips[12];
 
 //fonts
 TTF_Font* g_ptr_arial_font = nullptr;
@@ -49,6 +50,7 @@ Texture* ptr_current_texture;
 Texture button_sprite_texture;
 Texture text_texture;
 Texture text_time_texture;
+Texture animation_sprite_texture;
 
 MouseButton g_buttons[4];
 
@@ -206,7 +208,9 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
 void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
     SDL_Rect render_area;
-   
+    int max_width {200}; //used to center animation frame
+    int max_height {200}; // used to center animation frame
+    
     if (ptr_clip == nullptr)
         
     {
@@ -217,7 +221,8 @@ void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL
     
     else
     {
-        render_area = {x, y, ptr_clip->w, ptr_clip->h};
+        
+        render_area = {x + (max_width - (ptr_clip->w))/2, y + (max_height - (ptr_clip->h))/2, ptr_clip->w, ptr_clip->h};
     }
     
     SDL_RenderCopyEx(g_ptr_renderer, m_ptr_texture, ptr_clip, &render_area, angle, center, flip_state);
@@ -474,6 +479,11 @@ bool load_image_textures()
         success = false;
         printf("Failed to load buttons image\n");
     }
+    if (!animation_sprite_texture.load_from_file("Player_animations/player_animations2.png"))
+    {
+        success = false;
+        printf("Failed to load buttons image\n");
+    }
     
     return success;
 }
@@ -577,6 +587,22 @@ void set_texture_clips()
     g_button_clips[2] = {0, 300, 300, 300};
     g_button_clips[3] = {300, 300, 300, 300};
     
+    g_player_animation_clips[0] = {19, 18, 108-19, 150-18};
+    g_player_animation_clips[1] = {120, 19, 193-120, 150-19};
+    g_player_animation_clips[2] = {216, 20, 283-216, 150-20};
+    g_player_animation_clips[3] = {317, 22, 377-317, 151-22};
+    g_player_animation_clips[4] = {405, 21, 459-405, 153-21};
+    g_player_animation_clips[5] = {488, 22, 533-488, 151-22};
+    
+    g_player_animation_clips[6] = {94, 167, 147-94, 298-167};
+    g_player_animation_clips[7] = {176, 166, 238-176, 296-166};
+    g_player_animation_clips[8] = {263, 167, 339-263, 297-167};
+    g_player_animation_clips[9] = {345, 167, 426-345, 297-167};
+    g_player_animation_clips[10] = {435, 168, 531-435, 298-168};
+    g_player_animation_clips[11] = {26, 303, 129-26, 434-303};
+    
+    
+    
 }
 
 void close()
@@ -629,6 +655,8 @@ int main(int argc, char* args[])
            ptr_current_texture = &text_texture;
            uint64_t time_after_last_reset {0};
            std::stringstream time_to_print;
+           int frame{0};
+           SDL_Rect* current_clip = nullptr;
            while (quit != true)
               
           {
@@ -679,16 +707,30 @@ int main(int argc, char* args[])
     
               }
               
-              SDL_SetRenderDrawColor(g_ptr_renderer, 0x2F, 0xFF, 0xFF, 0xFF);
+              SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(g_ptr_renderer);
               
+              /*
               for (int i = 0; i < 4; i++)
                       
                 {
                     g_buttons[i].render_button();
                           
                 }
+               */
+             
+              if (frame/10 < 11)
+              {
+                  current_clip = &g_player_animation_clips[frame / 10];
+                  animation_sprite_texture.render_texture(100, 300, current_clip);
+                  animation_sprite_texture.render_texture(300, 300, current_clip, NULL, NULL, SDL_FLIP_HORIZONTAL);
+              }
               
+              frame ++;
+              if (frame/10 > 11) frame = 0;
+              
+              
+              /*
               text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
               
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
@@ -699,7 +741,7 @@ int main(int argc, char* args[])
               //.str() here converts copies stringstream into a string object and returns that
               
               text_time_texture.render_texture(240, 270);
-              
+              */
               SDL_RenderPresent(g_ptr_renderer);
            }
        }
