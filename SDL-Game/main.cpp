@@ -733,12 +733,16 @@ int main(int argc, char* args[])
            bool quit = false; //Main loop flag
            SDL_Event event;
            ptr_current_texture = &text_texture;
-           uint64_t time_after_last_reset {0};
+           //uint64_t time_after_last_reset {0};
            std::stringstream time_to_print;
            int frame{0};
            SDL_Rect* current_clip = nullptr;
+           double change_in_time{};
+           double previous_time{};
+           int frame_rate {};
            SDLTimer game_timer;
            game_timer.start();
+           
            while (quit != true)
               
           {
@@ -799,44 +803,36 @@ int main(int argc, char* args[])
               SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(g_ptr_renderer);
               
-              /*
-              for (int i = 0; i < 4; i++)
-                      
-                {
-                    g_buttons[i].render_button();
-                          
-                }
-               */
-              /*
-              text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
               
-              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
+              change_in_time = (game_timer.get_time_since_start()/1000.0f) - previous_time;
+              previous_time = (game_timer.get_time_since_start()/1000.0f);
+              frame_rate = 1.0/change_in_time;
+              if (frame_rate > 100000) frame_rate = 0;
               
-              time_to_print << "The time is " << (SDL_GetTicks64() - time_after_last_reset);
-              
-              text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
-              //.str() here converts copies stringstream into a string object and returns that
-              
-              text_time_texture.render_texture(240, 270);
-              */
+              if (frame_rate > 30)
+              {
+                  
+              }
              
               current_clip = &g_player_animation_clips[frame / 5];
               animation_sprite_texture.render_texture(100, 300, current_clip);
               animation_sprite_texture.render_texture(300, 300, current_clip, NULL, NULL, SDL_FLIP_HORIZONTAL);
               
-              frame ++;
-              if (frame/5 > 11) frame = 0;
-              
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
               
-              time_to_print << "The current time in seconds is " << game_timer.get_time_since_start()/1000.0f;
               
-              text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
-              //.str() here converts copies stringstream into a string object and returns that
-              
-              text_time_texture.render_texture(140, 270);
+              time_to_print << "The current frame rate is " << frame_rate;
+              if (frame == 55)
+              {
+                  text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+                  //.str() here converts copies stringstream into a string object and returns that
+              }
+              text_time_texture.render_texture(160, 270);
               
               SDL_RenderPresent(g_ptr_renderer);
+              
+              frame ++;
+              if (frame/5 > 11) frame = 0;
            }
        }
    }
@@ -1406,4 +1402,32 @@ arrow_sprite.free();
      TYPE_JPG
      
  };
+ */
+/*
+for (int i = 0; i < 4; i++)
+        
+  {
+      g_buttons[i].render_button();
+            
+  }
+ */
+/*
+text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
+
+time_to_print.str(""); //.str() discards previous content of stream and places new as ""
+
+time_to_print << "The time is " << (SDL_GetTicks64() - time_after_last_reset);
+
+text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+//.str() here converts copies stringstream into a string object and returns that
+
+text_time_texture.render_texture(240, 270);
+*/
+/*
+ *
+ if (frame_rate > 30)
+ {
+     time_to_wait = (1000.0/30.0) - (change_in_time*1000.0f);
+     SDL_Delay(time_to_wait);
+ }
  */
