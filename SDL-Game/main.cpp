@@ -21,7 +21,7 @@
 #include "function_declarations.h"
 #include "textures.h"
 #include "mouse_button.h"
-#include "timer.h"
+#include "timers.h"
 
 static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
@@ -368,6 +368,86 @@ void MouseButton::render_button()
     m_ptr_button_sprite_texture->render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
 }
 
+SDLTimer::SDLTimer()
+{
+    m_start_ticks = 0;
+    m_paused_ticks = 0;
+    m_is_started = false;
+    m_is_paused = false;
+    
+}
+void SDLTimer::start()
+{
+    m_is_started = true;
+    m_is_paused = false;
+    
+    m_start_ticks = SDL_GetTicks64();
+    m_paused_ticks = 0;
+    
+}
+
+void SDLTimer::pause()
+
+{
+    if (m_is_started && !(m_is_paused))
+    {
+        m_is_paused = true;
+        m_paused_ticks = SDL_GetTicks64() - m_start_ticks;
+        m_start_ticks = 0;
+    }
+}
+
+void SDLTimer::unpause()
+
+{
+    if (m_is_started && m_is_paused)
+    {
+        m_is_paused = false;
+        m_start_ticks = SDL_GetTicks64() - m_paused_ticks;
+        m_paused_ticks = 0;
+        
+    }
+    
+}
+void SDLTimer::stop()
+{
+    m_is_started = false;
+    m_is_paused = false;
+    
+    m_start_ticks = 0;
+    m_paused_ticks = 0;
+    
+}
+
+bool SDLTimer::is_paused()
+{
+    return m_is_paused;
+}
+
+bool SDLTimer::is_started()
+{
+    return m_is_started;
+}
+
+uint64_t SDLTimer::get_time_since_start() // this will get time since of program minus time since start
+{
+    if (is_started())
+    {
+        if (is_paused()) return m_paused_ticks;
+        else return SDL_GetTicks64() - m_start_ticks;
+    }
+    
+    return 0;
+}
+SDLTimer::~SDLTimer()
+{
+    m_start_ticks = 0;
+    m_paused_ticks = 0;
+    m_is_started = false;
+    m_is_paused = false;
+    
+}
+
 bool init()
 {
     
@@ -657,6 +737,8 @@ int main(int argc, char* args[])
            std::stringstream time_to_print;
            int frame{0};
            SDL_Rect* current_clip = nullptr;
+           SDLTimer game_timer;
+           game_timer.start();
            while (quit != true)
               
           {
@@ -693,8 +775,15 @@ int main(int argc, char* args[])
                               break;
                               
                           case SDLK_r:
-                              time_after_last_reset = SDL_GetTicks64();
+                              if (game_timer.is_started()) game_timer.stop();
+                              game_timer.start();
                               break;
+                              
+                          case SDLK_p:
+                              if (game_timer.is_paused()) game_timer.unpause();
+                              else game_timer.pause();
+                              break;
+                              
                       }
                       
                   }
@@ -718,18 +807,6 @@ int main(int argc, char* args[])
                           
                 }
                */
-             
-              if (frame/10 < 11)
-              {
-                  current_clip = &g_player_animation_clips[frame / 10];
-                  animation_sprite_texture.render_texture(100, 300, current_clip);
-                  animation_sprite_texture.render_texture(300, 300, current_clip, NULL, NULL, SDL_FLIP_HORIZONTAL);
-              }
-              
-              frame ++;
-              if (frame/10 > 11) frame = 0;
-              
-              
               /*
               text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
               
@@ -742,6 +819,23 @@ int main(int argc, char* args[])
               
               text_time_texture.render_texture(240, 270);
               */
+             
+              current_clip = &g_player_animation_clips[frame / 5];
+              animation_sprite_texture.render_texture(100, 300, current_clip);
+              animation_sprite_texture.render_texture(300, 300, current_clip, NULL, NULL, SDL_FLIP_HORIZONTAL);
+              
+              frame ++;
+              if (frame/5 > 11) frame = 0;
+              
+              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
+              
+              time_to_print << "The current time in seconds is " << game_timer.get_time_since_start()/1000.0f;
+              
+              text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+              //.str() here converts copies stringstream into a string object and returns that
+              
+              text_time_texture.render_texture(140, 270);
+              
               SDL_RenderPresent(g_ptr_renderer);
            }
        }
