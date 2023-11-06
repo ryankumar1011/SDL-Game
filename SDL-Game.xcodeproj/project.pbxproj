@@ -31,6 +31,7 @@
 		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
 		0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
+		0E964C0E2AF861F7003AA09E /* weapons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = weapons.h; sourceTree = "<group>"; };
 		0EAA2BA92AE5334B0034B5E8 /* SDL-Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "SDL-Game"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EAA2BAC2AE5334B0034B5E8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0EAA2BB42AE533760034B5E8 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
@@ -76,6 +77,7 @@
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
 				0EE4F58E2AEAB5880069B47C /* textures.h */,
+				0E964C0E2AF861F7003AA09E /* weapons.h */,
 				0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */,
 				0E3ACE7D2AF2FCF100F702CD /* timers.h */,
 				0E0D194E2AF5FA38000C5DAA /* function_declarations.h */,

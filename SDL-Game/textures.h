@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
-
 class Texture
 {
+    
 public:
 
     Texture();
@@ -33,10 +31,16 @@ public:
     int get_height();
         
     int get_width();
+   
+    void set_width(int width);
+    
+    void set_height(int height);
+    
+    void set_flip_state(SDL_RendererFlip flip_state);
     
     std::string get_path();
     
-    void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, int buffer_dim = 0, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
     
     void free();
     

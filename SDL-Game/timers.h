@@ -10,31 +10,43 @@
 
 class SDLTimer
 {
-    public:
+    
+public:
+    
     SDLTimer();
+    
     void start();
+    
     void pause();
+    
     void unpause();
+    
     void stop();
-    uint64_t get_time_since_start(); // this will get time since of program minus time since start
+    
+    uint64_t get_time(); // this will get time since of program minus time since start
+    
     bool is_paused();
+    
     bool is_started();
+    
     ~SDLTimer();
     
 private:
+    
     uint64_t m_start_ticks;
+    
     uint64_t m_paused_ticks; // this is the different between time of program and time since start when paused
+    
     bool m_is_paused;
+    
     bool m_is_started;
-
 };
 
 struct ChronoTimer
 {
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
-    std::chrono::duration<float> duration;
-    int timer_number;
-
+   
+public:
+    
     ChronoTimer(int number)
     {
         start = std::chrono::high_resolution_clock::now();
@@ -49,6 +61,14 @@ struct ChronoTimer
         std::cout << "Time for timer number" << timer_number << " is " << duration.count()*1'000'000'000 << "ns\n";
         
     }
+    
+public:
+    
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    
+    std::chrono::duration<float> duration;
+    
+    int timer_number{};
 };
 
 

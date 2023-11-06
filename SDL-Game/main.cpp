@@ -22,6 +22,7 @@
 #include "textures.h"
 #include "mouse_button.h"
 #include "timers.h"
+#include "weapons.h"
 
 static const int SCREEN_WIDTH = 600;
 static const int SCREEN_HEIGHT = 600;
@@ -49,8 +50,9 @@ Mix_Chunk* g_ptr_apple_hit_sound = nullptr;
 Texture* ptr_current_texture;
 Texture button_sprite_texture;
 Texture text_texture;
-Texture text_time_texture;
+Texture text_frame_rate_texture;
 Texture animation_sprite_texture;
+Texture kunai_texture;
 
 MouseButton g_buttons[4];
 
@@ -170,6 +172,16 @@ int Texture::get_width()
   return m_width;
     
 }
+void Texture::set_height(int height)
+{
+   m_height = height;
+}
+
+void Texture::set_width(int width)
+{
+   m_width = width;
+    
+}
 
 void Texture::set_font_color(const uint8_t &red, const uint8_t &green, const uint8_t &blue)
 {
@@ -205,26 +217,21 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
     SDL_SetTextureBlendMode(m_ptr_texture, blendmode);
 }
 
-void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+
+void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, int buffer_dim, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
 {
-    SDL_Rect render_area;
-    int max_width {200}; //used to center animation frame
-    int max_height {200}; // used to center animation frame
+    int max_width {buffer_dim}; // used to center texture (necessary for animation)
+    int max_height {buffer_dim}; // used to center texture (necessary for animation)
     
-    if (ptr_clip == nullptr)
-        
+    SDL_Rect render_area{};
+    
+    if (ptr_clip != nullptr)
     {
-        render_area = {x, y, m_width, m_height};
-       // SDL_RenderCopy(my_renderer, m_texture, NULL, &render_area);
-        
+        if (buffer_dim == 0) render_area = {x, y, ptr_clip->w, ptr_clip->h};
+        else render_area = {x + (max_width - (ptr_clip->w))/2, y + (max_height - (ptr_clip->h))/2, ptr_clip->w, ptr_clip->h};
     }
-    
-    else
-    {
-        
-        render_area = {x + (max_width - (ptr_clip->w))/2, y + (max_height - (ptr_clip->h))/2, ptr_clip->w, ptr_clip->h};
-    }
-    
+    else render_area = {x, y, m_width, m_height};
+
     SDL_RenderCopyEx(g_ptr_renderer, m_ptr_texture, ptr_clip, &render_area, angle, center, flip_state);
     // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
     //Third parameter is portion of texture to crop
@@ -257,9 +264,9 @@ MouseButton::MouseButton()
     
 }
 
-void MouseButton::handle_mouse_event (SDL_Event* ptr_event)
+void MouseButton::handle_mouse_event (SDL_Event& event)
 {
-    if ((ptr_event->type == SDL_MOUSEBUTTONDOWN) || (ptr_event->type == SDL_MOUSEBUTTONUP) || (ptr_event->type == SDL_MOUSEMOTION))
+    if ((event.type == SDL_MOUSEBUTTONDOWN) || (event.type == SDL_MOUSEBUTTONUP) || (event.type == SDL_MOUSEMOTION))
     {
         m_current_clip = MOUSE_CLIP_OUT;
         
@@ -291,7 +298,7 @@ void MouseButton::handle_mouse_event (SDL_Event* ptr_event)
         {
             m_current_clip = MOUSE_CLIP_OVER;
             
-            switch (ptr_event->type)
+            switch (event.type)
             {
                     
                 case SDL_MOUSEBUTTONDOWN:
@@ -429,7 +436,7 @@ bool SDLTimer::is_started()
     return m_is_started;
 }
 
-uint64_t SDLTimer::get_time_since_start() // this will get time since of program minus time since start
+uint64_t SDLTimer::get_time() // this will get time since of program minus time since start
 {
     if (is_started())
     {
@@ -439,6 +446,7 @@ uint64_t SDLTimer::get_time_since_start() // this will get time since of program
     
     return 0;
 }
+
 SDLTimer::~SDLTimer()
 {
     m_start_ticks = 0;
@@ -446,6 +454,43 @@ SDLTimer::~SDLTimer()
     m_is_started = false;
     m_is_paused = false;
     
+}
+
+Kunai::Kunai()
+{
+    m_position_x = 0;
+    m_position_y = 0;
+    m_velocity_x = 5;
+    m_velocity_y = 0;
+    
+}
+
+void Kunai::handle_event(SDL_Event& event)
+{
+    
+}
+void Kunai::set_position(int x, int y)
+{
+    m_position_x = x;
+    m_position_y = y;
+}
+
+void Kunai::update_position()
+{
+    m_position_x += m_velocity_x;
+    m_position_y += m_velocity_y;
+    if (((m_position_x + kunai_texture.get_width()) > SCREEN_WIDTH) || (m_position_x < 0))
+    {
+        m_position_x -= m_velocity_x;
+        m_velocity_x = -m_velocity_x;
+        (m_flip_state == SDL_FLIP_NONE) ? m_flip_state = SDL_FLIP_HORIZONTAL : m_flip_state = SDL_FLIP_NONE;
+    }
+    
+}
+
+void Kunai::render()
+{
+    kunai_texture.render_texture(m_position_x, m_position_y, nullptr, 0, 0 , nullptr, m_flip_state);
 }
 
 bool init()
@@ -513,8 +558,8 @@ bool init()
                         else
                         {
                             
-                            g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-                            
+                            g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED);
+                            //SDL_RENDERER_PRESENTVSYNC
                             if (g_ptr_renderer == nullptr)
                                 
                             {
@@ -562,7 +607,12 @@ bool load_image_textures()
     if (!animation_sprite_texture.load_from_file("Player_animations/player_animations2.png"))
     {
         success = false;
-        printf("Failed to load buttons image\n");
+        printf("Failed to load player animations sprite\n");
+    }
+    if (!kunai_texture.load_from_file("Weapons/kunai.png"))
+    {
+        success = false;
+        printf("Failed to load kunai image\n");
     }
     
     return success;
@@ -643,6 +693,7 @@ void initialize_media()
 {
     set_up_buttons();
     set_texture_clips();
+    set_texture_size();
 }
 
 void set_up_buttons()
@@ -681,7 +732,12 @@ void set_texture_clips()
     g_player_animation_clips[10] = {435, 168, 531-435, 298-168};
     g_player_animation_clips[11] = {26, 303, 129-26, 434-303};
     
-    
+}
+
+void set_texture_size()
+{
+    kunai_texture.set_width(30);
+    kunai_texture.set_height(15);
     
 }
 
@@ -690,8 +746,9 @@ void close()
     // Destroyed all LOADED surfaces and textures
     
     button_sprite_texture.free();
-    text_texture.free();
-    text_time_texture.free();
+    animation_sprite_texture.free();   
+    text_frame_rate_texture.free();
+    kunai_texture.free();
      
     TTF_CloseFont(g_ptr_arial_font); //we need to close a font that is opened from TTF_OpenFont
 
@@ -738,14 +795,20 @@ int main(int argc, char* args[])
            int frame{0};
            SDL_Rect* current_clip = nullptr;
            double change_in_time{};
-           double previous_time{};
+           double previous_time{0};
            int frame_rate {};
            SDLTimer game_timer;
            game_timer.start();
-           
+           SDLTimer cap_timer;
+           const int CAPPED_FRAME_RATE {30};
+           const int MINIMUM_LOOP_TICKS {1000/CAPPED_FRAME_RATE};
+           Kunai starting_kunai;
+           starting_kunai.set_position(10,10);
            while (quit != true)
               
           {
+              cap_timer.start();
+              
               while (SDL_PollEvent(&event) != 0)
                   {
         
@@ -795,7 +858,7 @@ int main(int argc, char* args[])
                   for (int i = 0; i < 4; i++)
                       
                       {
-                          g_buttons[i].handle_mouse_event(&event);
+                          g_buttons[i].handle_mouse_event(event);
                       }
     
               }
@@ -803,36 +866,45 @@ int main(int argc, char* args[])
               SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(g_ptr_renderer);
               
-              
-              change_in_time = (game_timer.get_time_since_start()/1000.0f) - previous_time;
-              previous_time = (game_timer.get_time_since_start()/1000.0f);
-              frame_rate = 1.0/change_in_time;
-              if (frame_rate > 100000) frame_rate = 0;
-              
-              if (frame_rate > 30)
+              if (frame == 0)
               {
-                  
-              }
-             
-              current_clip = &g_player_animation_clips[frame / 5];
-              animation_sprite_texture.render_texture(100, 300, current_clip);
-              animation_sprite_texture.render_texture(300, 300, current_clip, NULL, NULL, SDL_FLIP_HORIZONTAL);
-              
-              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
-              
-              
-              time_to_print << "The current frame rate is " << frame_rate;
-              if (frame == 55)
-              {
-                  text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+                  text_frame_rate_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
                   //.str() here converts copies stringstream into a string object and returns that
               }
-              text_time_texture.render_texture(160, 270);
+              
+              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
+              time_to_print << "The current frame rate is " << frame_rate;
+              
+              if (frame == 0)
+              {
+                  text_frame_rate_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+                  //.str() here converts copies stringstream into a string object and returns that
+              }
+              
+              text_frame_rate_texture.render_texture(160, 270);
+              
+              current_clip = &g_player_animation_clips[frame / 5];
+              animation_sprite_texture.render_texture(100, 300, current_clip, 200);
+              animation_sprite_texture.render_texture(300, 300, current_clip, 200, 0, nullptr, SDL_FLIP_HORIZONTAL);
+              
+              starting_kunai.update_position();
+              starting_kunai.render();
               
               SDL_RenderPresent(g_ptr_renderer);
               
               frame ++;
               if (frame/5 > 11) frame = 0;
+              
+              change_in_time = (game_timer.get_time()/1000.0f) - previous_time;
+              previous_time = (game_timer.get_time()/1000.0f);
+              frame_rate = 1.0/change_in_time;
+              if (frame_rate > 100000) frame_rate = 0;
+              
+              if (cap_timer.get_time() < MINIMUM_LOOP_TICKS)
+              {
+                  SDL_Delay((MINIMUM_LOOP_TICKS - cap_timer.get_time()));
+              }
+              
            }
        }
    }
@@ -1424,7 +1496,6 @@ text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), 
 text_time_texture.render_texture(240, 270);
 */
 /*
- *
  if (frame_rate > 30)
  {
      time_to_wait = (1000.0/30.0) - (change_in_time*1000.0f);

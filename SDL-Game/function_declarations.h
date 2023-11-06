@@ -17,4 +17,5 @@ bool load_audio();
 void initialize_media();
 void set_up_buttons();
 void set_texture_clips();
+void set_texture_size();
 void close();

@@ -21,11 +21,12 @@ enum MouseClipState
 
 class MouseButton
 {
-    public:
+
+public:
     
     MouseButton();
     
-    void handle_mouse_event (SDL_Event* ptr_event);
+    void handle_mouse_event (SDL_Event& event);
     
     void set_button_sprite_texture(Texture* ptr_button_sprite_texture);
     
@@ -44,7 +45,7 @@ class MouseButton
     void render_button();
     
     
-    private:
+private:
     
     int m_width;
     
