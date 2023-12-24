@@ -77,8 +77,8 @@
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
 				0EE4F58E2AEAB5880069B47C /* textures.h */,
-				0E964C0E2AF861F7003AA09E /* weapons.h */,
 				0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */,
+				0E964C0E2AF861F7003AA09E /* weapons.h */,
 				0E3ACE7D2AF2FCF100F702CD /* timers.h */,
 				0E0D194E2AF5FA38000C5DAA /* function_declarations.h */,
 			);

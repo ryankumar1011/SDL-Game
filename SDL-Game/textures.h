@@ -14,9 +14,11 @@ public:
 
     Texture();
     
+    
     bool load_from_file(const std::string& texture_path);
     
-    bool load_texture_from_font(TTF_Font* ptr_loaded_font, const std::string& text, const SDL_Color& font_color);
+    bool load_from_font(TTF_Font* ptr_loaded_font, const std::string& text, const SDL_Color& font_color);
+    
         
     void set_color_mod(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
 
@@ -28,30 +30,34 @@ public:
     
     void set_font_color(const uint8_t &red, const uint8_t &green, const uint8_t &blue);
     
-    int get_height();
-        
-    int get_width();
-   
     void set_width(int width);
     
     void set_height(int height);
     
     void set_flip_state(SDL_RendererFlip flip_state);
     
+    
+    int get_height();
+        
+    int get_width();
+   
     std::string get_path();
     
-    void render_texture(int x = 0, int y = 0, SDL_Rect* crop_image = nullptr, int buffer_dim = 0, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    
+    void render_texture(int x = 0, int y = 0, SDL_Rect* p_clip = nullptr, int max_dim = 0, SDL_RendererFlip flip_state = SDL_FLIP_NONE);
+    void render_texture(int x, int y, SDL_Rect* p_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state);
     
     void free();
+    
     
     ~Texture();
     
     
 private:
     
-    SDL_Texture* m_ptr_texture;
+    SDL_Texture* mp_texture;
     
-    const SDL_PixelFormat* m_ptr_format;
+    const SDL_PixelFormat* mp_format;
     
     SDL_Color m_font_color;
     

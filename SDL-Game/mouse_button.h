@@ -28,7 +28,7 @@ public:
     
     void handle_mouse_event (SDL_Event& event);
     
-    void set_button_sprite_texture(Texture* ptr_button_sprite_texture);
+    void set_button_sprite(Texture* p_button_sprite);
     
     Texture* get_button_sprite_texture();
     
@@ -40,7 +40,7 @@ public:
     
     int get_current_clip();
     
-    void handle_extra_clip_states();
+    void handle_extra_states();
     
     void render_button();
     
@@ -55,7 +55,7 @@ private:
     
     MouseClipState m_current_clip;
     
-    Texture* m_ptr_button_sprite_texture;
+    Texture* mp_button_sprite;
     
 };
 

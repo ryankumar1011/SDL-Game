@@ -9,7 +9,6 @@
 
 class Kunai
 {
-
     
 public:
     Kunai();

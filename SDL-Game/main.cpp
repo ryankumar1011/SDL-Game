@@ -24,34 +24,39 @@
 #include "timers.h"
 #include "weapons.h"
 
-static const int SCREEN_WIDTH = 600;
+
+static const int SCREEN_WIDTH = 800;
 static const int SCREEN_HEIGHT = 600;
 static const int SCREEN_DIAGONAL = sqrt((SCREEN_WIDTH*SCREEN_WIDTH) + (SCREEN_HEIGHT*SCREEN_HEIGHT));
 
-SDL_Window* g_ptr_window = nullptr;
-SDL_Texture* g_ptr_current_texture_display = nullptr;
-SDL_Renderer* g_ptr_renderer = nullptr;
-//Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
-// SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
+SDL_Window* gp_window = nullptr;
+SDL_Renderer* gp_renderer = nullptr;
 
-//clips
+//Texture are efficient, driver-specific representation of pixel data. Textures are used during hardware rendering, and are stored in VRAM opposed to regular RAM, accelerating rendering operations using GPU. Meanwhile SDL_Surface is just a struct that contains pixel information.
+
+//SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
+
+
+//Clips
 SDL_Rect g_button_clips [4];
 SDL_Rect g_player_animation_clips[12];
 
-//fonts
-TTF_Font* g_ptr_arial_font = nullptr;
+//Fonts
+TTF_Font* gp_arial_font = nullptr;
 
-//chunks and music from SDL mixer
-Mix_Music* g_ptr_background_music = nullptr;
-Mix_Chunk* g_ptr_shuriken_sound = nullptr;
-Mix_Chunk* g_ptr_apple_hit_sound = nullptr;
+//Chunks and music from SDL mixer
+Mix_Music* gp_background_music = nullptr;
+Mix_Chunk* gp_shuriken_sound = nullptr;
+Mix_Chunk* gp_apple_hit_sound = nullptr;
 
 //Instantiating objects:
-Texture* ptr_current_texture;
-Texture button_sprite_texture;
-Texture text_texture;
-Texture text_frame_rate_texture;
-Texture animation_sprite_texture;
+//Note - suffixes _sprite and _text are used to indicate textures of sprites and textures of texts respectively
+
+Texture* p_current_texture;
+Texture button_sprite;
+Texture button_text;
+Texture frame_rate_text;
+Texture animation_sprite;
 Texture kunai_texture;
 
 MouseButton g_buttons[4];
@@ -60,42 +65,50 @@ Texture::Texture()
     {
         m_height = 0;
         m_width = 0;
-        m_ptr_texture = nullptr;
         m_color_key = 0;
-
+        mp_texture = nullptr;
     }
 
-bool Texture::load_from_file(const std::string& texture_path)
+bool Texture::load_from_file(const std::string& file_path)
 {
     free();
+    //If the Texture class already stores a loaded texture, this texture should be freed first
     
-    SDL_Texture* ptr_loaded_texture = nullptr;
-    SDL_Surface* ptr_loaded_surface = nullptr;
-    m_texture_path = texture_path;
+    SDL_Texture* p_loaded_texture = nullptr;
+    SDL_Surface* p_loaded_surface = nullptr;
+    m_texture_path = file_path;
 
-        
-        // We first load surface, and then create texture from surface pixels (instead of converting it into display format, which we do with optimized_surface and SDL_ConvertSurface)
-        // We still need the file path using this method since we nead to load the surface into memory first
-    ptr_loaded_surface = IMG_Load(m_texture_path.c_str());
+    //We first load surface, and then create texture from surface pixels
+    //If we use surfaces, we would then convert them to display format using: optimized_surface = SDL_ConvertSurface(loaded_surface, my_surface->format, 0);
+    //However, this is not necessary here
+    //We still need the file path using this method since we nead to load the surface into memory first
     
-    if (ptr_loaded_surface == nullptr)
+    p_loaded_surface = IMG_Load(m_texture_path.c_str());
+    
+    if (p_loaded_surface == nullptr)
         {
-            printf("Error loading surface with path %s. ERROR: %s\n. ERROR: %s\n", texture_path.c_str(), SDL_GetError(), IMG_GetError());
+            printf("Error loading surface with path %s. ERROR: %s\n.", file_path.c_str(), IMG_GetError());
         }
     
     else
        {
-           m_ptr_format = (ptr_loaded_surface->format);
+           mp_format = (p_loaded_surface->format);
            
-           if (m_color_key == 0) m_color_key = SDL_MapRGB(m_ptr_format, 0xFF, 0xFF, 0xFF);
+           // color keying makes a specified color transparent or removes it
            
-           SDL_SetColorKey(ptr_loaded_surface, SDL_TRUE, m_color_key);
+           if (m_color_key == 0) // will be zero if no color key is set
+           {
+               m_color_key = SDL_MapRGB(mp_format, 0xFF, 0xFF, 0xFF); // this stores a pixel value
+               
+               //MapRGB generates pixel value with colour in the format of the used surface
+
+           }
            
-           //MapRGB generates pixel colour to be made transperent, which is in the format of the used surface
+           SDL_SetColorKey(p_loaded_surface, SDL_TRUE, m_color_key); // set to true, meaning color key is enabled
+                      
+           p_loaded_texture = SDL_CreateTextureFromSurface(gp_renderer, p_loaded_surface);
            
-           ptr_loaded_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
-           
-           if (ptr_loaded_texture == NULL)
+           if (p_loaded_texture == NULL)
                
            {
                printf("Error loading texture with path %s, ERROR: %s\n",m_texture_path.c_str(), SDL_GetError());
@@ -104,40 +117,40 @@ bool Texture::load_from_file(const std::string& texture_path)
            else
             {
                
-               m_width = ptr_loaded_surface->w;
-               m_height = ptr_loaded_surface->h;
+               m_width = p_loaded_surface->w;
+               m_height = p_loaded_surface->h;
                
             }
     
-           SDL_FreeSurface(ptr_loaded_surface);
+           SDL_FreeSurface(p_loaded_surface);
            
         }
 
-    m_ptr_texture = ptr_loaded_texture;
+    mp_texture = p_loaded_texture;
 
-    return (ptr_loaded_texture != nullptr);
+    return (p_loaded_texture != nullptr);
                 
 }
 
-bool Texture::load_texture_from_font(TTF_Font* ptr_loaded_font, const std::string& text, const SDL_Color& font_color)
+bool Texture::load_from_font(TTF_Font* p_loaded_font, const std::string& text, const SDL_Color& font_color)
 {
     free();
     
-    SDL_Surface* ptr_loaded_surface = nullptr;
-    SDL_Texture* ptr_font_texture = nullptr;
+    SDL_Surface* p_loaded_surface = nullptr;
+    SDL_Texture* p_font_texture = nullptr;
 
-    ptr_loaded_surface = TTF_RenderText_Blended(ptr_loaded_font, text.c_str(), font_color);
+    p_loaded_surface = TTF_RenderText_Blended(p_loaded_font, text.c_str(), font_color);
     
-    if (ptr_loaded_surface == nullptr)
+    if (p_loaded_surface == nullptr)
     {
-        printf("Error loading texture of font with text %s. ERROR: %s\n", text.c_str(), TTF_GetError());
+        printf("Error loading surface with text %s. ERROR: %s\n", text.c_str(), TTF_GetError());
     }
     
     else
     {
-    ptr_font_texture = SDL_CreateTextureFromSurface(g_ptr_renderer, ptr_loaded_surface);
+    p_font_texture = SDL_CreateTextureFromSurface(gp_renderer, p_loaded_surface);
     
-    if (ptr_font_texture == nullptr)
+    if (p_font_texture == nullptr)
         
     {
         printf("Error loading texture with text %s, ERROR: %s\n", text.c_str(), SDL_GetError());
@@ -146,19 +159,19 @@ bool Texture::load_texture_from_font(TTF_Font* ptr_loaded_font, const std::strin
     else
      {
         
-        m_width = ptr_loaded_surface->w;
-        m_height = ptr_loaded_surface->h;
+        m_width = p_loaded_surface->w;
+        m_height = p_loaded_surface->h;
         
      }
 
-     SDL_FreeSurface(ptr_loaded_surface);
+     SDL_FreeSurface(p_loaded_surface);
     
  }
 
- m_ptr_texture = ptr_font_texture;
+ mp_texture = p_font_texture;
  m_font_color = font_color;
 
- return (ptr_font_texture != nullptr);
+ return (p_font_texture != nullptr);
     
 }
 
@@ -190,7 +203,7 @@ void Texture::set_font_color(const uint8_t &red, const uint8_t &green, const uin
 
 void Texture::set_color_key(const uint8_t &red, const uint8_t &green, const uint8_t &blue)
 {
-    m_color_key = SDL_MapRGB(m_ptr_format, red, green, blue);
+    m_color_key = SDL_MapRGB(mp_format, red, green, blue);
     
 }
 
@@ -201,47 +214,75 @@ std::string Texture::get_path()
 
 void Texture::set_color_mod(const uint8_t& red, const uint8_t& green, const uint8_t& blue)
 {
-    SDL_SetTextureColorMod(m_ptr_texture, red, green, blue);
+    SDL_SetTextureColorMod(mp_texture, red, green, blue);
     
 }
 
 void Texture::set_alpha_mod(const uint8_t& alpha)
 
 {
-    SDL_SetTextureAlphaMod(m_ptr_texture, alpha);
+    SDL_SetTextureAlphaMod(mp_texture, alpha);
 }
 
 void Texture::set_blend_mode(SDL_BlendMode blendmode)
 
 {
-    SDL_SetTextureBlendMode(m_ptr_texture, blendmode);
+    SDL_SetTextureBlendMode(mp_texture, blendmode);
+    
 }
 
+//Below is the mainly used render function. It can render a texture, a clip of a sprite/texture and the flipped texture/clip. Using max_dim, it can also render clips of a sprite so that they are all centered within a certain width (this is usefull for animations)
 
-void Texture::render_texture(int x, int y, SDL_Rect* ptr_clip, int buffer_dim, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+void Texture::render_texture(int x, int y, SDL_Rect* p_clip, int max_dim, SDL_RendererFlip flip_state)
+
 {
-    int max_width {buffer_dim}; // used to center texture (necessary for animation)
-    int max_height {buffer_dim}; // used to center texture (necessary for animation)
-    
+    int max_width {max_dim};
+    int max_height {max_dim};
     SDL_Rect render_area{};
-    
-    if (ptr_clip != nullptr)
-    {
-        if (buffer_dim == 0) render_area = {x, y, ptr_clip->w, ptr_clip->h};
-        else render_area = {x + (max_width - (ptr_clip->w))/2, y + (max_height - (ptr_clip->h))/2, ptr_clip->w, ptr_clip->h};
-    }
-    else render_area = {x, y, m_width, m_height};
 
-    SDL_RenderCopyEx(g_ptr_renderer, m_ptr_texture, ptr_clip, &render_area, angle, center, flip_state);
-    // SDL_RenderCopy(my_renderer, m_texture, crop_image, &render_area);
-    //Third parameter is portion of texture to crop
-    //Fourth parameter is portion of target to copy into
+    if (p_clip == nullptr)
+    {
+        render_area = {x, y, m_width, m_height};
+        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+        
+    }
+    
+    else if ((max_dim == 0) || (max_width < p_clip->w) || (max_height < p_clip->h))
+    {
+        render_area = {x, y, p_clip->w, p_clip->h};
+        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+    }
+    
+    else
+    {
+        render_area = {x + (max_width - (p_clip->w))/2, y + (max_height - (p_clip->h))/2, p_clip->w, p_clip->h};
+        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+    }
+    
+    return;
+}
+
+//The below render function is used when the rotated texture/clip needs to be rendered. Centering is not implemented for this yet
+
+void Texture::render_texture(int x, int y, SDL_Rect* p_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+{
+    SDL_Rect render_area{};
+
+    if (p_clip != nullptr)
+    {
+        render_area = {x, y, m_width, m_height};
+        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);    }
+    else
+    {
+        render_area = {x, y, p_clip->w, p_clip->h};
+        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state); 
+    }
 }
 
 void Texture::free()
 {
-    SDL_DestroyTexture(m_ptr_texture);
-    m_ptr_texture = nullptr;
+    SDL_DestroyTexture(mp_texture);
+    mp_texture = nullptr;
     m_width = 0;
     m_height = 0;
     
@@ -264,9 +305,10 @@ MouseButton::MouseButton()
     
 }
 
+//Changes m_current_clip (with type of an enum MouseClipState) depending on the type of mouse event returned during SDL_PollEvent()
 void MouseButton::handle_mouse_event (SDL_Event& event)
 {
-    if ((event.type == SDL_MOUSEBUTTONDOWN) || (event.type == SDL_MOUSEBUTTONUP) || (event.type == SDL_MOUSEMOTION))
+    if ((event.type == SDL_MOUSEBUTTONDOWN) || (event.type == SDL_MOUSEBUTTONUP) || (event.type == SDL_MOUSEMOTION) || (event.type == SDL_MOUSEWHEEL))
     {
         m_current_clip = MOUSE_CLIP_OUT;
         
@@ -320,8 +362,26 @@ void MouseButton::handle_mouse_event (SDL_Event& event)
         }
     }
 }
+
+//Some mouse states may not change the clip to display. They may instead change the color of the button or have other effects.
+void MouseButton::handle_extra_states()
+
+{
+    mp_button_sprite->set_color_mod(0xFF, 0xFF, 0xFF);
     
-    
+    if (m_current_clip == MOUSE_CLIP_MOVE_OVER)
+    {
+        mp_button_sprite->set_color_mod(0x00, 0x60, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
+    if (m_current_clip == MOUSE_CLIP_SCROLL_OVER)
+    {
+        mp_button_sprite->set_color_mod(0x00, 0x60, 0x00);
+        m_current_clip = MOUSE_CLIP_OVER;
+    }
+
+}
+
 void MouseButton::set_position (int x, int y)
 {
     
@@ -340,39 +400,20 @@ void MouseButton::set_height(int height)
     m_height = height;
 }
 
-void MouseButton::set_button_sprite_texture(Texture* ptr_button_sprite_texture)
+void MouseButton::set_button_sprite(Texture* p_button_sprite)
 {
-    m_ptr_button_sprite_texture = ptr_button_sprite_texture;
+    mp_button_sprite = p_button_sprite;
 }
 
 int MouseButton::get_current_clip()
 {
     return m_current_clip;
-    
-}
-
-void MouseButton::handle_extra_clip_states()
-
-{
-    m_ptr_button_sprite_texture->set_color_mod(0xFF, 0xFF, 0xFF);
-    
-    if (m_current_clip == MOUSE_CLIP_MOVE_OVER)
-    {
-        m_ptr_button_sprite_texture->set_color_mod(0x00, 0x60, 0x00);
-        m_current_clip = MOUSE_CLIP_OVER;
-    }
-    if (m_current_clip == MOUSE_CLIP_SCROLL_OVER)
-    {
-        m_ptr_button_sprite_texture->set_color_mod(0x00, 0x60, 0x00);
-        m_current_clip = MOUSE_CLIP_OVER;
-    }
-
 }
 
 void MouseButton::render_button()
 {
-    handle_extra_clip_states();
-    m_ptr_button_sprite_texture->render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+    handle_extra_states();
+    mp_button_sprite->render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
 }
 
 SDLTimer::SDLTimer()
@@ -399,7 +440,7 @@ void SDLTimer::pause()
     if (m_is_started && !(m_is_paused))
     {
         m_is_paused = true;
-        m_paused_ticks = SDL_GetTicks64() - m_start_ticks;
+        m_paused_ticks = SDL_GetTicks64() - m_start_ticks; //the current time on clock
         m_start_ticks = 0;
     }
 }
@@ -411,6 +452,7 @@ void SDLTimer::unpause()
     {
         m_is_paused = false;
         m_start_ticks = SDL_GetTicks64() - m_paused_ticks;
+        //since the amount that start ticks is behind SDL_GetTicks is the time on the clock, we just update start ticks to unpause the clock
         m_paused_ticks = 0;
         
     }
@@ -436,7 +478,7 @@ bool SDLTimer::is_started()
     return m_is_started;
 }
 
-uint64_t SDLTimer::get_time() // this will get time since of program minus time since start
+uint64_t SDLTimer::get_time()
 {
     if (is_started())
     {
@@ -460,7 +502,7 @@ Kunai::Kunai()
 {
     m_position_x = 0;
     m_position_y = 0;
-    m_velocity_x = 5;
+    m_velocity_x = 2;
     m_velocity_y = 0;
     
 }
@@ -490,92 +532,83 @@ void Kunai::update_position()
 
 void Kunai::render()
 {
-    kunai_texture.render_texture(m_position_x, m_position_y, nullptr, 0, 0 , nullptr, m_flip_state);
+    kunai_texture.render_texture(m_position_x, m_position_y, nullptr, 0, m_flip_state);
 }
 
 bool init()
 {
     
-    bool success{true}; //flag for function (init) is set at start
+    bool success{true};
     
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
         
-        //can also only initialize video sub system, use SDL_INIT_EVERYTHING/SDL_INIT_VIDEO
     {
         success = false;
-        printf("Error initializing everything. ERROR: %s\n", SDL_GetError());
+        printf("Error initializing SDL. ERROR: %s\n", SDL_GetError());
     }
     
     else
         
     {
-        Mix_Init(MIX_INIT_FLAC|MIX_INIT_MP3);
         if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
             
         {
             printf("Warning: linear texture filtering not enabled\n");
         }
         
+        if (Mix_Init(MIX_INIT_FLAC|MIX_INIT_MP3) != (MIX_INIT_FLAC|MIX_INIT_MP3))
+        {
+            success = false;
+            printf("Error initializing SDL Mixer. ERROR: %s\n", Mix_GetError());
+        }
+        
         else
         {
-            g_ptr_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
             
-            if (TTF_Init() == -1)
+            if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG)
+                
             {
-                printf("Error initializing TTF. ERROR: %s\n", TTF_GetError());
+                printf("Error initializing SDL_Image. ERROR: %s\n", IMG_GetError());
+                success = false;
             }
+            
             else
             {
                 
-                if (g_ptr_window == nullptr)
-                    
+                if (TTF_Init() == -1)
                 {
+                    printf("Error initializing TTF. ERROR: %s\n", TTF_GetError());
                     success = false;
-                    printf("Error creating window. ERROR: %s\n", SDL_GetError());
                 }
+                
                 else
                 {
-                    int sdl_image_flags = IMG_INIT_PNG;
-                    // can use | (or bitwise operator) for multiple flags
-                    // !(IMG_Init(sdl_image_flags) & sdl_image_flags) is only used to check is Init for PNG failed
-                    
-                    if (!(IMG_Init(sdl_image_flags) == sdl_image_flags))
-                        
+                    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
                     {
-                        printf("Error initializing SDL_Image. ERROR: %s\n", IMG_GetError());
+                        printf("Error initializing SDL_Mixer. ERROR: %s\n", Mix_GetError());
                         success = false;
+                        
                     }
                     
                     else
-                        
                     {
-                        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+                        SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN, &gp_window, &gp_renderer);
+                        
+                        if (gp_window == nullptr || gp_renderer == nullptr)
                         {
-                            printf("Error initializing SDL_Mixer. ERROR: %s\n", Mix_GetError());
+                            printf("Error initializing window and renderer. ERROR: %s\n", SDL_GetError());
+                            success = false;
                             
                         }
                         
-                        else
-                        {
-                            
-                            g_ptr_renderer = SDL_CreateRenderer(g_ptr_window, -1, SDL_RENDERER_ACCELERATED);
-                            //SDL_RENDERER_PRESENTVSYNC
-                            if (g_ptr_renderer == nullptr)
-                                
-                            {
-                                success = false;
-                                printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
-                                
-                            }
-                            
-                            SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-                        }
+                        else SDL_SetRenderDrawColor(gp_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     }
+                    
                 }
             }
         }
     }
-    
+            
     return success;
 }
 
@@ -584,9 +617,9 @@ bool load_media()
     
     bool success = true;
     
-    if (!load_image_textures()) success = false;
+    if (!load_images()) success = false;
     if (!load_fonts()) success = false;
-    if (!load_text_textures()) success = false;
+    if (!load_texts()) success = false;
     if (!load_audio()) success = false;
     
     initialize_media();
@@ -595,16 +628,16 @@ bool load_media()
     
 }
 
-bool load_image_textures()
+bool load_images()
 {
     bool success = true;
     
-    if (!button_sprite_texture.load_from_file("Images/buttons.png"))
+    if (!button_sprite.load_from_file("Images/buttons.png"))
     {
         success = false;
         printf("Failed to load buttons image\n");
     }
-    if (!animation_sprite_texture.load_from_file("Player_animations/player_animations2.png"))
+    if (!animation_sprite.load_from_file("Player_animations/player_animations2.png"))
     {
         success = false;
         printf("Failed to load player animations sprite\n");
@@ -622,9 +655,12 @@ bool load_fonts()
 {
     bool success = true;
     
-    g_ptr_arial_font = load_font_from_file("Fonts/Arial.ttf", 20);
+    gp_arial_font = load_font_from_file("Fonts/Arial.ttf", 20);
     
-    if (g_ptr_arial_font == nullptr) success = false;
+    if (gp_arial_font == nullptr) 
+    {
+        success = false;
+    }
     
     return success;
 
@@ -633,27 +669,30 @@ bool load_fonts()
 TTF_Font* load_font_from_file(const std::string& font_path, int font_size)
 {
     
-    TTF_Font* ptr_font;
+    TTF_Font* p_font;
     
-    ptr_font = (TTF_OpenFont(font_path.c_str(), font_size));
+    p_font = (TTF_OpenFont(font_path.c_str(), font_size));
     
-    if (ptr_font == nullptr)
+    if (p_font == nullptr)
     {
-        printf("Failed to load font from font file with font_path %s\n", font_path.c_str());
+        printf("Failed to load font from TTF file with font path %s\n", font_path.c_str());
         
     }
     
-    return ptr_font;
+    return p_font;
     
 }
 
-bool load_text_textures()
+bool load_texts()
 {
     bool success = true;
     
     SDL_Color text_color = {0x50, 0x00, 0x00};
     
-    if (!text_texture.load_texture_from_font(g_ptr_arial_font, "Move over buttons to change color!", text_color)) success = false;
+    if (!button_text.load_from_font(gp_arial_font, "Move over buttons to change color!", text_color))
+    {
+        success = false;
+    }
     
     return success;
     
@@ -663,24 +702,24 @@ bool load_audio()
 {
     bool success = true;
     
-    g_ptr_background_music = Mix_LoadMUS("Audio/background_music.mp3");
+    gp_background_music = Mix_LoadMUS("Audio/background_music.mp3");
    
-    if (g_ptr_background_music == nullptr)
+    if (gp_background_music == nullptr)
     {
         success = false;
         printf("Failed to load background music\n");
     }
     
-    g_ptr_shuriken_sound = Mix_LoadWAV("Audio/shuriken2.wav");
+    gp_shuriken_sound = Mix_LoadWAV("Audio/shuriken2.wav");
     
-    if (g_ptr_shuriken_sound == nullptr)
+    if (gp_shuriken_sound == nullptr)
     {
         success = false;
         printf("Failed to load shuriken audio\n");
     }
-    g_ptr_apple_hit_sound = Mix_LoadWAV("Audio/apple_hit2.wav");
+    gp_apple_hit_sound = Mix_LoadWAV("Audio/apple_hit2.wav");
     
-    if (g_ptr_apple_hit_sound == nullptr)
+    if (gp_apple_hit_sound == nullptr)
     {
         success = false;
         printf("Failed to load apple hit audio\n");
@@ -700,7 +739,7 @@ void set_up_buttons()
 {
     for (int i = 0; i < 4; i++)
     {
-       g_buttons[i].set_button_sprite_texture(&button_sprite_texture);
+       g_buttons[i].set_button_sprite(&button_sprite);
        g_buttons[i].set_width(300);
        g_buttons[i].set_height(300);
     }
@@ -745,23 +784,23 @@ void close()
 {
     // Destroyed all LOADED surfaces and textures
     
-    button_sprite_texture.free();
-    animation_sprite_texture.free();   
-    text_frame_rate_texture.free();
+    button_sprite.free();
+    animation_sprite.free();   
+    frame_rate_text.free();
     kunai_texture.free();
      
-    TTF_CloseFont(g_ptr_arial_font); //we need to close a font that is opened from TTF_OpenFont
+    TTF_CloseFont(gp_arial_font); //we need to close a font that is opened from TTF_OpenFont
 
-    Mix_FreeMusic(g_ptr_background_music);
-    Mix_FreeChunk(g_ptr_shuriken_sound);
-    Mix_FreeChunk(g_ptr_apple_hit_sound);
+    Mix_FreeMusic(gp_background_music);
+    Mix_FreeChunk(gp_shuriken_sound);
+    Mix_FreeChunk(gp_apple_hit_sound);
     
     // Destroy Windows and Renderer, set pointers to NULL
-    SDL_DestroyWindow(g_ptr_window);
+    SDL_DestroyWindow(gp_window);
     //Takes care of destroying my_screen_surface/my_current_texture
-    SDL_DestroyRenderer(g_ptr_renderer);
-    g_ptr_window = nullptr;
-    g_ptr_renderer = nullptr;
+    SDL_DestroyRenderer(gp_renderer);
+    gp_window = nullptr;
+    gp_renderer = nullptr;
     
     //Just like you initialize them, you have to quit SDL subsystems
     TTF_Quit();
@@ -773,6 +812,7 @@ void close()
 
 int main(int argc, char* args[])
 {
+    
    if (!init())
    {
        printf("Error initializing. ERROR: %s\n", SDL_GetError());
@@ -784,30 +824,36 @@ int main(int argc, char* args[])
        {
            printf("Error loading media. ERROR: %s\n", SDL_GetError());
        }
+       
        else
        {
-           
-           bool quit = false; //Main loop flag
-           SDL_Event event;
-           ptr_current_texture = &text_texture;
-           //uint64_t time_after_last_reset {0};
-           std::stringstream time_to_print;
-           int frame{0};
+           Kunai starting_kunai;
+           starting_kunai.set_position(10,10);
            SDL_Rect* current_clip = nullptr;
-           double change_in_time{};
-           double previous_time{0};
+           
+           int frame{0};
            int frame_rate {};
+
+           double previous_time{};
+           double change_in_time{};
+           const int CAPPED_FRAME_RATE {60};
+           const int MINIMUM_LOOP_TICKS {1000/CAPPED_FRAME_RATE};
+           //loop ticks are in milliseconds. 1 seconds is 1000 ms so 1000/frame_rate is time in ms for each frame
+           
+           std::stringstream time_to_print;
            SDLTimer game_timer;
            game_timer.start();
            SDLTimer cap_timer;
-           const int CAPPED_FRAME_RATE {30};
-           const int MINIMUM_LOOP_TICKS {1000/CAPPED_FRAME_RATE};
-           Kunai starting_kunai;
-           starting_kunai.set_position(10,10);
+
+           bool quit = false;
+           SDL_Event event;
+        
            while (quit != true)
               
           {
               cap_timer.start();
+              
+              //Events
               
               while (SDL_PollEvent(&event) != 0)
                   {
@@ -825,20 +871,26 @@ int main(int argc, char* args[])
                               
                           case SDLK_m:
         
-                              if (Mix_PlayingMusic() == 0) Mix_PlayMusic(g_ptr_background_music, -1);
+                              if (Mix_PlayingMusic() == 0)
+                              {
+                                  Mix_PlayMusic(gp_background_music, -1);
+                              }
                               
-                              else if (Mix_PausedMusic() == 1) Mix_ResumeMusic();
-                              
+                              else if (Mix_PausedMusic() == 1)
+                              {
+                                  Mix_ResumeMusic();
+                              }
+                        
                               else Mix_PauseMusic();
                               
                               break;
                               
                           case SDLK_d:
-                              Mix_PlayChannel(-1, g_ptr_shuriken_sound, 0);
+                              Mix_PlayChannel(-1, gp_shuriken_sound, 0);
                               break;
                               
                           case SDLK_f:
-                              Mix_PlayChannel(-1, g_ptr_apple_hit_sound, 0);
+                              Mix_PlayChannel(-1, gp_apple_hit_sound, 0);
                               break;
                               
                           case SDLK_r:
@@ -863,37 +915,44 @@ int main(int argc, char* args[])
     
               }
               
-              SDL_SetRenderDrawColor(g_ptr_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-              SDL_RenderClear(g_ptr_renderer);
+              //Logic
               
-              if (frame == 0)
-              {
-                  text_frame_rate_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
-                  //.str() here converts copies stringstream into a string object and returns that
-              }
+              //the variable frame is incremented from 0 and ends at 55 every loop. Some actions like loading text are only done at a specific frame to improve performance
               
+              starting_kunai.update_position();
+
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
               time_to_print << "The current frame rate is " << frame_rate;
               
               if (frame == 0)
               {
-                  text_frame_rate_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
-                  //.str() here converts copies stringstream into a string object and returns that
+                  frame_rate_text.load_from_font(gp_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+                  //str() here copies stringstream into a string object and returns that
               }
+                            
+              //Rendering
               
-              text_frame_rate_texture.render_texture(160, 270);
+              SDL_SetRenderDrawColor(gp_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+              SDL_RenderClear(gp_renderer);
+                            
+              current_clip = &g_player_animation_clips[frame/5];
+              animation_sprite.render_texture(100, 300, current_clip, 200);
+              animation_sprite.render_texture(300, 300, current_clip, 200, SDL_FLIP_HORIZONTAL);
               
-              current_clip = &g_player_animation_clips[frame / 5];
-              animation_sprite_texture.render_texture(100, 300, current_clip, 200);
-              animation_sprite_texture.render_texture(300, 300, current_clip, 200, 0, nullptr, SDL_FLIP_HORIZONTAL);
+              frame_rate_text.render_texture(160, 270, nullptr);
               
-              starting_kunai.update_position();
               starting_kunai.render();
               
-              SDL_RenderPresent(g_ptr_renderer);
+              SDL_RenderPresent(gp_renderer);
               
               frame ++;
-              if (frame/5 > 11) frame = 0;
+              
+              if (frame > 55) 
+              {
+                  frame = 0;
+              }
+              
+              //waiting to keep a specific frame rate (for performance)
               
               change_in_time = (game_timer.get_time()/1000.0f) - previous_time;
               previous_time = (game_timer.get_time()/1000.0f);
@@ -913,7 +972,7 @@ int main(int argc, char* args[])
     return 0;
 }
 
-// Emmited code written during practice, can be used later:
+// Ommited code written during practice, can be used later:
 
 /*
 SDL_Surface* load_surface(std::string path, FileType file_type)
@@ -1501,4 +1560,53 @@ text_time_texture.render_texture(240, 270);
      time_to_wait = (1000.0/30.0) - (change_in_time*1000.0f);
      SDL_Delay(time_to_wait);
  }
- */
+ 
+ void Texture::render_texture(int x, int y, SDL_Rect* p_clip)
+ {
+     SDL_Rect render_area{};
+     
+     if (p_clip != nullptr)
+     {
+         render_area = {x, y, m_width, m_height};
+         SDL_RenderCopy(gp_renderer, mp_texture, p_clip, &render_area);
+     }
+     else
+     {
+         render_area = {x, y, p_clip->w, p_clip->h};
+         SDL_RenderCopy(gp_renderer, mp_texture, p_clip, &render_area);
+     }
+     
+ }
+ gp_window = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+ 
+ 
+ if (gp_window == nullptr)
+     
+ {
+     success = false;
+     printf("Error creating window. ERROR: %s\n", SDL_GetError());
+ }
+
+         else
+         {
+             
+             gp_renderer = SDL_CreateRenderer(gp_window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+             //SDL_RENDERER_PRESENTVSYNC
+             if (gp_renderer == nullptr)
+                 
+             {
+                 success = false;
+                 printf("Error initializing renderer. ERROR: %s\n", SDL_GetError());
+                 
+             }
+             
+             SDL_SetRenderDrawColor(gp_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+         }
+ 
+ if (frame == 0)
+ {
+     frame_rate_text.load_from_font(gp_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
+     //str() here copies stringstream into a string object and returns that
+ }
+ 
+  */
