@@ -8,9 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */; };
+		0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E8A25162B39A920009C0B44 /* global_variables.cpp */; };
 		0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EAA2BAC2AE5334B0034B5E8 /* main.cpp */; };
 		0EAA2BB52AE533760034B5E8 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB42AE533760034B5E8 /* SDL2.framework */; };
 		0EAA2BB72AE533870034B5E8 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */; };
+		0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97F9E2B396F5C00CC9236 /* texture.cpp */; };
+		0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA02B39702A00CC9236 /* mouse_button.cpp */; };
+		0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA22B39703A00CC9236 /* timers.cpp */; };
+		0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA42B3983E900CC9236 /* kunai.cpp */; };
+		0EB97FA82B3983F900CC9236 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA62B3983F900CC9236 /* init.cpp */; };
 		0EC008022AF45F35002BAE2D /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EC008012AF45F35002BAE2D /* SDL2_mixer.framework */; };
 /* End PBXBuildFile section */
 
@@ -27,17 +33,25 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0E0D194E2AF5FA38000C5DAA /* function_declarations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = function_declarations.h; sourceTree = "<group>"; };
+		0E0D194E2AF5FA38000C5DAA /* global_variables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_variables.h; sourceTree = "<group>"; };
 		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
 		0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
-		0E964C0E2AF861F7003AA09E /* weapons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = weapons.h; sourceTree = "<group>"; };
+		0E8A25162B39A920009C0B44 /* global_variables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = global_variables.cpp; sourceTree = "<group>"; };
+		0E8A25182B39AC84009C0B44 /* sdl_libraries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sdl_libraries.h; sourceTree = "<group>"; };
+		0E964C0E2AF861F7003AA09E /* kunai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kunai.h; sourceTree = "<group>"; };
 		0EAA2BA92AE5334B0034B5E8 /* SDL-Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "SDL-Game"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EAA2BAC2AE5334B0034B5E8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0EAA2BB42AE533760034B5E8 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = /Library/Frameworks/SDL2_image.framework; sourceTree = "<absolute>"; };
+		0EB97F9E2B396F5C00CC9236 /* texture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
+		0EB97FA02B39702A00CC9236 /* mouse_button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mouse_button.cpp; sourceTree = "<group>"; };
+		0EB97FA22B39703A00CC9236 /* timers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timers.cpp; sourceTree = "<group>"; };
+		0EB97FA42B3983E900CC9236 /* kunai.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kunai.cpp; sourceTree = "<group>"; };
+		0EB97FA62B3983F900CC9236 /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
+		0EB97FA72B3983F900CC9236 /* init.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = init.h; sourceTree = "<group>"; };
 		0EC008012AF45F35002BAE2D /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
-		0EE4F58E2AEAB5880069B47C /* textures.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = textures.h; sourceTree = "<group>"; };
+		0EE4F58E2AEAB5880069B47C /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,11 +90,19 @@
 			isa = PBXGroup;
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
-				0EE4F58E2AEAB5880069B47C /* textures.h */,
+				0EB97F9E2B396F5C00CC9236 /* texture.cpp */,
+				0EE4F58E2AEAB5880069B47C /* texture.h */,
+				0EB97FA02B39702A00CC9236 /* mouse_button.cpp */,
 				0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */,
-				0E964C0E2AF861F7003AA09E /* weapons.h */,
+				0EB97FA42B3983E900CC9236 /* kunai.cpp */,
+				0E964C0E2AF861F7003AA09E /* kunai.h */,
+				0EB97FA22B39703A00CC9236 /* timers.cpp */,
 				0E3ACE7D2AF2FCF100F702CD /* timers.h */,
-				0E0D194E2AF5FA38000C5DAA /* function_declarations.h */,
+				0EB97FA62B3983F900CC9236 /* init.cpp */,
+				0EB97FA72B3983F900CC9236 /* init.h */,
+				0E8A25162B39A920009C0B44 /* global_variables.cpp */,
+				0E0D194E2AF5FA38000C5DAA /* global_variables.h */,
+				0E8A25182B39AC84009C0B44 /* sdl_libraries.h */,
 			);
 			path = "SDL-Game";
 			sourceTree = "<group>";
@@ -154,6 +176,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */,
+				0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */,
+				0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */,
+				0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */,
+				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,
+				0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */,
+				0EB97FA82B3983F900CC9236 /* init.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

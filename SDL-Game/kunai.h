@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "sdl_libraries.h"
+
 class Kunai
 {
     

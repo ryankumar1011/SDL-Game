@@ -1,11 +1,14 @@
 //
-//  function_declarations.h
+//  Intialize.hpp
 //  SDL-Game
 //
-//  Created by Ryan Kumar on 4/11/23.
+//  Created by Ryan Kumar on 25/12/23.
 //
 
 #pragma once
+
+#include "sdl_libraries.h"
+#include <iostream>
 
 bool init();
 bool load_media();
@@ -19,3 +22,4 @@ void set_up_buttons();
 void set_texture_clips();
 void set_texture_size();
 void close();
+

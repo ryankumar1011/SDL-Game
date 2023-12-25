@@ -7,6 +7,8 @@
 
 #pragma once 
 
+#include <chrono>
+#include <iostream>
 
 class SDLTimer
 {
@@ -42,33 +44,23 @@ private:
     bool m_is_started;
 };
 
+//The below struct measures the time it takes for an instance of it to go out of scope. It can be used to measure the time taken for a function to execute
+
 struct ChronoTimer
 {
    
 public:
     
-    ChronoTimer(int number)
-    {
-        start = std::chrono::high_resolution_clock::now();
-        timer_number = number;
+    ChronoTimer();
     
-    }
+    ~ChronoTimer();
     
-    ~ChronoTimer()
-    {
-        end = std::chrono::high_resolution_clock::now();
-        duration = end - start;
-        std::cout << "Time for timer number" << timer_number << " is " << duration.count()*1'000'000'000 << "ns\n";
-        
-    }
-    
-public:
+private:
     
     std::chrono::time_point<std::chrono::steady_clock> start, end;
     
     std::chrono::duration<float> duration;
     
-    int timer_number{};
 };
 
 

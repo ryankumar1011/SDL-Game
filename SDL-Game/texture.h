@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include "sdl_libraries.h"
+#include <iostream>
+
 class Texture
 {
     

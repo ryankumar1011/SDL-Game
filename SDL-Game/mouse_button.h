@@ -7,6 +7,8 @@
 
 #pragma once 
 
+#include "texture.h"
+
 enum MouseClipState
 {
     MOUSE_CLIP_OUT,
