@@ -40,8 +40,12 @@ int main(int argc, char* args[])
        
        else
        {
+           std::cout << kunai_texture.get_width() << '\n';
+           std::cout << kunai_texture.get_height();
+           
            Kunai starting_kunai;
-           starting_kunai.set_position(10,10);
+           starting_kunai.scale_colliders();
+
            SDL_Rect* current_clip = nullptr;
            
            int frame{0};
@@ -60,7 +64,7 @@ int main(int argc, char* args[])
 
            bool quit = false;
            SDL_Event event;
-        
+
            while (quit != true)
               
           {
@@ -156,6 +160,8 @@ int main(int argc, char* args[])
               frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
               
               starting_kunai.render();
+              starting_kunai.render_scaled_kunai();
+              starting_kunai.render_colliders();
               
               SDL_RenderPresent(gp_renderer);
               
@@ -234,9 +240,7 @@ SDL_Surface* load_surface(std::string path, FileType file_type)
  return optimized_surface;
 
 }
-*/
 
-/*
 SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
 
 {
@@ -277,8 +281,7 @@ SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
     return loaded_texture;
 
 }
-*/
-/*
+
  SDL_Rect crop_rect; // rectangle to be copied
  // x and y start from top left corner, goes to the right and downwards as x and y increase
  crop_rect.x = 40; // starting x and y
@@ -292,8 +295,6 @@ SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
  stretch_rect.h = SCREEN_HEIGHT;
  stretch_rect.w = SCREEN_WIDTH;
  
- */
-/*
  bool load_media() //can be used for textures or surfaces
  {
      bool success = true;
@@ -332,8 +333,7 @@ SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
      
      return success;
  }
- */
-/*
+
  void close()
  {
      // Destroyed all LOADED surfaces and textures
@@ -357,8 +357,7 @@ SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
      IMG_Quit();
      SDL_Quit();
  }
- */
-/*
+
  if (event.type == SDL_QUIT) //what is the type compared?
  {
  quit = true;
@@ -384,16 +383,13 @@ SDL_Texture* load_texture(const std::string& path, unsigned char file_type)
  break;
  
  }
- */
-/*
+
 When using surfaces instead of textures:
 
 SDL_BlitScaled (current_surface_display, &crop_rect, my_surface, &stretch_rect);
 // or SDL_BlitSurface(current_surface_display, NULL, my_surface, NULL);
 SDL_UpdateWindowSurface(my_window);
 
-*/
-/*
  SDL_Texture* load_IMG_texture(const std::string& path)
  {
      SDL_Texture* loaded_texture = nullptr;
@@ -409,8 +405,8 @@ SDL_UpdateWindowSurface(my_window);
      
      return loaded_texture;
  }
- */
-/*
+ 
+ 
 SDL_RenderCopy(my_renderer, current_texture_display,NULL, NULL);
 //primative rendering allows for drawing basic shapes withouth loading textures. So you don't need RenderCopy to draw texture on target
 
@@ -466,8 +462,6 @@ SDL_RenderPresent(my_renderer);
 //draws content of hidden target onto window associated to renderer
 //Note: there can't be more than one renderer
 
-*/
-/*
  if(event.type != SDL_KEYUP) default_texture.render_texture();
  
  else
@@ -492,8 +486,7 @@ SDL_RenderPresent(my_renderer);
              break;
      }
  }
- */
-/*
+ 
  case SDLK_UP:
      current_texture = &up_texture;
      break;
@@ -509,8 +502,6 @@ SDL_RenderPresent(my_renderer);
  case SDLK_RIGHT:
      current_texture = &right_texture;
      break;
- */
-/*
 
 dots_texture.set_color_mod(red, green, blue);
 dots_texture.set_alpha_mod(alpha);
@@ -522,14 +513,13 @@ dots_texture.render_texture(SCREEN_WIDTH -100, 0, &dot_clips[1]);
 dots_texture.render_texture(0, SCREEN_HEIGHT - 100, &dot_clips[2]);
 dots_texture.render_texture(SCREEN_WIDTH -100, SCREEN_HEIGHT - 100, &dot_clips[3]);
 current_texture.render_texture();
- */
+
 
 //smiles_texture.render_texture(415, 325, &g_smiles_clips[frame/15]);
 
 //we use a pointer to object to fix issue with texture display. It is not possible to point to a class itself since they are not created at runtime - the objects are.
 //flip_state = SDL_FLIP_VERTICAL;
 //if ((frame % 10) == 0) flip_state = SDL_FLIP_NONE;
-/*
 
 if (frame < 15)
 {
@@ -567,8 +557,7 @@ SDL_RenderPresent(g_renderer);
 
 // auto start = std::chrono::high_resolution_clock::now();
 // SDL_WaitEvent(&event);
-*/
-/*
+
  switch(event.key.keysym.sym) // key symbol, accessing other unions in union?
       
   {
@@ -596,8 +585,7 @@ SDL_RenderPresent(g_renderer);
           break;
           
   }
- */
- /*
+ 
   uint8_t red {200};
   uint8_t green {200};
   uint8_t blue {200};
@@ -605,9 +593,7 @@ SDL_RenderPresent(g_renderer);
   double angle{0};
   int frame = 0;
   SDL_RendererFlip flip_state{SDL_FLIP_NONE};
-  */
-/*
- 
+
  //When using surfaces instead of textures, we have to also get surface when intializing
  
  else
@@ -618,8 +604,7 @@ SDL_RenderPresent(g_renderer);
  {
  printf("Error creating window surface. ERROR: %s\n", SDL_GetError());
  }
- */
-/*
+
  Texture default_texture;
  Texture up_texture;
  Texture down_texture;
@@ -719,12 +704,11 @@ arrow_sprite.free();
  g_stick_figure_backflip_clips[1] = {213, 184, 100, 175};
  g_stick_figure_backflip_clips[2] = {313, 184, 100, 175};
  g_stick_figure_backflip_clips[3] = {413, 184, 100, 175};
- */
 
 //auto end = std::chrono::high_resolution_clock::now();
 //std::chrono::duration<float> duration = end - start;
 // if (duration.count() > 1) std::cout << "Wait time is " << duration.count() << " seconds\n";
-/*
+
  #pragma once
 
  //variables all caps because they store constants
@@ -747,16 +731,14 @@ arrow_sprite.free();
      TYPE_JPG
      
  };
- */
-/*
+ 
 for (int i = 0; i < 4; i++)
         
   {
       g_buttons[i].render_button();
             
   }
- */
-/*
+
 text_texture.render_texture((SCREEN_WIDTH - ptr_current_texture->get_width())/2, (SCREEN_HEIGHT - ptr_current_texture->get_height())/2);
 
 time_to_print.str(""); //.str() discards previous content of stream and places new as ""
@@ -767,8 +749,7 @@ text_time_texture.load_texture_from_font(g_ptr_arial_font, time_to_print.str(), 
 //.str() here converts copies stringstream into a string object and returns that
 
 text_time_texture.render_texture(240, 270);
-*/
-/*
+
  if (frame_rate > 30)
  {
      time_to_wait = (1000.0/30.0) - (change_in_time*1000.0f);
@@ -822,5 +803,4 @@ text_time_texture.render_texture(240, 270);
      frame_rate_text.load_from_font(gp_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
      //str() here copies stringstream into a string object and returns that
  }
- 
-  */
+ */

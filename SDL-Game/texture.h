@@ -43,6 +43,8 @@ public:
     int get_height();
         
     int get_width();
+    
+    SDL_Texture* get_texture_pointer();
    
     std::string get_path();
     

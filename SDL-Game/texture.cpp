@@ -163,6 +163,12 @@ std::string Texture::get_path()
     return m_texture_path;
 }
 
+SDL_Texture* Texture::get_texture_pointer()
+{
+    return mp_texture;
+}
+
+
 void Texture::set_color_mod(const uint8_t& red, const uint8_t& green, const uint8_t& blue)
 {
     SDL_SetTextureColorMod(mp_texture, red, green, blue);
