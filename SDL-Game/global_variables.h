@@ -13,8 +13,10 @@ class Texture;
 class MouseButton;
 class Weapons;
 class SDLTimer;
-class ChronoTimer;
-
+struct ChronoTimer;
+class Object;
+class Player;
+class Kunai;
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
@@ -24,7 +26,7 @@ extern SDL_Window* gp_window;
 extern SDL_Renderer* gp_renderer;
 
 extern SDL_Rect g_button_clips [4];
-extern SDL_Rect g_player_animation_clips [12];
+extern SDL_Rect g_player_clips [12];
 
 extern TTF_Font* gp_arial_font;
 
@@ -38,5 +40,6 @@ extern Texture* p_current_texture;
 extern Texture button_sprite;
 extern Texture button_text;
 extern Texture frame_rate_text;
-extern Texture animation_sprite;
+extern Texture player_sprite;
 extern Texture kunai_texture;
+

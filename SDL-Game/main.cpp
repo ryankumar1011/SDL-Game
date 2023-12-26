@@ -10,7 +10,9 @@
 #include "texture.h"
 #include "mouse_button.h"
 #include "timers.h"
+#include "object.h"
 #include "kunai.h"
+#include "player.h"
 #include "init.h"
 #include "global_variables.h"
 
@@ -40,10 +42,11 @@ int main(int argc, char* args[])
        
        else
        {
-           std::cout << kunai_texture.get_width() << '\n';
-           std::cout << kunai_texture.get_height();
            
            Kunai starting_kunai;
+           Player player_1;
+           player_1.set_position(0, 0);
+                      
            starting_kunai.scale_colliders();
 
            SDL_Rect* current_clip = nullptr;
@@ -80,6 +83,8 @@ int main(int argc, char* args[])
                   {
                       quit = true;
                   }
+                      
+                 player_1.handle_event(event);
                   
                   if (event.type == SDL_KEYUP)
                   {
@@ -102,7 +107,7 @@ int main(int argc, char* args[])
                               
                               break;
                               
-                          case SDLK_d:
+                          case SDLK_l:
                               Mix_PlayChannel(-1, gp_shuriken_sound, 0);
                               break;
                               
@@ -124,12 +129,7 @@ int main(int argc, char* args[])
                       
                   }
                     
-                  for (int i = 0; i < 4; i++)
-                      
-                      {
-                          g_buttons[i].handle_mouse_event(event);
-                      }
-    
+        
               }
               
               //Logic
@@ -137,6 +137,7 @@ int main(int argc, char* args[])
               //the variable frame is incremented from 0 and ends at 55 every loop. Some actions like loading text are only done at a specific frame to improve performance
               
               starting_kunai.update_position();
+              player_1.update_position();
 
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
               time_to_print << "FR:" << frame_rate;
@@ -152,16 +153,18 @@ int main(int argc, char* args[])
               
               SDL_SetRenderDrawColor(gp_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
               SDL_RenderClear(gp_renderer);
-                            
-              current_clip = &g_player_animation_clips[frame/5];
-              animation_sprite.render_texture(100, 300, current_clip, 200);
-              animation_sprite.render_texture(SCREEN_WIDTH-300, 300, current_clip, 200, SDL_FLIP_HORIZONTAL);
               
               frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
+                            
+              //current_clip = &g_player_clips[frame/5];
+              //player_sprite.render_texture(100, 300, current_clip, 200);
+              //player_sprite.render_texture(SCREEN_WIDTH-300, 300, current_clip, 200, SDL_FLIP_HORIZONTAL);
               
-              starting_kunai.render();
-              starting_kunai.render_scaled_kunai();
-              starting_kunai.render_colliders();
+              player_1.render();
+              player_1.render_colliders();
+              
+              //starting_kunai.render_scaled_kunai();
+              //starting_kunai.render_colliders();
               
               SDL_RenderPresent(gp_renderer);
               

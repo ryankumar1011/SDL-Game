@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E65303A2B3AE828004487DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E6530382B3AE828004487DA /* object.cpp */; };
+		0E65303D2B3AEFD5004487DA /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E65303B2B3AEFD5004487DA /* player.cpp */; };
 		0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */; };
 		0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E8A25162B39A920009C0B44 /* global_variables.cpp */; };
 		0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EAA2BAC2AE5334B0034B5E8 /* main.cpp */; };
@@ -36,6 +38,10 @@
 		0E0D194E2AF5FA38000C5DAA /* global_variables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_variables.h; sourceTree = "<group>"; };
 		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
+		0E6530382B3AE828004487DA /* object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
+		0E6530392B3AE828004487DA /* object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
+		0E65303B2B3AEFD5004487DA /* player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = player.cpp; sourceTree = "<group>"; };
+		0E65303C2B3AEFD5004487DA /* player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = player.h; sourceTree = "<group>"; };
 		0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		0E8A25162B39A920009C0B44 /* global_variables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = global_variables.cpp; sourceTree = "<group>"; };
 		0E8A25182B39AC84009C0B44 /* sdl_libraries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sdl_libraries.h; sourceTree = "<group>"; };
@@ -69,6 +75,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E65303E2B3AEFFF004487DA /* game_objects */ = {
+			isa = PBXGroup;
+			children = (
+				0E6530382B3AE828004487DA /* object.cpp */,
+				0E6530392B3AE828004487DA /* object.h */,
+				0E65303B2B3AEFD5004487DA /* player.cpp */,
+				0E65303C2B3AEFD5004487DA /* player.h */,
+				0EB97FA42B3983E900CC9236 /* kunai.cpp */,
+				0E964C0E2AF861F7003AA09E /* kunai.h */,
+			);
+			path = game_objects;
+			sourceTree = "<group>";
+		};
 		0EAA2BA02AE5334B0034B5E8 = {
 			isa = PBXGroup;
 			children = (
@@ -90,12 +109,11 @@
 			isa = PBXGroup;
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
+				0E65303E2B3AEFFF004487DA /* game_objects */,
 				0EB97F9E2B396F5C00CC9236 /* texture.cpp */,
 				0EE4F58E2AEAB5880069B47C /* texture.h */,
 				0EB97FA02B39702A00CC9236 /* mouse_button.cpp */,
 				0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */,
-				0EB97FA42B3983E900CC9236 /* kunai.cpp */,
-				0E964C0E2AF861F7003AA09E /* kunai.h */,
 				0EB97FA22B39703A00CC9236 /* timers.cpp */,
 				0E3ACE7D2AF2FCF100F702CD /* timers.h */,
 				0EB97FA62B3983F900CC9236 /* init.cpp */,
@@ -177,6 +195,8 @@
 			files = (
 				0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */,
 				0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */,
+				0E65303D2B3AEFD5004487DA /* player.cpp in Sources */,
+				0E65303A2B3AE828004487DA /* object.cpp in Sources */,
 				0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */,
 				0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */,
 				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,

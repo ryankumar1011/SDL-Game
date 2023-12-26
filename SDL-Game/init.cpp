@@ -111,17 +111,19 @@ bool load_images()
         success = false;
         printf("Failed to load buttons image\n");
     }
-    if (!animation_sprite.load_from_file("Player_animations/player_animations2.png"))
+    
+    if (!player_sprite.load_from_file("Player_animations/player_animations2.png"))
     {
         success = false;
         printf("Failed to load player animations sprite\n");
     }
+    
     if (!kunai_texture.load_from_file("Weapons/kunai.png"))
     {
         success = false;
         printf("Failed to load kunai image\n");
     }
-    
+
     return success;
 }
 
@@ -231,19 +233,19 @@ void set_texture_clips()
     g_button_clips[2] = {0, 300, 300, 300};
     g_button_clips[3] = {300, 300, 300, 300};
     
-    g_player_animation_clips[0] = {19, 18, 108-19, 150-18};
-    g_player_animation_clips[1] = {120, 19, 193-120, 150-19};
-    g_player_animation_clips[2] = {216, 20, 283-216, 150-20};
-    g_player_animation_clips[3] = {317, 22, 377-317, 151-22};
-    g_player_animation_clips[4] = {405, 21, 459-405, 153-21};
-    g_player_animation_clips[5] = {488, 22, 533-488, 151-22};
+    g_player_clips[0] = {19, 18, 108-19, 150-18};
+    g_player_clips[1] = {120, 19, 193-120, 150-19};
+    g_player_clips[2] = {216, 20, 283-216, 150-20};
+    g_player_clips[3] = {317, 22, 377-317, 151-22};
+    g_player_clips[4] = {405, 21, 459-405, 153-21};
+    g_player_clips[5] = {488, 22, 533-488, 151-22};
     
-    g_player_animation_clips[6] = {94, 167, 147-94, 298-167};
-    g_player_animation_clips[7] = {176, 166, 238-176, 296-166};
-    g_player_animation_clips[8] = {263, 167, 339-263, 297-167};
-    g_player_animation_clips[9] = {345, 167, 426-345, 297-167};
-    g_player_animation_clips[10] = {435, 168, 531-435, 298-168};
-    g_player_animation_clips[11] = {26, 303, 129-26, 434-303};
+    g_player_clips[6] = {94, 167, 147-94, 298-167};
+    g_player_clips[7] = {176, 166, 238-176, 296-166};
+    g_player_clips[8] = {263, 167, 339-263, 297-167};
+    g_player_clips[9] = {345, 167, 426-345, 297-167};
+    g_player_clips[10] = {435, 168, 531-435, 298-168};
+    g_player_clips[11] = {26, 303, 129-26, 434-303};
     
 }
 
@@ -259,7 +261,7 @@ void close()
     // Destroyed all LOADED surfaces and textures
     
     button_sprite.free();
-    animation_sprite.free();
+    player_sprite.free();
     frame_rate_text.free();
     kunai_texture.free();
      

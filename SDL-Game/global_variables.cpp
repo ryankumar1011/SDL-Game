@@ -23,7 +23,7 @@ SDL_Renderer* gp_renderer = nullptr;
 
 //Clips
 SDL_Rect g_button_clips [4];
-SDL_Rect g_player_animation_clips[12];
+SDL_Rect g_player_clips[12];
 
 //Fonts
 TTF_Font* gp_arial_font = nullptr;
@@ -40,7 +40,7 @@ Texture* p_current_texture;
 Texture button_sprite;
 Texture button_text;
 Texture frame_rate_text;
-Texture animation_sprite;
+Texture player_sprite;
 Texture kunai_texture;
 
 MouseButton g_buttons[4];
