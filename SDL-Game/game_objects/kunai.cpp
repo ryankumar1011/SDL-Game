@@ -9,14 +9,14 @@
 #include "texture.h"
 #include "global_variables.h"
 
-const int Kunai::width = 31;
-const int Kunai::height = 15;
-
 Kunai::Kunai()
 {
+    m_width = 31;
+    m_height = 15;
+    
     m_position_x = 0;
     m_position_y = 0;
-    m_velocity_x = 0;
+    m_velocity_x = 3;
     m_velocity_y = 0;
 
     m_colliders.resize(8);
@@ -57,13 +57,30 @@ void Kunai::handle_event(SDL_Event& event)
 void Kunai::update_position()
 {
     m_position_x += m_velocity_x;
-    m_position_y += m_velocity_y;
+    update_colliders();
+
     if (((m_position_x + kunai_texture.get_width()) > SCREEN_WIDTH) || (m_position_x < 0))
     {
         m_position_x -= m_velocity_x;
         m_velocity_x = -m_velocity_x;
         (m_flip_state == SDL_FLIP_NONE) ? m_flip_state = SDL_FLIP_HORIZONTAL : m_flip_state = SDL_FLIP_NONE;
+        
+       update_colliders();
+
     }
+    
+    m_position_y += m_velocity_y;
+    
+    if (((m_position_y + m_width) > SCREEN_HEIGHT) || (m_position_y < 0))
+    {
+        m_position_y -= m_velocity_y;
+        m_velocity_y = 0;
+        
+       update_colliders();
+
+    }
+    
+    update_colliders();
     
 }
 
@@ -92,7 +109,12 @@ void Kunai::update_colliders()
     
     m_colliders[7].x = m_position_x + 15;
     m_colliders[7].y = m_position_y + 0;
-   
+    
+    if (m_flip_state == SDL_FLIP_HORIZONTAL)
+    {
+        flip_colliders();
+    }
+       
 }
 
 void Kunai::render()
@@ -102,14 +124,14 @@ void Kunai::render()
 
 //This function is ONLY FOR TESTING. It renderes a kunai scaled 20 times larger.
 
-void Kunai::render_scaled_kunai()
+void Kunai::render_scaled()
 {
-    SDL_Rect enlarged_rect = {25, 25, 620, 300}; // we are upscaling the kunai 20 times to see it clearly
+    SDL_Rect enlarged_rect = {m_position_x, m_position_y, 620, 300}; // we are upscaling the kunai 20 times to see it clearly
     
     SDL_RenderCopy(gp_renderer, kunai_texture.get_texture_pointer(), nullptr, &enlarged_rect);
 }
 
-//This function is ONLY FOR TESTING. It scales the kunai colliders 20 times. It should be called outside game loop
+//This function is ONLY FOR TESTING. It scales the kunai colliders 20 times. It should be called outside game loop. Kunai should and colliders should not be moving.
 
 void Kunai::scale_colliders()
 {

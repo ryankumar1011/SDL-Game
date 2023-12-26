@@ -25,6 +25,30 @@
 //SDL libraries:
 #include "sdl_libraries.h"
 
+void check_all_collisions(std::vector<Object*>& objects)
+{
+    for (int i = 0; i < objects.size(); i++)
+    {
+        for (int j = i + 1; j < objects.size(); j++)
+        {
+            if(objects[i]->check_collision(*objects[j]))
+            {
+                //resolve collision
+                //can use enum instead of dynamic casting here
+                if (dynamic_cast<const Kunai*>(objects[i]) && dynamic_cast<const Player*>(objects[j]))
+                    {
+                        // Resolve collision between Kunai and Player
+                        std::cout << "Kunai hit object\n";
+                        objects.erase(objects.begin() + i);
+                    }
+            }
+        }
+    }
+}
+
+//resolve collission function
+//learn dynamic casting and how to use smart pointers
+
 int main(int argc, char* args[])
 {
     
@@ -44,11 +68,14 @@ int main(int argc, char* args[])
        {
            
            Kunai starting_kunai;
+           starting_kunai.set_position(0, 300);
            Player player_1;
-           player_1.set_position(0, 0);
-                      
-           starting_kunai.scale_colliders();
-
+           player_1.set_position(600, 300);
+           
+           std::vector<Object*> objects;
+           objects.push_back(&starting_kunai);
+           objects.push_back(&player_1);
+           
            SDL_Rect* current_clip = nullptr;
            
            int frame{0};
@@ -129,7 +156,6 @@ int main(int argc, char* args[])
                       
                   }
                     
-        
               }
               
               //Logic
@@ -138,6 +164,9 @@ int main(int argc, char* args[])
               
               starting_kunai.update_position();
               player_1.update_position();
+              
+              check_all_collisions(objects);
+
 
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
               time_to_print << "FR:" << frame_rate;
@@ -160,11 +189,11 @@ int main(int argc, char* args[])
               //player_sprite.render_texture(100, 300, current_clip, 200);
               //player_sprite.render_texture(SCREEN_WIDTH-300, 300, current_clip, 200, SDL_FLIP_HORIZONTAL);
               
-              player_1.render();
-              player_1.render_colliders();
-              
-              //starting_kunai.render_scaled_kunai();
-              //starting_kunai.render_colliders();
+              for (int i = 0; i < objects.size(); i++)
+              {
+                  objects[i]->render();
+                  objects[i]->render_colliders();
+              }
               
               SDL_RenderPresent(gp_renderer);
               

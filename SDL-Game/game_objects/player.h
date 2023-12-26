@@ -13,10 +13,6 @@ class Player : public Object
 {
     
 public:
-    static const int width;
-    static const int height;
-    
-public:
     Player();
     void handle_event(SDL_Event& event) override;
     void update_position() override;

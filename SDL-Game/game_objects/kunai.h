@@ -16,10 +16,6 @@ class Kunai : public Object
 {
     
 public:
-    static const int width;
-    static const int height;
-    
-public:
     Kunai();
     void handle_event(SDL_Event& event) override;
     void update_position() override;
@@ -28,7 +24,7 @@ public:
     
     //for testing
     void scale_colliders();
-    void render_scaled_kunai();
+    void render_scaled();
 
 };
 

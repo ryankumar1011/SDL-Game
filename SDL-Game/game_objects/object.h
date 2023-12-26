@@ -9,13 +9,17 @@
 #include <vector>
 #include "sdl_libraries.h"
 
+//test collision detection
 //apply forces(), player 1, player 2, object, colliders,
+//apply friction, gravity, bounciness
 
 class Object
 {
 public:
     void set_position(int x, int y);
-    bool check_collision(std::vector<SDL_Rect>& a_colliders, std::vector<SDL_Rect>& b_colliders);
+    bool check_collision(Object& other);
+    void flip_colliders();
+    std::vector<SDL_Rect>& get_colliders();
     void render_colliders(); //for testing
 
     virtual void handle_event(SDL_Event& event) = 0;
@@ -24,6 +28,8 @@ public:
     virtual void render() = 0;
     
 protected:
+    int m_width;
+    int m_height;
     int m_position_x;
     int m_position_y;
     int m_velocity_x;
