@@ -22,52 +22,61 @@
 #include <string>
 #include <chrono>
 #include <sstream>
+#include <algorithm>
 
 //SDL libraries:
 #include "sdl_libraries.h"
 
 Hearts hearts;
 
-void check_all_collisions(std::vector<Object*>& objects)
+void resolve_collision(Object* p_object_1, Object* p_object_2)
 {
-    std::vector<Object*>::iterator it_1 = objects.begin();
-    
-    std::vector<Object*>::iterator it_2;
-
-    while(it_1 != objects.end())
+    //resolve collision
+    //can use enum instead of dynamic casting here
+    if (dynamic_cast<const Kunai*>(p_object_1) && dynamic_cast<const Player*>(p_object_2))
     {
-        it_2 = objects.begin() + 1;
+        // Resolve collision between Kunai and Player
+        std::cout << "Kunai hit object\n";
         
-        while(it_2 != objects.end())
+        p_object_1->delete_mark = true;
+        if (!hearts.pop_color())
         {
-            if((*it_1)->check_collision(*it_2))
-            {
-                if (dynamic_cast<Kunai*>(*it_1) && dynamic_cast<Player*>(*it_2))
-                {
-                    // Resolve collision between Kunai and Player
-                    std::cout << "Kunai hit object\n";
-                    it_1 = objects.erase(it_1);
-                    
-                    std::cout << "heart pop\n";
-                    
-                    if (!hearts.pop_color())
-                    {
-                        std::cout << "you loose\n";
-                    }
-                }
-                else
-                {
-                    ++it_2;
-                }
-            }
-            else ++it_2;
+            std::cout << "you loose\n";
         }
-        ++it_1;
+    }
+    
+    else if (dynamic_cast<const Player*>(p_object_2) && dynamic_cast<const Kunai*>(p_object_1))
+    {
+        // Resolve collision between Kunai and Player
+        std::cout << "Kunai hit object\n";
+        
+        p_object_2->delete_mark = true;
+        
+        if (!hearts.pop_color())
+        {
+            std::cout << "you loose\n";
+        }
     }
 }
 
-//resolve collission function
-//learn dynamic casting and how to use smart pointers
+void check_all_collisions(std::vector<Object*>& p_objects)
+{
+    for (int i = 0; i < p_objects.size(); i++)
+    {
+        for (int j = i + 1; j < p_objects.size(); j++)
+        {
+            if(p_objects[i]->check_collision(p_objects[j]))
+            {
+                resolve_collision(p_objects[i], p_objects[j]);
+                
+            }
+        }
+    }
+    p_objects.erase( std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object){return object->delete_mark;}), p_objects.end());
+    //pointer to object will be passed by reference
+}
+
+//Use enums instead od dynamic casting
 
 int main(int argc, char* args[])
 {
@@ -88,14 +97,15 @@ int main(int argc, char* args[])
        {
            hearts.set_position(5, 5);
            
+           
            Kunai starting_kunai;
            starting_kunai.set_position(0, 300);
            Player player_1;
            player_1.set_position(600, 300);
            
-           std::vector<Object*> objects;
-           objects.push_back(&starting_kunai);
-           objects.push_back(&player_1);
+           std::vector<Object*> p_objects;
+           p_objects.push_back(&starting_kunai);
+           p_objects.push_back(&player_1);
 
            int frame{0};
            int frame_rate {};
@@ -183,7 +193,7 @@ int main(int argc, char* args[])
               starting_kunai.update_position();
               player_1.update_position();
               
-              check_all_collisions(objects);
+              check_all_collisions(p_objects);
 
 
               time_to_print.str(""); //.str() discards previous content of stream and places new as ""
@@ -203,10 +213,10 @@ int main(int argc, char* args[])
               
               frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
                             
-              for (int i = 0; i < objects.size(); i++)
+              for (int i = 0; i < p_objects.size(); i++)
               {
-                  objects[i]->render();
-                  objects[i]->render_colliders();
+                  p_objects[i]->render();
+                  p_objects[i]->render_colliders();
               }
               
               hearts.render();
@@ -892,6 +902,45 @@ text_time_texture.render_texture(240, 270);
      change_var(m_velocity_y, m_acceleration_y -0.01*m_velocity_y, 5);
  }
  else change_var(m_velocity_y, m_acceleration_y, 5);
+ 
+ void check_all_collisions(std::vector<Object*>& objects)
+ {
+     std::vector<Object*>::iterator it_1 = objects.begin();
+     
+     std::vector<Object*>::iterator it_2;
+
+     while(it_1 != objects.end())
+     {
+         it_2 = objects.begin() + 1;
+         
+         while(it_2 != objects.end())
+         {
+             if((*it_1)->check_collision(*it_2))
+             {
+                 if (dynamic_cast<Kunai*>(*it_1) && dynamic_cast<Player*>(*it_2))
+                 {
+                     // Resolve collision between Kunai and Player
+                     std::cout << "Kunai hit object\n";
+                     it_1 = objects.erase(it_1);
+                     
+                     std::cout << "heart pop\n";
+                     
+                     if (!hearts.pop_color())
+                     {
+                         std::cout << "you loose\n";
+                     }
+                 }
+                 
+                 else
+                 {
+                     ++it_2;
+                 }
+             }
+             else ++it_2;
+         }
+         ++it_1;
+     }
+ }
  */
  
  

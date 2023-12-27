@@ -12,8 +12,8 @@
 
 Hearts::Hearts()
 {
-    m_red_clip =  {1, 0, 17, 14};
-    m_white_clip =  {19, 0, 17, 14};
+    m_red_clip = {1, 0, 17, 14};
+    m_white_clip = {19, 0, 17, 14};
     
     for (int i = 0; i < 3; i++)
     {

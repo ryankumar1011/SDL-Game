@@ -12,10 +12,13 @@
 class Player : public Object
 {
 public:
-    float GRAVITY_ACCELERATION = 0.3;
+    static constexpr float WIDTH = 89;
+    static constexpr float HEIGHT = 132;
     
 public:
     Player();
+    float get_height() override;
+    float get_width() override;
     void handle_event(SDL_Event& event) override;
     void update_position() override;
     void update_colliders() override;

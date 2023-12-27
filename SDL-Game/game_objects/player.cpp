@@ -11,8 +11,6 @@
 
 Player::Player()
 {
-    m_width = 89;
-    m_height = 132;
     
     m_position_x = 0;
     m_position_y = 0;
@@ -35,6 +33,16 @@ Player::Player()
     
     m_frame = -1;
     
+}
+
+float Player::get_height()
+{
+    return Player::HEIGHT;
+}
+
+float Player::get_width()
+{
+    return Player::WIDTH;
 }
 
 void Player::handle_event(SDL_Event& event)
@@ -68,14 +76,14 @@ void Player::update_position()
     m_position_x += m_velocity_x;
     m_position_y += m_velocity_y;
     
-    if (((m_position_x + m_width) > SCREEN_WIDTH) || (m_position_x < 0))
+    if (((m_position_x + Player::WIDTH) > SCREEN_WIDTH) || (m_position_x < 0))
     {
         m_position_x -= m_velocity_x;
         m_velocity_x = 0;
         m_acceleration_x = 0;
     }
     
-    if (((m_position_y + m_height) > SCREEN_HEIGHT) || (m_position_y < 0))
+    if (((m_position_y + Player::HEIGHT) > SCREEN_HEIGHT) || (m_position_y < 0))
     {
         m_position_y -= m_velocity_y;
         m_velocity_y = 0;
@@ -86,8 +94,8 @@ void Player::update_position()
         m_acceleration_y = GRAVITY_ACCELERATION;
     }
     
-    change_var(m_velocity_x, m_acceleration_x - 0.80*m_velocity_x, 15);
-    change_var(m_velocity_y, m_acceleration_y - 0.03*m_velocity_y, 15);
+    change_var(m_velocity_x, m_acceleration_x - FRICTION_MULTIPLIER*m_velocity_x, 15);
+    change_var(m_velocity_y, m_acceleration_y - AIR_RESISTANCE*m_velocity_y, 15);
     
     if (m_acceleration_x < 0)
     {

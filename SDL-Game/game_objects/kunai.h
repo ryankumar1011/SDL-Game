@@ -14,9 +14,14 @@
 
 class Kunai : public Object
 {
+public:
+    static constexpr float WIDTH = 31;
+    static constexpr float HEIGHT = 15;
     
 public:
     Kunai();
+    float get_height() override;
+    float get_width() override;
     void handle_event(SDL_Event& event) override;
     void update_position() override;
     void update_colliders() override;

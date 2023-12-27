@@ -11,9 +11,6 @@
 
 Kunai::Kunai()
 {
-    m_width = 31;
-    m_height = 15;
-    
     m_position_x = 0;
     m_position_y = 0;
     m_velocity_x = 3;
@@ -49,34 +46,34 @@ Kunai::Kunai()
     
 }
 
+float Kunai::get_height()
+{
+    return Kunai::HEIGHT; // Do not need to specify Kunai:: (this is for clarity)
+}
+
+float Kunai::get_width()
+{
+    return Kunai::WIDTH;
+}
+
 void Kunai::handle_event(SDL_Event& event)
 {
+    
+    
+    
     
 }
 
 void Kunai::update_position()
 {
     m_position_x += m_velocity_x;
-    update_colliders();
+    m_position_y += m_velocity_y;
 
-    if (((m_position_x + kunai_texture.get_width()) > SCREEN_WIDTH) || (m_position_x < 0))
+    if (((m_position_x + Kunai::WIDTH) > SCREEN_WIDTH) || (m_position_x < 0))
     {
         m_position_x -= m_velocity_x;
         m_velocity_x = -m_velocity_x;
         (m_flip_state == SDL_FLIP_NONE) ? m_flip_state = SDL_FLIP_HORIZONTAL : m_flip_state = SDL_FLIP_NONE;
-        
-       update_colliders();
-
-    }
-    
-    m_position_y += m_velocity_y;
-    
-    if (((m_position_y + m_width) > SCREEN_HEIGHT) || (m_position_y < 0))
-    {
-        m_position_y -= m_velocity_y;
-        m_velocity_y = 0;
-        
-       update_colliders();
 
     }
     

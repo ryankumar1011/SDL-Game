@@ -80,6 +80,18 @@ std::vector<SDL_FRect>& Object::get_colliders()
     return m_colliders;
 }
 
+void Object::flip_colliders()
+{
+    for (int i = 0; i < m_colliders.size(); i++)
+    {
+        //the x position of the left side will be changed, so m_collider[i].x is changed accordingly
+        m_colliders[i].x = m_position_x + (get_width() - (m_colliders[i].x - m_position_x));
+        
+        //since the collider's left x position becomes the right x position when horizontally flipped, we need to change m_collider[i].x to the new left position
+        m_colliders[i].x = m_colliders[i].x - m_colliders[i].w;
+    }
+}
+
 //This function is ONLY FOR TESTING. It is used to render the positions of the colliders.
 //To check the position of colliders more easily, first scale_colliders() and render_scaled_kunai() can be called to render enlarged kunai and change its colliders
 //Note::scale_colliders() should be called outside game loop - colliders should only be scalled once
@@ -95,14 +107,3 @@ void Object::render_colliders()
     
 }
 
-void Object::flip_colliders()
-{
-    for (int i = 0; i < m_colliders.size(); i++)
-    {
-        //the x position of the left side will be changed, so m_collider[i].x is changed accordingly
-        m_colliders[i].x = m_position_x + (m_width - (m_colliders[i].x - m_position_x));
-        
-        //since the collider's left x position becomes the right x position when horizontally flipped, we need to change m_collider[i].x to the new left position
-        m_colliders[i].x = m_colliders[i].x - m_colliders[i].w;
-    }
-}
