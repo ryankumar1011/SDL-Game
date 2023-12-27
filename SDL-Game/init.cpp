@@ -106,24 +106,24 @@ bool load_images()
 {
     bool success = true;
     
-    if (!button_sprite.load_from_file("Images/buttons.png"))
-    {
-        success = false;
-        printf("Failed to load buttons image\n");
-    }
-    
-    if (!player_sprite.load_from_file("Player_animations/player_animations2.png"))
+    if (!player_sprite.load_from_file("Images/player_animations2.png"))
     {
         success = false;
         printf("Failed to load player animations sprite\n");
     }
     
-    if (!kunai_texture.load_from_file("Weapons/kunai.png"))
+    if (!kunai_texture.load_from_file("Images/kunai.png"))
     {
         success = false;
         printf("Failed to load kunai image\n");
     }
-
+    
+    if (!heart_sprite.load_from_file("Images/pixel_hearts.png"))
+    {
+        success = false;
+        printf("Failed to load heart sprite\n");
+    }
+    
     return success;
 }
 
@@ -165,10 +165,12 @@ bool load_texts()
     
     SDL_Color text_color = {0x50, 0x00, 0x00};
     
+    /*
     if (!button_text.load_from_font(gp_arial_font, "Move over buttons to change color!", text_color))
     {
         success = false;
     }
+    */
     
     return success;
     
@@ -213,6 +215,7 @@ void initialize_media()
 
 void set_up_buttons()
 {
+    /*
     for (int i = 0; i < 4; i++)
     {
        g_buttons[i].set_button_sprite(&button_sprite);
@@ -223,15 +226,18 @@ void set_up_buttons()
     g_buttons[1].set_position(300, 0);
     g_buttons[2].set_position(0, 300);
     g_buttons[3].set_position(300, 300);
-     
+     */
+
 }
 
 void set_texture_clips()
 {
+    /*
     g_button_clips[0] = {0, 0, 300, 300};
     g_button_clips[1] = {300, 0, 300, 300};
     g_button_clips[2] = {0, 300, 300, 300};
     g_button_clips[3] = {300, 300, 300, 300};
+    */
     
     g_player_clips[0] = {19, 18, 108-19, 150-18};
     g_player_clips[1] = {120, 19, 193-120, 150-19};
@@ -260,11 +266,12 @@ void close()
 {
     // Destroyed all LOADED surfaces and textures
     
-    button_sprite.free();
-    player_sprite.free();
+    //button_sprite.free();
     frame_rate_text.free();
     kunai_texture.free();
-     
+    player_sprite.free();
+    heart_sprite.free();
+    
     TTF_CloseFont(gp_arial_font); //we need to close a font that is opened from TTF_OpenFont
 
     Mix_FreeMusic(gp_background_music);
@@ -284,4 +291,3 @@ void close()
     IMG_Quit();
     SDL_Quit();
 }
-

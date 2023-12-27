@@ -21,7 +21,6 @@ SDL_Renderer* gp_renderer = nullptr;
 //SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
 //Clips
-SDL_Rect g_button_clips [4];
 SDL_Rect g_player_clips[12];
 
 //Fonts
@@ -35,12 +34,11 @@ Mix_Chunk* gp_apple_hit_sound = nullptr;
 //Instantiating objects:
 //Note - suffixes _sprite and _text are used to indicate textures of sprites and textures of texts respectively
 
-Texture* p_current_texture;
-Texture button_sprite;
-Texture button_text;
 Texture frame_rate_text;
 Texture player_sprite;
 Texture kunai_texture;
+Texture heart_sprite;
 
-MouseButton g_buttons[4];
+//SDL_Rect g_button_clips [4];
+//MouseButton g_buttons[4];
 

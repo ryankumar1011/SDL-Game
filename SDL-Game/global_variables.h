@@ -34,12 +34,11 @@ extern Mix_Music* gp_background_music;
 extern Mix_Chunk* gp_shuriken_sound;
 extern Mix_Chunk* gp_apple_hit_sound;
 
-extern MouseButton g_buttons[4];
-
 extern Texture* p_current_texture;
 extern Texture button_sprite;
 extern Texture button_text;
 extern Texture frame_rate_text;
 extern Texture player_sprite;
 extern Texture kunai_texture;
+extern Texture heart_sprite;
 

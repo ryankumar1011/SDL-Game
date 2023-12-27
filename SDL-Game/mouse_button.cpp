@@ -8,9 +8,6 @@
 #include "mouse_button.h"
 #include "global_variables.h"
 
-
-extern SDL_Rect g_button_clips[4];
-
 MouseButton::MouseButton()
 {
     m_position = {0,0};
@@ -23,7 +20,7 @@ MouseButton::MouseButton()
 }
 
 //Changes m_current_clip (with type of an enum MouseClipState) depending on the type of mouse event returned during SDL_PollEvent()
-void MouseButton::handle_mouse_event (SDL_Event& event)
+void MouseButton::handle_event (SDL_Event& event)
 {
     if ((event.type == SDL_MOUSEBUTTONDOWN) || (event.type == SDL_MOUSEBUTTONUP) || (event.type == SDL_MOUSEMOTION) || (event.type == SDL_MOUSEWHEEL))
     {
@@ -84,16 +81,16 @@ void MouseButton::handle_mouse_event (SDL_Event& event)
 void MouseButton::handle_extra_states()
 
 {
-    mp_button_sprite->set_color_mod(0xFF, 0xFF, 0xFF);
+    mp_sprite->set_color_mod(0xFF, 0xFF, 0xFF);
     
     if (m_current_clip == MOUSE_CLIP_MOVE_OVER)
     {
-        mp_button_sprite->set_color_mod(0x00, 0x60, 0x00);
+        mp_sprite->set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
     if (m_current_clip == MOUSE_CLIP_SCROLL_OVER)
     {
-        mp_button_sprite->set_color_mod(0x00, 0x60, 0x00);
+        mp_sprite->set_color_mod(0x00, 0x60, 0x00);
         m_current_clip = MOUSE_CLIP_OVER;
     }
 
@@ -117,9 +114,9 @@ void MouseButton::set_height(int height)
     m_height = height;
 }
 
-void MouseButton::set_button_sprite(Texture* p_button_sprite)
+void MouseButton::set_sprite(Texture* p_sprite)
 {
-    mp_button_sprite = p_button_sprite;
+    mp_sprite = p_sprite;
 }
 
 int MouseButton::get_current_clip()
@@ -130,6 +127,7 @@ int MouseButton::get_current_clip()
 void MouseButton::render_button()
 {
     handle_extra_states();
-    mp_button_sprite->render_texture(m_position.x, m_position.y, &g_button_clips[m_current_clip]);
+    mp_sprite->render_texture(m_position.x, m_position.y, &m_clips[m_current_clip]);
+    
 }
 

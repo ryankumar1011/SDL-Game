@@ -5,7 +5,7 @@
 //  Created by Ryan Kumar on 1/11/23.
 //
 
-#pragma once 
+#pragma once
 
 #include "texture.h"
 
@@ -18,7 +18,6 @@ enum MouseClipState
     MOUSE_CLIP_MOVE_OVER,
     MOUSE_CLIP_SCROLL_OVER,
     MOUSE_CLIP_TOTAL
-    
 };
 
 class MouseButton
@@ -28,9 +27,9 @@ public:
     
     MouseButton();
     
-    void handle_mouse_event (SDL_Event& event);
+    void handle_event (SDL_Event& event);
     
-    void set_button_sprite(Texture* p_button_sprite);
+    void set_sprite(Texture* p_spritee);
     
     Texture* get_button_sprite_texture();
     
@@ -57,7 +56,9 @@ private:
     
     MouseClipState m_current_clip;
     
-    Texture* mp_button_sprite;
+    Texture* mp_sprite;
+    
+    SDL_Rect m_clips[];
     
 };
 

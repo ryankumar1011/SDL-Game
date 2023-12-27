@@ -45,11 +45,11 @@ void Player::handle_event(SDL_Event& event)
         
         if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
         {
-            change_var(m_acceleration_x, -0.25, -4);
+            change_var(m_acceleration_x, -0.6, -4.5);
         }
         if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
         {
-            change_var(m_acceleration_x, 0.25, 4);
+            change_var(m_acceleration_x, 0.60, 4.5);
         }
         
         if ((key_states[SDL_SCANCODE_F] && event.key.repeat == 0))
@@ -58,7 +58,7 @@ void Player::handle_event(SDL_Event& event)
         }
         if ((key_states[SDL_SCANCODE_SPACE] && event.key.repeat == 0))
         {
-            m_velocity_y = -10;
+            m_velocity_y = -11.5;
         }
     }
 }
@@ -86,14 +86,14 @@ void Player::update_position()
         m_acceleration_y = GRAVITY_ACCELERATION;
     }
     
-    change_var(m_velocity_x, m_acceleration_x - 0.85*m_velocity_x, 15);
+    change_var(m_velocity_x, m_acceleration_x - 0.80*m_velocity_x, 15);
     change_var(m_velocity_y, m_acceleration_y - 0.03*m_velocity_y, 15);
     
     if (m_acceleration_x < 0)
     {
         if (m_flip_state == SDL_FLIP_NONE) m_flip_state = SDL_FLIP_HORIZONTAL;
     }
-    else 
+    else
     {
         if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
     }
@@ -134,4 +134,3 @@ void Player::render()
         }
     }
 }
-

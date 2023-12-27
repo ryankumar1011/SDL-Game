@@ -13,6 +13,7 @@
 #include "object.h"
 #include "kunai.h"
 #include "player.h"
+#include "hearts.h"
 #include "init.h"
 #include "global_variables.h"
 
@@ -24,6 +25,8 @@
 
 //SDL libraries:
 #include "sdl_libraries.h"
+
+Hearts hearts;
 
 void check_all_collisions(std::vector<Object*>& objects)
 {
@@ -44,6 +47,13 @@ void check_all_collisions(std::vector<Object*>& objects)
                     // Resolve collision between Kunai and Player
                     std::cout << "Kunai hit object\n";
                     it_1 = objects.erase(it_1);
+                    
+                    std::cout << "heart pop\n";
+                    
+                    if (!hearts.pop_color())
+                    {
+                        std::cout << "you loose\n";
+                    }
                 }
                 else
                 {
@@ -76,6 +86,7 @@ int main(int argc, char* args[])
        
        else
        {
+           hearts.set_position(5, 5);
            
            Kunai starting_kunai;
            starting_kunai.set_position(0, 300);
@@ -198,6 +209,8 @@ int main(int argc, char* args[])
                   objects[i]->render_colliders();
               }
               
+              hearts.render();
+            
               SDL_RenderPresent(gp_renderer);
               
               frame++;
