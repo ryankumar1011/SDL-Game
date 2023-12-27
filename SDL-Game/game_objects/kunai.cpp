@@ -119,14 +119,14 @@ void Kunai::update_colliders()
 
 void Kunai::render()
 {
-    kunai_texture.render_texture(m_position_x, m_position_y, nullptr, 0, m_flip_state);
+    kunai_texture.render_texture(int(m_position_x), int(m_position_y), nullptr, 0, m_flip_state);
 }
 
 //This function is ONLY FOR TESTING. It renderes a kunai scaled 20 times larger.
 
 void Kunai::render_scaled()
 {
-    SDL_Rect enlarged_rect = {m_position_x, m_position_y, 620, 300}; // we are upscaling the kunai 20 times to see it clearly
+    SDL_Rect enlarged_rect = {int(m_position_x), int(m_position_y), 620, 300}; // we are upscaling the kunai 20 times to see it clearly
     
     SDL_RenderCopy(gp_renderer, kunai_texture.get_texture_pointer(), nullptr, &enlarged_rect);
 }

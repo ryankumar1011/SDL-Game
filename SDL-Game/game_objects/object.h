@@ -15,13 +15,13 @@
 
 class Object
 {
+    
 public:
-    void set_position(int x, int y);
-    void change_velocity_x(int amount, int cap);
-    void change_velocity_y(int amount, int cap);
+    void set_position(float x, float y);
+    void change_var(float& var, float amount, float cap);
     bool check_collision(Object* other);
     void flip_colliders();
-    std::vector<SDL_Rect>& get_colliders();
+    std::vector<SDL_FRect>& get_colliders();
     void render_colliders(); //for testing
 
     virtual void handle_event(SDL_Event& event) = 0;
@@ -32,10 +32,14 @@ public:
 protected:
     int m_width;
     int m_height;
-    int m_position_x;
-    int m_position_y;
-    int m_velocity_x;
-    int m_velocity_y;
-    std::vector<SDL_Rect> m_colliders;
+    float m_position_x;
+    float m_position_y;
+    float m_velocity_x;
+    float m_velocity_y;
+    float m_acceleration_x;
+    float m_acceleration_y;
+
+    std::vector<SDL_FRect> m_colliders;
     SDL_RendererFlip m_flip_state;
+    
 };

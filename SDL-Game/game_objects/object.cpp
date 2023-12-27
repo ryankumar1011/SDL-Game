@@ -8,66 +8,48 @@
 #include "object.h"
 #include "global_variables.h"
 
-void Object::set_position(int x, int y)
+void Object::set_position(float x, float y)
 {
     m_position_x = x;
     m_position_y = y;
 }
 
-void Object::change_velocity_x(int amount, int cap)
+
+void Object::change_var(float& var, float amount, float cap)
 {
-    int new_velocity{};
+    float new_var{};
     
-    if ((cap >= 0 && m_velocity_x < cap) || (cap < 0 && m_velocity_x > cap))
+    if (amount > 0) cap = abs(cap);
+    
+    else cap = - abs(cap);
+    
+    new_var = var + amount;
+    
+    if ((cap >= 0 && new_var <= cap) || (cap < 0 && new_var >= cap))
     {
-        new_velocity = m_velocity_x + amount;
-        
-        if ((cap >= 0 && new_velocity <= cap) || (cap < 0 && new_velocity >= cap))
-        {
-            m_velocity_x = new_velocity;
-        }
-        else
-        {
-            m_velocity_x = cap;
-        }
+        var = new_var;
+    }
+    else
+    {
+        var = cap;
     }
 }
-
-void Object::change_velocity_y(int amount, int cap)
-{
-    int new_velocity{};
-    
-    if ((cap >= 0 && m_velocity_y < cap) || (cap < 0 && m_velocity_y > cap))
-    {
-        new_velocity = m_velocity_y + amount;
-        
-        if ((cap >= 0 && new_velocity <= cap) || (cap < 0 && new_velocity >= cap))
-        {
-            m_velocity_y = new_velocity;
-        }
-        else
-        {
-            m_velocity_y = cap;
-        }
-    }
-}
-
 
 //This function uses seperate axis theorem to check for a collision. This can be easily done by SDL function SDL_HasIntersection(), but this is just for practice.
 
 bool Object::check_collision(Object* other)
 {
-    std::vector<SDL_Rect>& other_colliders = other->get_colliders();
+    std::vector<SDL_FRect>& other_colliders = other->get_colliders();
     
-    int m_left;
-    int m_right;
-    int m_top;
-    int m_bottom;
+    float m_left;
+    float m_right;
+    float m_top;
+    float m_bottom;
     
-    int other_left;
-    int other_right;
-    int other_top;
-    int other_bottom;
+    float other_left;
+    float other_right;
+    float other_top;
+    float other_bottom;
     
     for (int i = 0; i < m_colliders.size(); i++)
     {
@@ -93,7 +75,7 @@ bool Object::check_collision(Object* other)
     return false;
 }
 
-std::vector<SDL_Rect>& Object::get_colliders()
+std::vector<SDL_FRect>& Object::get_colliders()
 {
     return m_colliders;
 }
@@ -108,7 +90,7 @@ void Object::render_colliders()
     
     for (int i = 0; i < m_colliders.size(); i++)
     {
-        SDL_RenderDrawRect(gp_renderer, &m_colliders[i]);
+        SDL_RenderDrawRectF(gp_renderer, &m_colliders[i]);
     }
     
 }

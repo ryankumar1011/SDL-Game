@@ -16,9 +16,13 @@ Player::Player()
     
     m_position_x = 0;
     m_position_y = 0;
+    
     m_velocity_x = 0;
     m_velocity_y = 0;
     
+    m_acceleration_x = 0;
+    m_acceleration_y = GRAVITY_ACCELERATION;
+        
     m_colliders.resize(2);
 
     m_colliders[0].w = 62;
@@ -30,7 +34,6 @@ Player::Player()
     update_colliders();
     
     m_frame = -1;
-    mp_current_clip = &g_player_clips[0];
     
 }
 
@@ -40,28 +43,22 @@ void Player::handle_event(SDL_Event& event)
     {
         const uint8_t* key_states = SDL_GetKeyboardState(nullptr);
         
-        //use template,change acceleration instead?
-        
-        if (key_states[SDL_SCANCODE_A] | key_states[SDL_SCANCODE_LEFT])
+        if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
         {
-            change_velocity_x(-1, -6);
+            change_var(m_acceleration_x, -0.25, -4);
         }
-        if (key_states[SDL_SCANCODE_D] | key_states[SDL_SCANCODE_RIGHT])
+        if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
         {
-            change_velocity_x(1, 6);
-        }
-        if (key_states[SDL_SCANCODE_W] | key_states[SDL_SCANCODE_UP])
-        {
-            change_velocity_y(-1, -6);
-        }
-        if (key_states[SDL_SCANCODE_S] | key_states[SDL_SCANCODE_DOWN])
-        {
-            change_velocity_y(1, 6);
+            change_var(m_acceleration_x, 0.25, 4);
         }
         
         if ((key_states[SDL_SCANCODE_F] && event.key.repeat == 0))
         {
             m_frame = 0;
+        }
+        if ((key_states[SDL_SCANCODE_SPACE] && event.key.repeat == 0))
+        {
+            m_velocity_y = -10;
         }
     }
 }
@@ -71,20 +68,34 @@ void Player::update_position()
     m_position_x += m_velocity_x;
     m_position_y += m_velocity_y;
     
-    update_colliders();
-    
     if (((m_position_x + m_width) > SCREEN_WIDTH) || (m_position_x < 0))
     {
         m_position_x -= m_velocity_x;
         m_velocity_x = 0;
-        (m_flip_state == SDL_FLIP_NONE) ? m_flip_state = SDL_FLIP_HORIZONTAL : m_flip_state = SDL_FLIP_NONE;
-        
+        m_acceleration_x = 0;
     }
     
     if (((m_position_y + m_height) > SCREEN_HEIGHT) || (m_position_y < 0))
     {
         m_position_y -= m_velocity_y;
         m_velocity_y = 0;
+        m_acceleration_y = 0;
+    }
+    else
+    {
+        m_acceleration_y = GRAVITY_ACCELERATION;
+    }
+    
+    change_var(m_velocity_x, m_acceleration_x - 0.85*m_velocity_x, 15);
+    change_var(m_velocity_y, m_acceleration_y - 0.03*m_velocity_y, 15);
+    
+    if (m_acceleration_x < 0)
+    {
+        if (m_flip_state == SDL_FLIP_NONE) m_flip_state = SDL_FLIP_HORIZONTAL;
+    }
+    else 
+    {
+        if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
     }
     
     update_colliders();
@@ -109,13 +120,11 @@ void Player::render()
 {
     if (m_frame < 0)
     {
-        player_sprite.render_texture(m_position_x, m_position_y, &g_player_clips[0], 0, m_flip_state);
+        player_sprite.render_texture((int)m_position_x, (int)m_position_y, &g_player_clips[0], 0, m_flip_state);
     }
     else
     {
-        mp_current_clip = &g_player_clips[m_frame/5];
-        
-        player_sprite.render_texture(m_position_x, m_position_y, mp_current_clip, 0, m_flip_state);
+        player_sprite.render_texture((int)m_position_x, (int)m_position_y, &g_player_clips[m_frame/5], 0, m_flip_state);
         
         m_frame++;
         

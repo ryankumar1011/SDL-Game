@@ -11,6 +11,8 @@
 
 class Player : public Object
 {
+public:
+    float GRAVITY_ACCELERATION = 0.3;
     
 public:
     Player();
@@ -20,7 +22,6 @@ public:
     void render() override;
     
 private:
-    SDL_Rect* mp_current_clip;
     int m_frame;
     
 };

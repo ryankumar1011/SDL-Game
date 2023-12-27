@@ -838,4 +838,47 @@ text_time_texture.render_texture(240, 270);
      frame_rate_text.load_from_font(gp_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
      //str() here copies stringstream into a string object and returns that
  }
+ if (m_frame < 0)
+ {
+     if (m_frame < -30)
+     {
+         m_velocity_x += m_acceleration_x;
+         m_velocity_y += m_acceleration_y;
+         
+         m_frame = -1;
+     }
+     m_frame--;
+ }
+ void Object::change_velocity_y(float amount, float cap)
+ {
+     float new_velocity{};
+     
+     if ((cap >= 0 && m_velocity_y < cap) || (cap < 0 && m_velocity_y > cap))
+     {
+         new_velocity = m_velocity_y + amount;
+         
+         if ((cap >= 0 && new_velocity <= cap) || (cap < 0 && new_velocity >= cap))
+         {
+             m_velocity_y = new_velocity;
+         }
+         else
+         {
+             m_velocity_y = cap;
+         }
+     }
+ }
+ 
+ if (abs(m_velocity_x) > 1)
+ {
+     change_var(m_velocity_x, m_acceleration_x -0.05*m_velocity_x, 5);
+ }
+ else change_var(m_velocity_x, m_acceleration_x, 5);
+ 
+ if (abs(m_velocity_y) > 1)
+ {
+     change_var(m_velocity_y, m_acceleration_y -0.01*m_velocity_y, 5);
+ }
+ else change_var(m_velocity_y, m_acceleration_y, 5);
  */
+ 
+ 
