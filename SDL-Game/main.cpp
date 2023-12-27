@@ -27,22 +27,32 @@
 
 void check_all_collisions(std::vector<Object*>& objects)
 {
-    for (int i = 0; i < objects.size(); i++)
+    std::vector<Object*>::iterator it_1 = objects.begin();
+    
+    std::vector<Object*>::iterator it_2;
+
+    while(it_1 != objects.end())
     {
-        for (int j = i + 1; j < objects.size(); j++)
+        it_2 = objects.begin() + 1;
+        
+        while(it_2 != objects.end())
         {
-            if(objects[i]->check_collision(*objects[j]))
+            if((*it_1)->check_collision(*it_2))
             {
-                //resolve collision
-                //can use enum instead of dynamic casting here
-                if (dynamic_cast<const Kunai*>(objects[i]) && dynamic_cast<const Player*>(objects[j]))
-                    {
-                        // Resolve collision between Kunai and Player
-                        std::cout << "Kunai hit object\n";
-                        objects.erase(objects.begin() + i);
-                    }
+                if (dynamic_cast<Kunai*>(*it_1) && dynamic_cast<Player*>(*it_2))
+                {
+                    // Resolve collision between Kunai and Player
+                    std::cout << "Kunai hit object\n";
+                    it_1 = objects.erase(it_1);
+                }
+                else
+                {
+                    ++it_2;
+                }
             }
+            else ++it_2;
         }
+        ++it_1;
     }
 }
 
@@ -75,12 +85,9 @@ int main(int argc, char* args[])
            std::vector<Object*> objects;
            objects.push_back(&starting_kunai);
            objects.push_back(&player_1);
-           
-           SDL_Rect* current_clip = nullptr;
-           
+
            int frame{0};
            int frame_rate {};
-
            double previous_time{};
            double change_in_time{};
            const int CAPPED_FRAME_RATE {60};
@@ -134,15 +141,15 @@ int main(int argc, char* args[])
                               
                               break;
                               
-                          case SDLK_l:
+                          case SDLK_v:
                               Mix_PlayChannel(-1, gp_shuriken_sound, 0);
                               break;
                               
-                          case SDLK_f:
+                          case SDLK_b:
                               Mix_PlayChannel(-1, gp_apple_hit_sound, 0);
                               break;
                               
-                          case SDLK_r:
+                          case SDLK_n:
                               if (game_timer.is_started()) game_timer.stop();
                               game_timer.start();
                               break;
@@ -180,15 +187,11 @@ int main(int argc, char* args[])
                             
               //Rendering
               
-              SDL_SetRenderDrawColor(gp_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+              SDL_SetRenderDrawColor(gp_renderer, 0xE7, 0xFF, 0xCE, 0xFF);
               SDL_RenderClear(gp_renderer);
               
               frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
                             
-              //current_clip = &g_player_clips[frame/5];
-              //player_sprite.render_texture(100, 300, current_clip, 200);
-              //player_sprite.render_texture(SCREEN_WIDTH-300, 300, current_clip, 200, SDL_FLIP_HORIZONTAL);
-              
               for (int i = 0; i < objects.size(); i++)
               {
                   objects[i]->render();
@@ -197,9 +200,9 @@ int main(int argc, char* args[])
               
               SDL_RenderPresent(gp_renderer);
               
-              frame ++;
+              frame++;
               
-              if (frame > 55) 
+              if (frame > 60)
               {
                   frame = 0;
               }

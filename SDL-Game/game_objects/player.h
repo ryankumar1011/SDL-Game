@@ -19,5 +19,9 @@ public:
     void update_colliders() override;
     void render() override;
     
+private:
+    SDL_Rect* mp_current_clip;
+    int m_frame;
+    
 };
 

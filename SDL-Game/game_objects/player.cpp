@@ -9,8 +9,6 @@
 #include "texture.h"
 #include "global_variables.h"
 
-
-
 Player::Player()
 {
     m_width = 89;
@@ -31,24 +29,41 @@ Player::Player()
     
     update_colliders();
     
+    m_frame = -1;
+    mp_current_clip = &g_player_clips[0];
+    
 }
 
 void Player::handle_event(SDL_Event& event)
 {
-    if (event.type == SDL_KEYDOWN && event.key.repeat != 0)
+    if (event.type == SDL_KEYDOWN)
     {
         const uint8_t* key_states = SDL_GetKeyboardState(nullptr);
         
+        //use template,change acceleration instead?
+        
         if (key_states[SDL_SCANCODE_A] | key_states[SDL_SCANCODE_LEFT])
         {
-            m_velocity_x -= 1;
+            change_velocity_x(-1, -6);
         }
         if (key_states[SDL_SCANCODE_D] | key_states[SDL_SCANCODE_RIGHT])
         {
-            m_velocity_x += 1;
+            change_velocity_x(1, 6);
+        }
+        if (key_states[SDL_SCANCODE_W] | key_states[SDL_SCANCODE_UP])
+        {
+            change_velocity_y(-1, -6);
+        }
+        if (key_states[SDL_SCANCODE_S] | key_states[SDL_SCANCODE_DOWN])
+        {
+            change_velocity_y(1, 6);
+        }
+        
+        if ((key_states[SDL_SCANCODE_F] && event.key.repeat == 0))
+        {
+            m_frame = 0;
         }
     }
-    
 }
 
 void Player::update_position()
@@ -58,14 +73,21 @@ void Player::update_position()
     
     update_colliders();
     
-    if (((m_position_x + kunai_texture.get_width()) > SCREEN_WIDTH) || (m_position_x < 0))
+    if (((m_position_x + m_width) > SCREEN_WIDTH) || (m_position_x < 0))
     {
         m_position_x -= m_velocity_x;
-        m_velocity_x = -m_velocity_x;
+        m_velocity_x = 0;
         (m_flip_state == SDL_FLIP_NONE) ? m_flip_state = SDL_FLIP_HORIZONTAL : m_flip_state = SDL_FLIP_NONE;
         
-        update_colliders();
     }
+    
+    if (((m_position_y + m_height) > SCREEN_HEIGHT) || (m_position_y < 0))
+    {
+        m_position_y -= m_velocity_y;
+        m_velocity_y = 0;
+    }
+    
+    update_colliders();
         
 }
 
@@ -85,6 +107,22 @@ void Player::update_colliders()
 
 void Player::render()
 {
-    player_sprite.render_texture(m_position_x, m_position_y, &g_player_clips[0], 0, m_flip_state);
+    if (m_frame < 0)
+    {
+        player_sprite.render_texture(m_position_x, m_position_y, &g_player_clips[0], 0, m_flip_state);
+    }
+    else
+    {
+        mp_current_clip = &g_player_clips[m_frame/5];
+        
+        player_sprite.render_texture(m_position_x, m_position_y, mp_current_clip, 0, m_flip_state);
+        
+        m_frame++;
+        
+        if (m_frame > 55)
+        {
+            m_frame = -1;
+        }
+    }
 }
 

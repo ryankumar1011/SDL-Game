@@ -20,7 +20,6 @@ SDL_Renderer* gp_renderer = nullptr;
 
 //SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
-
 //Clips
 SDL_Rect g_button_clips [4];
 SDL_Rect g_player_clips[12];

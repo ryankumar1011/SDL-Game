@@ -14,11 +14,50 @@ void Object::set_position(int x, int y)
     m_position_y = y;
 }
 
+void Object::change_velocity_x(int amount, int cap)
+{
+    int new_velocity{};
+    
+    if ((cap >= 0 && m_velocity_x < cap) || (cap < 0 && m_velocity_x > cap))
+    {
+        new_velocity = m_velocity_x + amount;
+        
+        if ((cap >= 0 && new_velocity <= cap) || (cap < 0 && new_velocity >= cap))
+        {
+            m_velocity_x = new_velocity;
+        }
+        else
+        {
+            m_velocity_x = cap;
+        }
+    }
+}
+
+void Object::change_velocity_y(int amount, int cap)
+{
+    int new_velocity{};
+    
+    if ((cap >= 0 && m_velocity_y < cap) || (cap < 0 && m_velocity_y > cap))
+    {
+        new_velocity = m_velocity_y + amount;
+        
+        if ((cap >= 0 && new_velocity <= cap) || (cap < 0 && new_velocity >= cap))
+        {
+            m_velocity_y = new_velocity;
+        }
+        else
+        {
+            m_velocity_y = cap;
+        }
+    }
+}
+
+
 //This function uses seperate axis theorem to check for a collision. This can be easily done by SDL function SDL_HasIntersection(), but this is just for practice.
 
-bool Object::check_collision(Object& other)
+bool Object::check_collision(Object* other)
 {
-    std::vector<SDL_Rect>& other_colliders = other.get_colliders();
+    std::vector<SDL_Rect>& other_colliders = other->get_colliders();
     
     int m_left;
     int m_right;

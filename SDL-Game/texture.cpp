@@ -49,7 +49,7 @@ bool Texture::load_from_file(const std::string& file_path)
            
            if (m_color_key == 0) // will be zero if no color key is set
            {
-               m_color_key = SDL_MapRGB(mp_format, 0xFF, 0xFF, 0xFF); // this stores a pixel value
+               //m_color_key = SDL_MapRGB(mp_format, 0xFF, 0xFF, 0xFF); // this stores a pixel value
                
                //MapRGB generates pixel value with colour in the format of the used surface
 

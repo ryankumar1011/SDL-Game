@@ -17,7 +17,9 @@ class Object
 {
 public:
     void set_position(int x, int y);
-    bool check_collision(Object& other);
+    void change_velocity_x(int amount, int cap);
+    void change_velocity_y(int amount, int cap);
+    bool check_collision(Object* other);
     void flip_colliders();
     std::vector<SDL_Rect>& get_colliders();
     void render_colliders(); //for testing
