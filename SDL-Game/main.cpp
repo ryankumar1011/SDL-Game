@@ -941,6 +941,16 @@ text_time_texture.render_texture(240, 270);
          ++it_1;
      }
  }
+ 
+ if (m_acceleration_x < 0)
+ {
+     if (m_flip_state == SDL_FLIP_NONE) m_flip_state = SDL_FLIP_HORIZONTAL;
+ }
+ else
+ {
+     if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
+ }
+ 
  */
  
  

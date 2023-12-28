@@ -47,17 +47,21 @@ float Player::get_width()
 
 void Player::handle_event(SDL_Event& event)
 {
+    const uint8_t* key_states = SDL_GetKeyboardState(nullptr);
+    
     if (event.type == SDL_KEYDOWN)
     {
-        const uint8_t* key_states = SDL_GetKeyboardState(nullptr);
         
         if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
         {
-            change_var(m_acceleration_x, -0.6, -4.5);
+            change_var(m_acceleration_x, -0.1, -1);
+            if (m_flip_state == SDL_FLIP_NONE) m_flip_state = SDL_FLIP_HORIZONTAL;
         }
         if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
         {
-            change_var(m_acceleration_x, 0.60, 4.5);
+            change_var(m_acceleration_x, 0.1, 1);
+            if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
+            
         }
         
         if ((key_states[SDL_SCANCODE_F] && event.key.repeat == 0))
@@ -68,6 +72,13 @@ void Player::handle_event(SDL_Event& event)
         {
             m_velocity_y = -11.5;
         }
+    }
+    else if (event.type == SDL_KEYUP)
+    {
+        if ((key_states[SDL_SCANCODE_A] == 0) && (key_states[SDL_SCANCODE_LEFT] == 0) && (m_acceleration_x < 0))
+            m_acceleration_x = 0;
+        if ((key_states[SDL_SCANCODE_D] == 0) && (key_states[SDL_SCANCODE_RIGHT] == 0) && (m_acceleration_x > 0))
+            m_acceleration_x = 0;
     }
 }
 
@@ -88,24 +99,17 @@ void Player::update_position()
         m_position_y -= m_velocity_y;
         m_velocity_y = 0;
         m_acceleration_y = 0;
+        
+        
     }
     else
     {
         m_acceleration_y = GRAVITY_ACCELERATION;
     }
     
-    change_var(m_velocity_x, m_acceleration_x - FRICTION_MULTIPLIER*m_velocity_x, 15);
+    change_var(m_velocity_x, m_acceleration_x - FRICTION_MULTIPLIER*m_velocity_x, 10);
     change_var(m_velocity_y, m_acceleration_y - AIR_RESISTANCE*m_velocity_y, 15);
-    
-    if (m_acceleration_x < 0)
-    {
-        if (m_flip_state == SDL_FLIP_NONE) m_flip_state = SDL_FLIP_HORIZONTAL;
-    }
-    else
-    {
-        if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
-    }
-    
+   
     update_colliders();
         
 }

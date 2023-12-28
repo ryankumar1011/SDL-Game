@@ -18,7 +18,7 @@ class Object
     
 public:
     static constexpr float GRAVITY_ACCELERATION = 0.3;
-    static constexpr float FRICTION_MULTIPLIER = 0.80;
+    static constexpr float FRICTION_MULTIPLIER = 0.03;
     static constexpr float AIR_RESISTANCE = 0.03;
     bool delete_mark = false;
 
