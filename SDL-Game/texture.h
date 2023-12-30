@@ -16,7 +16,7 @@ class Texture
 public:
 
     Texture();
-    
+
     
     bool load_from_file(const std::string& texture_path);
     

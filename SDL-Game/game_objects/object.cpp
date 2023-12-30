@@ -14,7 +14,6 @@ void Object::set_position(float x, float y)
     m_position_y = y;
 }
 
-
 void Object::change_var(float& var, float amount, float cap)
 {
     float new_var{};

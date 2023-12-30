@@ -7,7 +7,9 @@
 
 #include "global_variables.h"
 #include "texture.h"
-#include "mouse_button.h"
+#include "player.h"
+#include "hearts.h"
+#include "game_objects.h"
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 600;
@@ -20,8 +22,7 @@ SDL_Renderer* gp_renderer = nullptr;
 
 //SDL_Renderer is a struct that handles ALL rendering and contains information about settings related to rendering
 
-//Clips
-SDL_Rect g_player_clips[12];
+GameObjects g_game_objects;
 
 //Fonts
 TTF_Font* gp_arial_font = nullptr;
@@ -34,10 +35,10 @@ Mix_Chunk* gp_apple_hit_sound = nullptr;
 //Instantiating objects:
 //Note - suffixes _sprite and _text are used to indicate textures of sprites and textures of texts respectively
 
-Texture frame_rate_text;
-Texture player_sprite;
-Texture kunai_texture;
-Texture heart_sprite;
+Texture g_frame_rate_text;
+Texture g_player_sprite;
+Texture g_kunai_texture;
+Texture g_heart_sprite;
 
 //SDL_Rect g_button_clips [4];
 //MouseButton g_buttons[4];

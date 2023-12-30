@@ -10,10 +10,11 @@
 #include "texture.h"
 #include "mouse_button.h"
 #include "timers.h"
-#include "object.h"
 #include "kunai.h"
 #include "player.h"
 #include "hearts.h"
+#include "object.h"
+#include "game_objects.h"
 #include "init.h"
 #include "global_variables.h"
 
@@ -27,56 +28,21 @@
 //SDL libraries:
 #include "sdl_libraries.h"
 
-Hearts hearts;
-
-void resolve_collision(Object* p_object_1, Object* p_object_2)
+void update_frame_rate(int frame_rate)
 {
-    //resolve collision
-    //can use enum instead of dynamic casting here
-    if (dynamic_cast<const Kunai*>(p_object_1) && dynamic_cast<const Player*>(p_object_2))
-    {
-        // Resolve collision between Kunai and Player
-        std::cout << "Kunai hit object\n";
-        
-        p_object_1->delete_mark = true;
-        if (!hearts.pop_color())
-        {
-            std::cout << "you loose\n";
-        }
-    }
+    std::stringstream frame_rate_stream;
     
-    else if (dynamic_cast<const Player*>(p_object_2) && dynamic_cast<const Kunai*>(p_object_1))
-    {
-        // Resolve collision between Kunai and Player
-        std::cout << "Kunai hit object\n";
-        
-        p_object_2->delete_mark = true;
-        
-        if (!hearts.pop_color())
-        {
-            std::cout << "you loose\n";
-        }
-    }
+    frame_rate_stream.str(""); //.str() discards previous content of stream and places new as ""
+    frame_rate_stream << "FR:" << frame_rate;
+
+    g_frame_rate_text.load_from_font(gp_arial_font, frame_rate_stream.str(), {0x00, 0x00, 0x00});
+        //str() here copies stringstream into a string object and returns that
 }
 
-void check_all_collisions(std::vector<Object*>& p_objects)
+void render_frame_rate()
 {
-    for (int i = 0; i < p_objects.size(); i++)
-    {
-        for (int j = i + 1; j < p_objects.size(); j++)
-        {
-            if(p_objects[i]->check_collision(p_objects[j]))
-            {
-                resolve_collision(p_objects[i], p_objects[j]);
-                
-            }
-        }
-    }
-    p_objects.erase( std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object){return object->delete_mark;}), p_objects.end());
-    //pointer to object will be passed by reference
+    g_frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
 }
-
-//Use enums instead od dynamic casting
 
 int main(int argc, char* args[])
 {
@@ -95,18 +61,16 @@ int main(int argc, char* args[])
        
        else
        {
-           hearts.set_position(5, 5);
-           
-           
-           Kunai starting_kunai;
-           starting_kunai.set_position(0, 300);
            Player player_1;
            player_1.set_position(600, 300);
+           g_game_objects.insert(&player_1);
            
-           std::vector<Object*> p_objects;
-           p_objects.push_back(&starting_kunai);
-           p_objects.push_back(&player_1);
-
+           Hearts hearts_1;
+           hearts_1.set_position(5, 5);
+           player_1.set_hearts(&hearts_1);
+           
+           g_frame_rate_text.set_alpha_mod(0xAA);
+    
            int frame{0};
            int frame_rate {};
            double previous_time{};
@@ -115,7 +79,6 @@ int main(int argc, char* args[])
            const int MINIMUM_LOOP_TICKS {1000/CAPPED_FRAME_RATE};
            //loop ticks are in milliseconds. 1 seconds is 1000 ms so 1000/frame_rate is time in ms for each frame
            
-           std::stringstream time_to_print;
            SDLTimer game_timer;
            game_timer.start();
            SDLTimer cap_timer;
@@ -188,39 +151,22 @@ int main(int argc, char* args[])
               
               //Logic
               
-              //the variable frame is incremented from 0 and ends at 55 every loop. Some actions like loading text are only done at a specific frame to improve performance
+              g_game_objects.update();
               
-              starting_kunai.update_position();
-              player_1.update_position();
+              //Frame rate is only updated once per second for performance (updating it requires loading a new texture with different text)
               
-              check_all_collisions(p_objects);
+              if (frame == 0) update_frame_rate(frame_rate);
 
-
-              time_to_print.str(""); //.str() discards previous content of stream and places new as ""
-              time_to_print << "FR:" << frame_rate;
-              
-              if (frame == 0)
-              {
-                  frame_rate_text.load_from_font(gp_arial_font, time_to_print.str(), {0x00, 0x00, 0x00});
-                  frame_rate_text.set_alpha_mod(0xAA);
-                  //str() here copies stringstream into a string object and returns that
-              }
                             
               //Rendering
               
               SDL_SetRenderDrawColor(gp_renderer, 0xE7, 0xFF, 0xCE, 0xFF);
               SDL_RenderClear(gp_renderer);
               
-              frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
-                            
-              for (int i = 0; i < p_objects.size(); i++)
-              {
-                  p_objects[i]->render();
-                  p_objects[i]->render_colliders();
-              }
+              render_frame_rate();
               
-              hearts.render();
-            
+              g_game_objects.render();
+              
               SDL_RenderPresent(gp_renderer);
               
               frame++;
@@ -235,7 +181,8 @@ int main(int argc, char* args[])
               change_in_time = (game_timer.get_time()/1000.0f) - previous_time;
               previous_time = (game_timer.get_time()/1000.0f);
               frame_rate = 1.0/change_in_time;
-              if (frame_rate > 100000) frame_rate = 0;
+              
+              if (frame_rate > 10000) frame_rate = 0;
               
               if (cap_timer.get_time() < MINIMUM_LOOP_TICKS)
               {
@@ -951,6 +898,82 @@ text_time_texture.render_texture(240, 270);
      if (m_flip_state == SDL_FLIP_HORIZONTAL) m_flip_state = SDL_FLIP_NONE;
  }
  
+ if (dynamic_cast<const Kunai*>(p_object_1) && dynamic_cast<const Player*>(p_object_2))
+ {
+     // Resolve collision between Kunai and Player
+     std::cout << "Kunai hit object\n";
+     
+     p_object_1->delete_mark = true;
+     if (!hearts.pop_color())
+     {
+         std::cout << "you loose\n";
+     }
+ }
+ 
+ else if (dynamic_cast<  Player*>(p_object_2) && dynamic_cast<const Kunai*>(p_object_1))
+ {
+     // Resolve collision between Kunai and Player
+     std::cout << "Kunai hit object\n";
+     
+     p_object_2->delete_mark = true;
+     
+     if (!hearts.pop_color())
+     {
+         std::cout << "you loose\n";
+     }
+ }
+}
+ 
+ std::vector<Object*>::iterator it = std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object)
+{if(object->delete_mark) {delete object; return true;} else return false;});
+ 
+ std::vector<Object*>::iterator it = std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object){return object->delete_mark;});
+ while (it != p_objects.end())
+  {
+      Kunai* p_kunai = dynamic_cast<Kunai*>(*it);
+      it = p_objects.erase(it);
+      delete p_kunai;
+      p_kunai = nullptr;
+  }
+ //pointer to object will be passed by reference
+ 
+ std::vector<Object*>::iterator it = std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object)   {return object->delete_mark;});
+ 
+ while (it != p_objects.end())
+  {
+      if (((*it)->get_name() == KUNAI) && ((*it)->delete_mark))
+      {
+          Kunai* p_kunai = dynamic_cast<Kunai*>(*it);
+          it = p_objects.erase(it);
+          player_1.delete_kunai(p_kunai);
+          p_kunai = nullptr;
+      }
+      
+     else it++;
+  }
+ p_objects.erase(std::remove_if(p_objects.begin(), p_objects.end(), [](Object*& object) {
+        if (object->delete_mark)
+        {
+            delete object;
+            return true;
+        }
+        return false;
+    }), p_objects.end());
+ 
+ std::vector<Object*>::iterator it = std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object)   {return (object->get_name() == KUNAI) && object->delete_mark;});
+ 
+ while (it != p_objects.end())
+ {
+     delete (*it);
+     it = p_objects.erase(it);
+  }
+ std::vector<Object*>::iterator it = std::remove_if(p_objects.begin(), p_objects.end(), [](Object* object) {return object->delete_mark;});
+ 
+ while (it != p_objects.end())
+ {
+     delete (*it);
+     it = p_objects.erase(it);
+  }
  */
  
  

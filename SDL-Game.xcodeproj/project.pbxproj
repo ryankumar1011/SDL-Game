@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E22E3462B3CB36600BF7A0B /* hearts.cpp */; };
+		0E3735072B3F614D009E373D /* game_objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3735052B3F614D009E373D /* game_objects.cpp */; };
 		0E65303A2B3AE828004487DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E6530382B3AE828004487DA /* object.cpp */; };
 		0E65303D2B3AEFD5004487DA /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E65303B2B3AEFD5004487DA /* player.cpp */; };
 		0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */; };
@@ -39,6 +40,8 @@
 		0E0D194E2AF5FA38000C5DAA /* global_variables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_variables.h; sourceTree = "<group>"; };
 		0E22E3462B3CB36600BF7A0B /* hearts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hearts.cpp; sourceTree = "<group>"; };
 		0E22E3472B3CB36600BF7A0B /* hearts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hearts.h; sourceTree = "<group>"; };
+		0E3735052B3F614D009E373D /* game_objects.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_objects.cpp; sourceTree = "<group>"; };
+		0E3735062B3F614D009E373D /* game_objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game_objects.h; sourceTree = "<group>"; };
 		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
 		0E6530382B3AE828004487DA /* object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
@@ -81,6 +84,8 @@
 		0E65303E2B3AEFFF004487DA /* game_objects */ = {
 			isa = PBXGroup;
 			children = (
+				0E3735052B3F614D009E373D /* game_objects.cpp */,
+				0E3735062B3F614D009E373D /* game_objects.h */,
 				0E6530382B3AE828004487DA /* object.cpp */,
 				0E6530392B3AE828004487DA /* object.h */,
 				0E65303B2B3AEFD5004487DA /* player.cpp */,
@@ -204,6 +209,7 @@
 				0E65303A2B3AE828004487DA /* object.cpp in Sources */,
 				0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */,
 				0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */,
+				0E3735072B3F614D009E373D /* game_objects.cpp in Sources */,
 				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,
 				0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */,
 				0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */,

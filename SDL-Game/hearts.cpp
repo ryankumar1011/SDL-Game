@@ -39,13 +39,17 @@ bool Hearts::pop_color()
 {
     for (int i = 2; i >= 0; i--)
     {
+        if (i == 0)
+       {
+           m_colors[i] = WHITE;
+           return false;
+       }
         if (m_colors[i] == RED)
         {
             m_colors[i] = WHITE;
             return true;
         }
     }
-    
     return false;
 }
 
@@ -53,9 +57,9 @@ void Hearts::render()
 {
     for (int i = 0; i < 3; i++)
     {
-        if (m_colors[i] == RED) SDL_RenderCopy(gp_renderer, heart_sprite.get_texture_pointer(), &m_red_clip, &m_render_areas[i]);
+        if (m_colors[i] == RED) SDL_RenderCopy(gp_renderer, g_heart_sprite.get_texture_pointer(), &m_red_clip, &m_render_areas[i]);
         
-        else if (m_colors[i] == WHITE) SDL_RenderCopy(gp_renderer, heart_sprite.get_texture_pointer(), &m_white_clip, &m_render_areas[i]);
+        else if (m_colors[i] == WHITE) SDL_RenderCopy(gp_renderer, g_heart_sprite.get_texture_pointer(), &m_white_clip, &m_render_areas[i]);
     }
 }
 

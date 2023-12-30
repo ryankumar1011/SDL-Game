@@ -44,22 +44,28 @@ Kunai::Kunai()
     
     update_colliders();
     
+    std::cout << "Kunai created\n";
+
+    
+}
+
+ObjectName Kunai::get_name()
+{
+    return Kunai::NAME; // Do not need to specify Kunai:: (this is for clarity)
 }
 
 float Kunai::get_height()
 {
-    return Kunai::HEIGHT; // Do not need to specify Kunai:: (this is for clarity)
+    return Kunai::HEIGHT;
 }
 
 float Kunai::get_width()
 {
-    return Kunai::WIDTH;
+    return Kunai::WIDTH; 
 }
 
 void Kunai::handle_event(SDL_Event& event)
 {
-    
-    
     
     
 }
@@ -116,16 +122,16 @@ void Kunai::update_colliders()
 
 void Kunai::render()
 {
-    kunai_texture.render_texture(int(m_position_x), int(m_position_y), nullptr, 0, m_flip_state);
+    g_kunai_texture.render_texture((int)m_position_x, (int)m_position_y, nullptr, 0, m_flip_state);
 }
 
 //This function is ONLY FOR TESTING. It renderes a kunai scaled 20 times larger.
 
 void Kunai::render_scaled()
 {
-    SDL_Rect enlarged_rect = {int(m_position_x), int(m_position_y), 620, 300}; // we are upscaling the kunai 20 times to see it clearly
+    SDL_Rect enlarged_rect = {(int)m_position_x, (int)m_position_y, 620, 300}; // we are upscaling the kunai 20 times to see it clearly
     
-    SDL_RenderCopy(gp_renderer, kunai_texture.get_texture_pointer(), nullptr, &enlarged_rect);
+    SDL_RenderCopy(gp_renderer, g_kunai_texture.get_texture_pointer(), nullptr, &enlarged_rect);
 }
 
 //This function is ONLY FOR TESTING. It scales the kunai colliders 20 times. It should be called outside game loop. Kunai should and colliders should not be moving.
@@ -139,4 +145,9 @@ void Kunai::scale_colliders()
         m_colliders[i].w = m_colliders[i].w*20;
         m_colliders[i].h = m_colliders[i].h*20;
     }
+}
+
+Kunai::~Kunai()
+{
+    std::cout << "Kunai destroyed\n";
 }

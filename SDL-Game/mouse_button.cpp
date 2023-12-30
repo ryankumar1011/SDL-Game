@@ -96,12 +96,10 @@ void MouseButton::handle_extra_states()
 
 }
 
-void MouseButton::set_position (int x, int y)
+void MouseButton::set_position(int x, int y)
 {
-    
     m_position.x = x;
     m_position.y = y;
-    
 }
 
 void MouseButton::set_width(int width)

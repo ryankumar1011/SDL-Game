@@ -9,9 +9,12 @@
 #include <vector>
 #include "sdl_libraries.h"
 
-//test collision detection
-//apply forces(), player 1, player 2, object, colliders,
-//apply friction, gravity, bounciness
+enum ObjectName
+{
+    KUNAI,
+    PLAYER
+};
+
 
 class Object
 {
@@ -30,12 +33,14 @@ public:
     std::vector<SDL_FRect>& get_colliders();
     void render_colliders(); //for testing
     
+    virtual ObjectName get_name() = 0;
     virtual float get_height() = 0;
     virtual float get_width() = 0;
     virtual void handle_event(SDL_Event& event) = 0;
     virtual void update_position() = 0;
     virtual void update_colliders() = 0;
     virtual void render() = 0;
+    virtual ~Object() = default;
 
 protected:
     float m_position_x;
