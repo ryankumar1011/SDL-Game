@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "sdl_libraries.h"
+#include <SDL2_ttf/SDL_ttf.h>
 #include <iostream>
 
 bool init();

@@ -46,7 +46,7 @@ private:
 
 //The below struct measures the time it takes for an instance of it to go out of scope. It can be used to measure the time taken for a function to execute
 
-struct ChronoTimer
+class ChronoTimer
 {
    
 public:

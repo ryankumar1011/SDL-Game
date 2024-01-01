@@ -6,7 +6,6 @@
 //
 
 #include "mouse_button.h"
-#include "global_variables.h"
 
 MouseButton::MouseButton()
 {
@@ -125,7 +124,7 @@ int MouseButton::get_current_clip()
 void MouseButton::render_button()
 {
     handle_extra_states();
-    mp_sprite->render_texture(m_position.x, m_position.y, &m_clips[m_current_clip]);
+    mp_sprite->render(m_position.x, m_position.y, &m_clips[m_current_clip]);
     
 }
 

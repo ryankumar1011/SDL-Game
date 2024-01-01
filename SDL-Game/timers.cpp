@@ -7,7 +7,9 @@
 
 
 #include "timers.h"
-#include "global_variables.h"
+#include <SDL2_ttf/SDL_ttf.h>
+
+//#include "global_variables.h"
 
 SDLTimer::SDLTimer()
 {

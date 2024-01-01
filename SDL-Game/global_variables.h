@@ -14,7 +14,8 @@ class Texture;
 class MouseButton;
 class Weapons;
 class SDLTimer;
-struct ChronoTimer;
+class ChronoTimer;
+class FrameRate;
 class Object;
 class Player;
 class Kunai;
@@ -35,8 +36,3 @@ extern TTF_Font* gp_arial_font;
 extern Mix_Music* gp_background_music;
 extern Mix_Chunk* gp_shuriken_sound;
 extern Mix_Chunk* gp_apple_hit_sound;
-
-extern Texture g_frame_rate_text;
-extern Texture g_player_sprite;
-extern Texture g_kunai_texture;
-extern Texture g_heart_sprite;

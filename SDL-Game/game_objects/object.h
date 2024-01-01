@@ -7,7 +7,7 @@
 
 #pragma once
 #include <vector>
-#include "sdl_libraries.h"
+#include <SDL2/SDL.h>
 
 enum ObjectName
 {
@@ -15,10 +15,8 @@ enum ObjectName
     PLAYER
 };
 
-
 class Object
 {
-    
 public:
     static constexpr float GRAVITY_ACCELERATION = 0.3;
     static constexpr float FRICTION_MULTIPLIER = 0.03;
@@ -27,6 +25,7 @@ public:
 
 public:
     void set_position(float x, float y);
+    void set_velocity(float x, float y);
     void change_var(float& var, float amount, float cap);
     bool check_collision(Object* other);
     void flip_colliders();
@@ -34,8 +33,7 @@ public:
     void render_colliders(); //for testing
     
     virtual ObjectName get_name() = 0;
-    virtual float get_height() = 0;
-    virtual float get_width() = 0;
+    virtual int get_width() = 0;
     virtual void handle_event(SDL_Event& event) = 0;
     virtual void update_position() = 0;
     virtual void update_colliders() = 0;
@@ -52,5 +50,4 @@ protected:
     
     std::vector<SDL_FRect> m_colliders;
     SDL_RendererFlip m_flip_state;
-    
 };

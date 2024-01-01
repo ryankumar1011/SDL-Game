@@ -10,6 +10,7 @@
 #include "texture.h"
 #include "mouse_button.h"
 #include "timers.h"
+#include "frame_rate.h"
 #include "kunai.h"
 #include "player.h"
 #include "hearts.h"
@@ -26,23 +27,10 @@
 #include <algorithm>
 
 //SDL libraries:
-#include "sdl_libraries.h"
-
-void update_frame_rate(int frame_rate)
-{
-    std::stringstream frame_rate_stream;
-    
-    frame_rate_stream.str(""); //.str() discards previous content of stream and places new as ""
-    frame_rate_stream << "FR:" << frame_rate;
-
-    g_frame_rate_text.load_from_font(gp_arial_font, frame_rate_stream.str(), {0x00, 0x00, 0x00});
-        //str() here copies stringstream into a string object and returns that
-}
-
-void render_frame_rate()
-{
-    g_frame_rate_text.render_texture(SCREEN_WIDTH-40, 5, nullptr);
-}
+#include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
+#include <SDL2_mixer/SDL_mixer.h>
 
 int main(int argc, char* args[])
 {
@@ -63,13 +51,12 @@ int main(int argc, char* args[])
        {
            Player player_1;
            player_1.set_position(600, 300);
+           player_1.get_hearts().set_position(5, 5);
+           player_1.get_hearts().set_number(5);
+           
            g_game_objects.insert(&player_1);
-           
-           Hearts hearts_1;
-           hearts_1.set_position(5, 5);
-           player_1.set_hearts(&hearts_1);
-           
-           g_frame_rate_text.set_alpha_mod(0xAA);
+
+           FrameRate frame_rate_text;
     
            int frame{0};
            int frame_rate {};
@@ -155,7 +142,10 @@ int main(int argc, char* args[])
               
               //Frame rate is only updated once per second for performance (updating it requires loading a new texture with different text)
               
-              if (frame == 0) update_frame_rate(frame_rate);
+              if (frame == 0) 
+              {
+                  frame_rate_text.update(frame_rate);
+              }
 
                             
               //Rendering
@@ -163,7 +153,7 @@ int main(int argc, char* args[])
               SDL_SetRenderDrawColor(gp_renderer, 0xE7, 0xFF, 0xCE, 0xFF);
               SDL_RenderClear(gp_renderer);
               
-              render_frame_rate();
+              frame_rate_text.render();
               
               g_game_objects.render();
               
@@ -974,6 +964,16 @@ text_time_texture.render_texture(240, 270);
      delete (*it);
      it = p_objects.erase(it);
   }
+ 
+ m_position[0].x = x;
+ m_position[0].y = y;
+
+ m_position[1].x = m_position[0].x + m_render_areas[0].w + 1;
+ m_position[1].y = m_position[0].y;
+ 
+ m_position[2].x = m_position[1].x + m_render_areas[1].w + 1;
+ m_position[2].y = m_position[0].y;
+ 
  */
  
  

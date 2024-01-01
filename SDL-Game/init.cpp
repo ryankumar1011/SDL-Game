@@ -7,10 +7,13 @@
 
 #include "init.h"
 #include "texture.h"
-#include "mouse_button.h"
 #include "player.h"
 #include "kunai.h"
 #include "global_variables.h"
+
+#include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+#include <SDL2_mixer/SDL_mixer.h>
 
 bool init()
 {
@@ -108,19 +111,19 @@ bool load_images()
 {
     bool success = true;
     
-    if (!g_player_sprite.load_from_file("Images/player_animations2.png"))
+    if (!Player::get_texture().load_from_file("Images/player_animations2.png"))
     {
         success = false;
         printf("Failed to load player animations sprite\n");
     }
     
-    if (!g_kunai_texture.load_from_file("Images/kunai.png"))
+    if (!Kunai::get_texture().load_from_file("Images/kunai.png"))
     {
         success = false;
         printf("Failed to load kunai image\n");
     }
     
-    if (!g_heart_sprite.load_from_file("Images/pixel_hearts.png"))
+    if (!Hearts::get_texture().load_from_file("Images/pixel_hearts.png"))
     {
         success = false;
         printf("Failed to load heart sprite\n");
@@ -227,9 +230,8 @@ void set_texture_clips()
 
 void set_texture_size()
 {
-   g_kunai_texture.set_width(Kunai::WIDTH);
-   g_kunai_texture.set_height(Kunai::HEIGHT);
-    
+   Kunai::get_texture().set_width(Kunai::WIDTH);
+   Kunai::get_texture().set_height(Kunai::HEIGHT);
 }
 
 void close()
@@ -237,10 +239,9 @@ void close()
     // Destroyed all LOADED surfaces and textures
     
     //button_sprite.free();
-    g_frame_rate_text.free();
-    g_kunai_texture.free();
-    g_player_sprite.free();
-    g_heart_sprite.free();
+    Kunai::get_texture().free();
+    Player::get_texture().free();
+    Hearts::get_texture().free();
     
     TTF_CloseFont(gp_arial_font); //we need to close a font that is opened from TTF_OpenFont
 
@@ -250,6 +251,7 @@ void close()
     
     // Destroy Windows and Renderer, set pointers to NULL
     SDL_DestroyWindow(gp_window);
+    
     //Takes care of destroying my_screen_surface/my_current_texture
     SDL_DestroyRenderer(gp_renderer);
     gp_window = nullptr;

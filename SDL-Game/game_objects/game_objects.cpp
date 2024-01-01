@@ -6,11 +6,12 @@
 //
 
 #include "game_objects.h"
-#include <vector>
-#include <iostream>
 #include "hearts.h"
 #include "player.h"
-#include "global_variables.h"
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <SDL2/SDL.h>
 
 void GameObjects::insert(Object* p_object)
 {
@@ -40,7 +41,7 @@ void GameObjects::resolve_collision(Object* p_object_1, Object* p_object_2)
                     
                     std::cout << "Kunai hit\n";
                     
-                    if ((static_cast<Player*>(p_object_2))->pop_heart())
+                    if ((static_cast<Player*>(p_object_2))->get_hearts().pop_color())
                     {
                         std::cout << "you loose\n";
                     }
@@ -66,7 +67,7 @@ void GameObjects::resolve_collision(Object* p_object_1, Object* p_object_2)
                     
                     std::cout << "Kunai hit\n";
                     
-                    if (!(static_cast<Player*>(p_object_1))->pop_heart())
+                    if (!(static_cast<Player*>(p_object_1))->get_hearts().pop_color())
                     {
                         std::cout << "you loose\n";
                     }
@@ -120,7 +121,6 @@ void GameObjects::update()
     }
 
     resolve_all_collisions();
-
 }
 
 void GameObjects::render()

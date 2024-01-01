@@ -21,7 +21,6 @@ public:
 private:
     std::vector<Object*> mp_objects;
     std::vector<Object*> mp_added_objects;
-    
 };
 
 

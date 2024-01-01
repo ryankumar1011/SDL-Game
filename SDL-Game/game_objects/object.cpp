@@ -14,6 +14,12 @@ void Object::set_position(float x, float y)
     m_position_y = y;
 }
 
+void Object::set_velocity(float x, float y)
+{
+    m_velocity_x = x;
+    m_velocity_y = y;
+}
+
 void Object::change_var(float& var, float amount, float cap)
 {
     float new_var{};
@@ -50,27 +56,25 @@ bool Object::check_collision(Object* other)
     float other_top;
     float other_bottom;
     
-    for (int i = 0; i < m_colliders.size(); i++)
+    for (auto& i : m_colliders)
     {
-        m_left = m_colliders[i].x;
-        m_top = m_colliders[i].y;
-        m_right = m_colliders[i].x + m_colliders[i].w;
-        m_bottom = m_colliders[i].y + m_colliders[i].h;
+        m_left = i.x;
+        m_top = i.y;
+        m_right = i.x + i.w;
+        m_bottom = i.y + i.h;
         
-        for (int j = 0; j < other_colliders.size(); j++)
+        for (auto& j : other_colliders)
         {
-            other_left = other_colliders[j].x;
-            other_top = other_colliders[j].y;
-            other_right = other_colliders[j].x + other_colliders[j].w;
-            other_bottom = other_colliders[j].y + other_colliders[j].h;
-            
+            other_left = j.x;
+            other_top = j.y;
+            other_right = j.x + j.w;
+            other_bottom = j.y + j.h;
             if (((m_bottom <= other_top) || (m_top >= other_bottom) || (m_right <= other_left) || (m_left >= other_right)) == false)
             {
                 return true;
             }
         }
     }
-            
     return false;
 }
 
@@ -81,28 +85,27 @@ std::vector<SDL_FRect>& Object::get_colliders()
 
 void Object::flip_colliders()
 {
-    for (int i = 0; i < m_colliders.size(); i++)
+    for (auto& i : m_colliders)
     {
         //the x position of the left side will be changed, so m_collider[i].x is changed accordingly
-        m_colliders[i].x = m_position_x + (get_width() - (m_colliders[i].x - m_position_x));
+        i.x = m_position_x + (get_width() - (i.x - m_position_x));
         
         //since the collider's left x position becomes the right x position when horizontally flipped, we need to change m_collider[i].x to the new left position
-        m_colliders[i].x = m_colliders[i].x - m_colliders[i].w;
+        i.x = i.x - i.w;
     }
 }
 
 //This function is ONLY FOR TESTING. It is used to render the positions of the colliders.
 //To check the position of colliders more easily, first scale_colliders() and render_scaled_kunai() can be called to render enlarged kunai and change its colliders
-//Note::scale_colliders() should be called outside game loop - colliders should only be scalled once
+//Note::scale_colliders() should be called outside game loop since colliders should only be scaled once. If Kunai is scaled its velocity should be set to 0
 
 void Object::render_colliders()
 {
     SDL_SetRenderDrawColor(gp_renderer, 0x00, 0x00, 0x00, 0xFF);
     
-    for (int i = 0; i < m_colliders.size(); i++)
+    for (auto& i : m_colliders)
     {
-        SDL_RenderDrawRectF(gp_renderer, &m_colliders[i]);
+        SDL_RenderDrawRectF(gp_renderer, &i);
     }
-    
 }
 
