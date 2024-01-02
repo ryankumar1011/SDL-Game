@@ -22,19 +22,22 @@ class Hearts
     
 public:
     Hearts();
-    static constexpr int WIDTH = 17;
-    static constexpr int HEIGHT = 14;
+    static constexpr float SCALE_FACTOR = 1;
+    static constexpr float WIDTH = 17*SCALE_FACTOR;
+    static constexpr float HEIGHT = 14*SCALE_FACTOR;
+    
     static Texture& get_texture();
-    void set_position(int x, int y);
+    void set_position(float x, float y);
     void set_number(int number);
     bool pop_color();
     void render();
     
 private:
     int m_number;
-    std::vector<SDL_Point> m_positions;
+    std::vector<SDL_FPoint> m_positions;
     std::vector<HeartColor> m_colors;
-    SDL_Rect m_red_clip;
-    SDL_Rect m_white_clip;
+    static SDL_Rect m_red_clip;
+    static SDL_Rect m_white_clip;
     static Texture m_sprite;
 };
+

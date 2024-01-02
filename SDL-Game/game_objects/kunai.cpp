@@ -6,7 +6,9 @@
 //
 
 #include "kunai.h"
+#include "player.h"
 #include "texture.h"
+#include "game_objects.h"
 #include "global_variables.h"
 
 Texture Kunai::m_texture;
@@ -22,6 +24,8 @@ Kunai::Kunai()
     m_position_y = 0;
     m_velocity_x = 0;
     m_velocity_y = 0;
+    m_acceleration_x = 0;
+    m_acceleration_y = 0;
 
     m_colliders.resize(8);
 
@@ -49,6 +53,7 @@ Kunai::Kunai()
     m_colliders[7].w = 6;
     m_colliders[7].h = 3;
     
+    scale_colliders();
     update_colliders();
     
     std::cout << "Kunai created\n";
@@ -66,10 +71,9 @@ int Kunai::get_width()
     return WIDTH;
 }
 
-void Kunai::handle_event(SDL_Event& event)
+float Kunai::get_scale_factor()
 {
-    
-    
+    return SCALE_FACTOR;
 }
 
 void Kunai::update_position()
@@ -123,38 +127,43 @@ void Kunai::update_colliders()
     m_colliders[7].x = m_position_x + 15;
     m_colliders[7].y = m_position_y + 0;
     
+    update_colliders_scaled();
+
     if (m_flip_state == SDL_FLIP_HORIZONTAL)
     {
         flip_colliders();
     }
-       
 }
-
+void Kunai::resolve_collision(Object* p_other)
+{
+    ObjectName other_name = p_other->get_name();
+    
+    switch(other_name)
+    {
+        case PLAYER:
+            g_game_objects.remove(this);
+            std::cout << "Kunai hit player\n";
+            if (!(static_cast<Player*>(p_other))->get_hearts().pop_color())
+            {
+              std::cout << "you loose\n";
+            }
+            break;
+            
+        case KUNAI:
+            g_game_objects.remove(this);
+            g_game_objects.remove(p_other);
+            std::cout << "Kunai hit kunai\n";
+            break;
+            
+        case APPLE:
+            g_game_objects.remove(p_other);
+            std::cout << "Kunai hit apple\n";
+            break;
+    }
+}
 void Kunai::render()
 {
-    m_texture.render((int)m_position_x, (int)m_position_y, nullptr, 0, m_flip_state);
-}
-
-//This function is ONLY FOR TESTING. It renderes a kunai scaled 20 times larger.
-
-void Kunai::render_scaled()
-{
-    SDL_Rect enlarged_rect = {(int)m_position_x, (int)m_position_y, 620, 300}; // we are upscaling the kunai 20 times to see it clearly
-    
-    SDL_RenderCopy(gp_renderer, m_texture.get_texture(), nullptr, &enlarged_rect);
-}
-
-//This function is ONLY FOR TESTING. It scales the kunai colliders 20 times. It should be called outside game loop. Kunai should and colliders should not be moving.
-
-void Kunai::scale_colliders()
-{
-    for (auto& i : m_colliders)
-    {
-        i.x = 25 + i.x*20;
-        i.y = 25 + i.y*20;
-        i.w = i.w*20;
-        i.h = i.h*20;
-    }
+    m_texture.render(m_position_x, m_position_y, nullptr, SCALE_FACTOR, m_flip_state);
 }
 
 Kunai::~Kunai()

@@ -83,6 +83,30 @@ std::vector<SDL_FRect>& Object::get_colliders()
     return m_colliders;
 }
 
+float Object::get_scale_factor()
+{
+    return 1;
+}
+
+void Object::scale_colliders()
+{
+    for (auto& i : m_colliders)
+    {
+        i.w *= get_scale_factor();
+        i.h *= get_scale_factor();
+    }
+}
+
+void Object::update_colliders_scaled()
+{
+    for (auto& i : m_colliders)
+    {
+        i.x = m_position_x + (i.x - m_position_x)*get_scale_factor();
+        i.y = m_position_y + (i.y - m_position_y)*get_scale_factor();
+    }
+}
+
+
 void Object::flip_colliders()
 {
     for (auto& i : m_colliders)
@@ -95,9 +119,7 @@ void Object::flip_colliders()
     }
 }
 
-//This function is ONLY FOR TESTING. It is used to render the positions of the colliders.
-//To check the position of colliders more easily, first scale_colliders() and render_scaled_kunai() can be called to render enlarged kunai and change its colliders
-//Note::scale_colliders() should be called outside game loop since colliders should only be scaled once. If Kunai is scaled its velocity should be set to 0
+//This function is for testing. It is used to render the positions of the colliders.
 
 void Object::render_colliders()
 {

@@ -38,21 +38,20 @@ Player::Player()
 {    
     m_position_x = 0;
     m_position_y = 0;
-    
     m_velocity_x = 0;
     m_velocity_y = 0;
-    
     m_acceleration_x = 0;
     m_acceleration_y = GRAVITY_ACCELERATION;
         
     m_colliders.resize(2);
 
     m_colliders[0].w = 62;
-    m_colliders[0].h = 59;
+    m_colliders[0].h = 57;
     
     m_colliders[1].w = 71;
     m_colliders[1].h = 75;
     
+    scale_colliders();
     update_colliders();
     
     m_frame = -1;
@@ -71,6 +70,11 @@ int Player::get_width()
     return WIDTH;
 }
 
+float Player::get_scale_factor()
+{
+    return SCALE_FACTOR;
+}
+
 Hearts& Player::get_hearts()
 {
     return m_hearts;
@@ -84,14 +88,14 @@ void Player::create_kunai()
     {
         if (m_position_x + 107 + Kunai::WIDTH > SCREEN_WIDTH) p_kunai->set_position(SCREEN_WIDTH - Kunai::WIDTH, m_position_y + 64.5);
         else p_kunai->set_position(m_position_x + 107, m_position_y + 64.5);
-        p_kunai->set_velocity(3, 0);
+        p_kunai->set_velocity(6, 0);
     }
     
     else
     {
         if (m_position_x + 70 - 107 - Kunai::WIDTH < 0) p_kunai->set_position(0, m_position_y + 64.5);
         else p_kunai->set_position(m_position_x + 70 - 107, m_position_y + 64.5);
-        p_kunai->set_velocity(-3, 0);
+        p_kunai->set_velocity(-6, 0);
     }
     
     g_game_objects.insert(p_kunai);
@@ -105,15 +109,15 @@ void Player::handle_event(SDL_Event& event)
     {
         if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
         {
-            //m_acceleration_x = -0.35;
-            change_var(m_acceleration_x, -0.15, -MAX_ACCELERATION_X); //acts more like player has inertia
+            m_acceleration_x = -MAX_ACCELERATION_X;
+            //change_var(m_acceleration_x, -0.15, -MAX_ACCELERATION_X); //acts more like player has inertia
             m_flip_state = SDL_FLIP_HORIZONTAL;
         }
         
         if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
         {
-            //m_acceleration_x = 0.35;
-            change_var(m_acceleration_x, 0.15, MAX_ACCELERATION_X); //acts more will act like player has inertia
+            m_acceleration_x = MAX_ACCELERATION_X;
+            //change_var(m_acceleration_x, 0.15, MAX_ACCELERATION_X); //acts more will act like player has inertia
             m_flip_state = SDL_FLIP_NONE;
         }
         
@@ -121,11 +125,11 @@ void Player::handle_event(SDL_Event& event)
         {
             if (m_frame == -1) m_frame = 0; //start the animation
             
-            if (m_frame > 22) //cut the animation short
+            if (m_frame > 24) //cut the animation short
             {
                 create_kunai();
                 
-                m_frame = -1;
+                m_frame = 0; //and start again
             }
         }
 
@@ -142,13 +146,22 @@ void Player::handle_event(SDL_Event& event)
         if ((key_states[SDL_SCANCODE_A] == 0) && (key_states[SDL_SCANCODE_LEFT] == 0) && (m_acceleration_x < 0))
         {
             m_acceleration_x = 0;
-            if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT]) m_flip_state = SDL_FLIP_NONE;
+            if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT]) 
+            {
+                m_flip_state = SDL_FLIP_NONE;
+                m_acceleration_x = MAX_ACCELERATION_X;
+            }
         }
         
         if ((key_states[SDL_SCANCODE_D] == 0) && (key_states[SDL_SCANCODE_RIGHT] == 0) && (m_acceleration_x > 0))
         {
             m_acceleration_x = 0;
-            if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT]) m_flip_state = SDL_FLIP_HORIZONTAL;
+            if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
+            {
+                m_flip_state = SDL_FLIP_HORIZONTAL;
+                m_acceleration_x = -MAX_ACCELERATION_X;
+            }
+
         }
     }
 }
@@ -187,14 +200,42 @@ void Player::update_position()
 void Player::update_colliders()
 {
     m_colliders[0].x = m_position_x + 3;
-    m_colliders[0].y = m_position_y + 3;
+    m_colliders[0].y = m_position_y + 1;
     
     m_colliders[1].x = m_position_x + 13;
     m_colliders[1].y = m_position_y + 57;
     
+    update_colliders_scaled();
+    
     if (m_flip_state == SDL_FLIP_HORIZONTAL)
     {
         flip_colliders();
+    }
+}
+
+void Player::resolve_collision(Object* p_other)
+{
+    ObjectName other_name = p_other->get_name();
+    
+    switch(other_name)
+    {
+        case KUNAI:
+            g_game_objects.remove(p_other);
+            std::cout << "Kunai hit player\n";
+            if (!get_hearts().pop_color())
+            {
+                std::cout << "you loose\n";
+            }
+            break;
+            
+        case APPLE:
+            g_game_objects.remove(p_other);
+            std::cout << "Apple hit player\n";
+            if (!get_hearts().pop_color())
+            {
+                std::cout << "you loose\n";
+            }
+            break;
     }
 }
 
@@ -204,11 +245,11 @@ void Player::render()
     
     if (m_frame < 0)
     {
-        m_sprite.render((int)m_position_x, (int)m_position_y, &m_clips[0], 0, m_flip_state);
+        m_sprite.render(m_position_x, m_position_y, &m_clips[0], SCALE_FACTOR, m_flip_state);
     }
     else
     {
-        m_sprite.render((int)m_position_x, (int)m_position_y, &m_clips[m_frame/4], 0, m_flip_state);
+        m_sprite.render(m_position_x, m_position_y, &m_clips[m_frame/4], SCALE_FACTOR, m_flip_state, WIDTH);
         
         m_frame++;
     }

@@ -23,6 +23,7 @@
 		0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA42B3983E900CC9236 /* kunai.cpp */; };
 		0EB97FA82B3983F900CC9236 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA62B3983F900CC9236 /* init.cpp */; };
 		0EC008022AF45F35002BAE2D /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EC008012AF45F35002BAE2D /* SDL2_mixer.framework */; };
+		0EFA07B12B4380C300AED262 /* apple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EFA07AF2B4380C300AED262 /* apple.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -66,6 +67,8 @@
 		0EB97FA72B3983F900CC9236 /* init.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = init.h; sourceTree = "<group>"; };
 		0EC008012AF45F35002BAE2D /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		0EE4F58E2AEAB5880069B47C /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		0EFA07AF2B4380C300AED262 /* apple.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = apple.cpp; sourceTree = "<group>"; };
+		0EFA07B02B4380C300AED262 /* apple.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = apple.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +97,8 @@
 				0E65303C2B3AEFD5004487DA /* player.h */,
 				0EB97FA42B3983E900CC9236 /* kunai.cpp */,
 				0E964C0E2AF861F7003AA09E /* kunai.h */,
+				0EFA07AF2B4380C300AED262 /* apple.cpp */,
+				0EFA07B02B4380C300AED262 /* apple.h */,
 			);
 			path = game_objects;
 			sourceTree = "<group>";
@@ -216,6 +221,7 @@
 				0E3735072B3F614D009E373D /* game_objects.cpp in Sources */,
 				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,
 				0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */,
+				0EFA07B12B4380C300AED262 /* apple.cpp in Sources */,
 				0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */,
 				0EB97FA82B3983F900CC9236 /* init.cpp in Sources */,
 			);

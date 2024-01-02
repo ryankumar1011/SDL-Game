@@ -13,8 +13,7 @@ class GameObjects
 public:
     void insert(Object* p_object);
     void remove(Object* p_object);
-    void resolve_collision(Object* p_object_1, Object* p_object_2);
-    void resolve_all_collisions();
+    void resolve_collisions();
     void update();
     void render();
     

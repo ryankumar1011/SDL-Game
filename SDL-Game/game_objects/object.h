@@ -12,42 +12,48 @@
 enum ObjectName
 {
     KUNAI,
-    PLAYER
+    PLAYER,
+    APPLE
 };
 
 class Object
 {
 public:
-    static constexpr float GRAVITY_ACCELERATION = 0.3;
-    static constexpr float FRICTION_MULTIPLIER = 0.03;
-    static constexpr float AIR_RESISTANCE = 0.03;
     bool delete_mark = false;
 
 public:
     void set_position(float x, float y);
     void set_velocity(float x, float y);
-    void change_var(float& var, float amount, float cap);
     bool check_collision(Object* other);
-    void flip_colliders();
-    std::vector<SDL_FRect>& get_colliders();
     void render_colliders(); //for testing
     
     virtual ObjectName get_name() = 0;
-    virtual int get_width() = 0;
-    virtual void handle_event(SDL_Event& event) = 0;
     virtual void update_position() = 0;
-    virtual void update_colliders() = 0;
+    virtual void resolve_collision(Object* p_other) = 0;
     virtual void render() = 0;
     virtual ~Object() = default;
 
 protected:
+    static constexpr float GRAVITY_ACCELERATION = 0.3;
+    static constexpr float FRICTION_MULTIPLIER = 0.03;
+    static constexpr float AIR_RESISTANCE = 0.03;
+    
     float m_position_x;
     float m_position_y;
     float m_velocity_x;
     float m_velocity_y;
     float m_acceleration_x;
     float m_acceleration_y;
-    
     std::vector<SDL_FRect> m_colliders;
     SDL_RendererFlip m_flip_state;
+    
+    void change_var(float& var, float amount, float cap);
+    std::vector<SDL_FRect>& get_colliders();
+    void flip_colliders();
+    void scale_colliders();
+    void update_colliders_scaled();
+    
+    virtual float get_scale_factor();
+    virtual int get_width() = 0; //this is needed for flip_colliders() to work for all base classes
+    virtual void update_colliders() = 0;
 };

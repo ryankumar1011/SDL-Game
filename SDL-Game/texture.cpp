@@ -166,51 +166,61 @@ void Texture::set_blend_mode(SDL_BlendMode blendmode)
     SDL_SetTextureBlendMode(mp_texture, blendmode);
 }
 
-//Below is the mainly used render function. It can render a texture, a clip of a sprite/texture and the flipped texture/clip. Using max_dim, it can also render clips of a sprite so that they are all centered within a certain width (this is usefull for animations)
+//Below is the mainly used render function. It can render a texture, a clip of a sprite/texture and the flipped texture/clip. Using max_width, it can also render clips of a sprite so that they are all centered within a certain width (may be used for animations)
 
-void Texture::render(int x, int y, SDL_Rect* p_clip, int max_dim, SDL_RendererFlip flip_state)
+void Texture::render(float x, float y, SDL_Rect* p_clip, float scale_factor, SDL_RendererFlip flip_state, float center_width)
 
 {
-    int max_width {max_dim};
-    int max_height {max_dim};
-    SDL_Rect render_area{};
+    SDL_FRect render_area{};
 
     if (p_clip == nullptr)
     {
-        render_area = {x, y, m_width, m_height};
-        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
-        
+        render_area = {x, y, scale_factor*m_width, scale_factor*m_height};
+        SDL_RenderCopyExF(gp_renderer, mp_texture, nullptr, &render_area, 0, nullptr, flip_state);
     }
-    
-    else if ((max_dim == 0) || (max_width < p_clip->w) || (max_height < p_clip->h))
-    {
-        render_area = {x, y, p_clip->w, p_clip->h};
-        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
-    }
-    
     else
     {
-        render_area = {x + (max_width - (p_clip->w))/2, y + (max_height - (p_clip->h))/2, p_clip->w, p_clip->h};
-        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+        float clip_width = scale_factor*(float)(p_clip->w);
+        float clip_height = scale_factor*(float)(p_clip->h);
+        center_width = center_width*scale_factor;
+        
+        if (clip_width > center_width && (center_width != 0) && flip_state == SDL_FLIP_HORIZONTAL)
+        {
+            //the animation expands leftwards with right side fixed
+            render_area = {x - (clip_width - center_width), y, clip_width, clip_height};
+            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+        }
+        
+        else if (center_width == 0 || clip_width > center_width)
+        {
+            //the animation expands rightwards with left side fixed
+            render_area = {x, y, clip_width, clip_height};
+            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+        }
+        
+        else
+        {
+            render_area = {x + (center_width - clip_width)/2, y, clip_width, clip_height};
+            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
+        }
     }
     
-    return;
 }
 
 //The below render function is used when the rotated texture/clip needs to be rendered. Centering is not implemented for this yet
 
-void Texture::render(int x, int y, SDL_Rect* p_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state)
+void Texture::render(float x, float y, SDL_Rect* p_clip, float scale_factor, double angle, SDL_FPoint* center, SDL_RendererFlip flip_state)
 {
-    SDL_Rect render_area{};
+    SDL_FRect render_area{};
 
-    if (p_clip != nullptr)
+    if (p_clip == nullptr)
     {
-        render_area = {x, y, m_width, m_height};
-        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);    }
+        render_area = {x, y, m_width*scale_factor, m_height*scale_factor};
+        SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);    }
     else
     {
-        render_area = {x, y, p_clip->w, p_clip->h};
-        SDL_RenderCopyEx(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);
+        render_area = {x, y, scale_factor*(float)p_clip->w, scale_factor*(float)p_clip->h};
+        SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);
     }
 }
 

@@ -15,23 +15,22 @@ class Kunai : public Object
 {
 public:
     static const ObjectName NAME = KUNAI;
-    static constexpr int WIDTH = 31;
-    static constexpr int HEIGHT = 15;
+    static constexpr float SCALE_FACTOR = 1.2;
+    static constexpr float WIDTH = 31*SCALE_FACTOR;
+    static constexpr float HEIGHT = 15*SCALE_FACTOR;
     
 public:
     Kunai();
     static Texture& get_texture();
+    
     ObjectName get_name() override;
     int get_width() override;
-    void handle_event(SDL_Event& event) override;
+    float get_scale_factor() override;
     void update_position() override;
     void update_colliders() override;
+    void resolve_collision(Object* p_other) override;
     void render() override;
     ~Kunai() override;
-    
-    //for testing
-    void scale_colliders();
-    void render_scaled();
 
 private:
     static Texture m_texture;

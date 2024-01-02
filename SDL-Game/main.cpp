@@ -11,6 +11,7 @@
 #include "mouse_button.h"
 #include "timers.h"
 #include "frame_rate.h"
+#include "apple.h"
 #include "kunai.h"
 #include "player.h"
 #include "hearts.h"
@@ -24,6 +25,7 @@
 #include <string>
 #include <chrono>
 #include <sstream>
+#include <random>
 #include <algorithm>
 
 //SDL libraries:
@@ -31,6 +33,18 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
+
+
+//call kunai count
+
+int generate_random_number(int min, int max)
+{
+    std::random_device rd;
+    std::mt19937 generator(rd());  // Seed the generator with a random device
+    std::uniform_int_distribution<int> distribution(min, max);
+
+    return distribution(generator);
+}
 
 int main(int argc, char* args[])
 {
@@ -52,7 +66,7 @@ int main(int argc, char* args[])
            Player player_1;
            player_1.set_position(600, 300);
            player_1.get_hearts().set_position(5, 5);
-           player_1.get_hearts().set_number(5);
+           player_1.get_hearts().set_number(50);
            
            g_game_objects.insert(&player_1);
 
@@ -137,8 +151,15 @@ int main(int argc, char* args[])
               }
               
               //Logic
+              if (frame == 0)
+              {
+                  Apple* apple = new Apple;
+                  apple->set_position(generate_random_number(300, 600), 0);
+                  g_game_objects.insert(apple);
+              }
               
               g_game_objects.update();
+        
               
               //Frame rate is only updated once per second for performance (updating it requires loading a new texture with different text)
               
@@ -974,6 +995,94 @@ text_time_texture.render_texture(240, 270);
  m_position[2].x = m_position[1].x + m_render_areas[1].w + 1;
  m_position[2].y = m_position[0].y;
  
+ void GameObjects::resolve_collision(Object* p_object_1, Object* p_object_2)
+ {
+     //can use dynamic casting instead of enums
+     
+     ObjectName object_1_name = p_object_1->get_name();
+     ObjectName object_2_name = p_object_2->get_name();
+     
+     switch (object_1_name)
+     {
+         case KUNAI:
+             
+             switch(object_2_name)
+             {
+                 case PLAYER:
+                     remove(p_object_1);
+                     
+                     std::cout << "Kunai hit player\n";
+                     
+                     if ((static_cast<Player*>(p_object_2))->get_hearts().pop_color())
+                     {
+                         std::cout << "you loose\n";
+                     }
+                     break;
+                     
+                 case KUNAI:
+                     remove(p_object_1);
+                     remove(p_object_2);
+                     std::cout << "Kunai hit kunai\n";
+                     break;
+                     
+                 case APPLE:
+                     remove(p_object_2);
+                     std::cout << "Kunai hit apple\n";
+                     break;
+             }
+             
+             break;
+             
+         case PLAYER:
+             
+             switch(object_2_name)
+             {
+                 case KUNAI:
+                     remove(p_object_2);
+                     std::cout << "Kunai hit player\n";
+                     if (!(static_cast<Player*>(p_object_1))->get_hearts().pop_color())
+                     {
+                         std::cout << "you loose\n";
+                     }
+                     break;
+                     
+                 case APPLE:
+                     remove(p_object_2);
+                     std::cout << "Apple hit player\n";
+                     if (!(static_cast<Player*>(p_object_1))->get_hearts().pop_color())
+                     {
+                         std::cout << "you loose\n";
+                     }
+                     break;
+             }
+             break;
+             
+         case APPLE:
+             
+             switch(object_2_name)
+             {
+                 case PLAYER:
+                     remove(p_object_1);
+                     std::cout << "Apple hit player\n";
+                     if (!(static_cast<Player*>(p_object_2))->get_hearts().pop_color())
+                     {
+                         std::cout << "you loose\n";
+                     }
+                     break;
+                     
+                 case APPLE:
+                     remove(p_object_1);
+                     std::cout << "Apple hit apple\n";
+                     break;
+                     
+                 case KUNAI:
+                     remove(p_object_1);
+                     std::cout << "Kunai hit apple\n";
+                     break;
+     
+             }
+     }
+ }
  */
  
  

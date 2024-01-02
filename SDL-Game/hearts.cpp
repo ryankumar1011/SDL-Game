@@ -9,6 +9,8 @@
 #include "texture.h"
 
 Texture Hearts::m_sprite;
+SDL_Rect Hearts::m_red_clip = {0, 0, 17, 14};;
+SDL_Rect Hearts::m_white_clip = {18, 0, 17, 14};
 
 Texture& Hearts::get_texture()
 {
@@ -18,8 +20,6 @@ Texture& Hearts::get_texture()
 Hearts::Hearts()
 {
     m_number = 3;
-    m_red_clip = {1, 0, 17, 14};
-    m_white_clip = {19, 0, 17, 14};
 
     m_positions.resize(m_number);
     
@@ -33,7 +33,7 @@ Hearts::Hearts()
     std::cout << "hearts created\n";
 }
 
-void Hearts::set_position(int x, int y)
+void Hearts::set_position(float x, float y)
 {
     m_positions[0].x = x;
     m_positions[0].y = y;
@@ -81,10 +81,10 @@ void Hearts::render()
     {
         if (m_colors[i] == RED) 
         {
-            m_sprite.render(m_positions[i].x, m_positions[i].y, &m_red_clip);
+            m_sprite.render(m_positions[i].x, m_positions[i].y, &m_red_clip, SCALE_FACTOR);
         }
         
-        else if (m_colors[i] == WHITE) m_sprite.render(m_positions[i].x, m_positions[i].y, &m_white_clip);
+        else if (m_colors[i] == WHITE) m_sprite.render(m_positions[i].x, m_positions[i].y, &m_white_clip, SCALE_FACTOR);
     }
 }
 

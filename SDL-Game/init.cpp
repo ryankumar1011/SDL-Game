@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "player.h"
 #include "kunai.h"
+#include "apple.h"
 #include "global_variables.h"
 
 #include <SDL2/SDL.h>
@@ -128,6 +129,11 @@ bool load_images()
         success = false;
         printf("Failed to load heart sprite\n");
     }
+    if (!Apple::get_texture().load_from_file("Images/apple.png"))
+    {
+        success = false;
+        printf("Failed to load apple image\n");
+    }
     
     return success;
 }
@@ -230,8 +236,6 @@ void set_texture_clips()
 
 void set_texture_size()
 {
-   Kunai::get_texture().set_width(Kunai::WIDTH);
-   Kunai::get_texture().set_height(Kunai::HEIGHT);
 }
 
 void close()

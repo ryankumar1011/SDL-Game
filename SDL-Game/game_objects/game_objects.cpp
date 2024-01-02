@@ -22,64 +22,8 @@ void GameObjects::remove(Object* p_object)
 {
     p_object->delete_mark = true;
 }
-
-void GameObjects::resolve_collision(Object* p_object_1, Object* p_object_2)
-{
-    //can use dynamic casting instead of enums
     
-    ObjectName object_1_name = p_object_1->get_name();
-    ObjectName object_2_name = p_object_2->get_name();
-    
-    switch (object_1_name)
-    {
-        case KUNAI:
-            
-            switch(object_2_name)
-            {
-                case PLAYER:
-                    remove(p_object_1);
-                    
-                    std::cout << "Kunai hit\n";
-                    
-                    if ((static_cast<Player*>(p_object_2))->get_hearts().pop_color())
-                    {
-                        std::cout << "you loose\n";
-                    }
-                    
-                    break;
-
-                case KUNAI:
-                    remove(p_object_1);
-                    remove(p_object_2);
-                    
-                    break;
-            }
-            
-            break;
-            
-        case PLAYER:
-            
-            switch(object_2_name)
-            {
-                case KUNAI:
-                   
-                    remove(p_object_2);
-                    
-                    std::cout << "Kunai hit\n";
-                    
-                    if (!(static_cast<Player*>(p_object_1))->get_hearts().pop_color())
-                    {
-                        std::cout << "you loose\n";
-                    }
-                    
-                    break;
-            }
-            
-            break;
-    }
-}
-    
-void GameObjects::resolve_all_collisions()
+void GameObjects::resolve_collisions()
 {
     for (int i = 0; i < mp_objects.size(); i++)
     {
@@ -87,8 +31,7 @@ void GameObjects::resolve_all_collisions()
         {
             if(mp_objects[i]->check_collision(mp_objects[j]))
             {
-                resolve_collision(mp_objects[i], mp_objects[j]);
-                
+                mp_objects[i]->resolve_collision(mp_objects[j]);
             }
         }
     }
@@ -120,7 +63,7 @@ void GameObjects::update()
         p_object->update_position();
     }
 
-    resolve_all_collisions();
+    resolve_collisions();
 }
 
 void GameObjects::render()
@@ -129,6 +72,7 @@ void GameObjects::render()
     {
         p_object->render();
         p_object->render_colliders();
+        
     }
 }
 

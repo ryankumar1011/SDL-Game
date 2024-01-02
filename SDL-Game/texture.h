@@ -39,8 +39,9 @@ public:
     
     SDL_Texture* get_texture();
     
-    void render(int x = 0, int y = 0, SDL_Rect* p_clip = nullptr, int max_dim = 0, SDL_RendererFlip flip_state = SDL_FLIP_NONE);
-    void render(int x, int y, SDL_Rect* p_clip, double angle, SDL_Point* center, SDL_RendererFlip flip_state);
+    void render(float x = 0, float y = 0, SDL_Rect* p_clip = nullptr, float scale_factor = 1, SDL_RendererFlip flip_state = SDL_FLIP_NONE, float center_width = 0);
+
+    void render(float x, float y, SDL_Rect* p_clip, float scale_factor, double angle, SDL_FPoint* center, SDL_RendererFlip flip_state);
     
     void free();
     
@@ -52,9 +53,9 @@ private:
     
     const SDL_PixelFormat* mp_format;
     
-    int m_height;
+    float m_height;
     
-    int m_width;
+    float m_width;
     
     uint32_t m_color_key;
 };
