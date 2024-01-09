@@ -12,25 +12,27 @@
 class Apple : public Object
 {
 public:
-    static const ObjectName NAME = APPLE;
+    static constexpr ObjectName NAME = APPLE;
+    static constexpr float MASS = 1;
     static constexpr float SCALE_FACTOR = 1.3;
-    static constexpr float WIDTH = 15*SCALE_FACTOR;
-    static constexpr float HEIGHT = 17*SCALE_FACTOR;
+    static constexpr float WIDTH = 15.0*SCALE_FACTOR;
+    static constexpr float HEIGHT = 17.0*SCALE_FACTOR;
     static constexpr float MAX_VELOCITY_Y = 3;
+    static constexpr float MAX_VELOCITY_X = 3;
     
     Apple();
     static Texture& get_texture();
     ObjectName get_name() override;
-    int get_width() override;
-    float get_scale_factor() override;
+    float get_mass() override;
     void update_position() override;
-    void update_colliders() override;
     void resolve_collision(Object* p_other) override;
     void render() override;
     
 private:
-    double m_angle;
-    SDL_FPoint m_center;
-    static SDL_Rect m_clip;
     static Texture m_texture;
+    static SDL_Rect m_clip;
+    double m_angle;
+    double m_angle_velocity = 3;
+    void update_colliders();
 };
+

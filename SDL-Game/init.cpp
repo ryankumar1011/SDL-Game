@@ -134,6 +134,11 @@ bool load_images()
         success = false;
         printf("Failed to load apple image\n");
     }
+    if (!Shield::get_texture().load_from_file("Images/shield.png"))
+    {
+        success = false;
+        printf("Failed to load apple image\n");
+    }
     
     return success;
 }
@@ -142,11 +147,20 @@ bool load_fonts()
 {
     bool success = true;
     
-    gp_arial_font = load_font_from_file("Fonts/Arial.ttf", 13);
+    gp_arial_font = load_font_from_file("Fonts/arial.ttf", 13);
     
     if (gp_arial_font == nullptr)
     {
         success = false;
+        printf("Failed to load arial font\n");
+    }
+    
+    gp_crayon_font = load_font_from_file("Fonts/pastel_crayon.ttf", 17);
+    
+    if (gp_arial_font == nullptr)
+    {
+        success = false;
+        printf("Failed to load crayon font\n");
     }
     
     return success;
@@ -242,12 +256,15 @@ void close()
 {
     // Destroyed all LOADED surfaces and textures
     
-    //button_sprite.free();
     Kunai::get_texture().free();
     Player::get_texture().free();
     Hearts::get_texture().free();
+    Apple::get_texture().free();
+    Shield::get_texture().free();
     
-    TTF_CloseFont(gp_arial_font); //we need to close a font that is opened from TTF_OpenFont
+    //we need to close a font that is opened from TTF_OpenFont
+    TTF_CloseFont(gp_arial_font);
+    TTF_CloseFont(gp_crayon_font);
 
     Mix_FreeMusic(gp_background_music);
     Mix_FreeChunk(gp_shuriken_sound);
@@ -255,8 +272,6 @@ void close()
     
     // Destroy Windows and Renderer, set pointers to NULL
     SDL_DestroyWindow(gp_window);
-    
-    //Takes care of destroying my_screen_surface/my_current_texture
     SDL_DestroyRenderer(gp_renderer);
     gp_window = nullptr;
     gp_renderer = nullptr;

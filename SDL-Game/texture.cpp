@@ -186,23 +186,23 @@ void Texture::render(float x, float y, SDL_Rect* p_clip, float scale_factor, SDL
         
         if (clip_width > center_width && (center_width != 0) && flip_state == SDL_FLIP_HORIZONTAL)
         {
-            //the animation expands leftwards with right side fixed
+            //the clip is offset to the left so that its right side looks fixed
             render_area = {x - (clip_width - center_width), y, clip_width, clip_height};
-            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
         }
         
         else if (center_width == 0 || clip_width > center_width)
         {
-            //the animation expands rightwards with left side fixed
+            //the clip is not offset so its right side looks fixed
             render_area = {x, y, clip_width, clip_height};
-            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
         }
         
         else
         {
+            //the clip is centered
             render_area = {x + (center_width - clip_width)/2, y, clip_width, clip_height};
-            SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
         }
+        
+        SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, 0, nullptr, flip_state);
     }
     
 }
@@ -216,7 +216,8 @@ void Texture::render(float x, float y, SDL_Rect* p_clip, float scale_factor, dou
     if (p_clip == nullptr)
     {
         render_area = {x, y, m_width*scale_factor, m_height*scale_factor};
-        SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);    }
+        SDL_RenderCopyExF(gp_renderer, mp_texture, p_clip, &render_area, angle, center, flip_state);   
+    }
     else
     {
         render_area = {x, y, scale_factor*(float)p_clip->w, scale_factor*(float)p_clip->h};

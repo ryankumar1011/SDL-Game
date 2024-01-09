@@ -19,6 +19,7 @@ GameObjects g_game_objects;
 
 //Fonts
 TTF_Font* gp_arial_font = nullptr;
+TTF_Font* gp_crayon_font = nullptr;
 
 //Chunks and music from SDL mixer
 Mix_Music* gp_background_music = nullptr;

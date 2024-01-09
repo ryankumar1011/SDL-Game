@@ -15,10 +15,17 @@
 
 void GameObjects::insert(Object* p_object)
 {
+    p_object->remove_mark = false;
+    p_object->delete_mark = false;
     mp_added_objects.push_back(p_object);
 }
 
 void GameObjects::remove(Object* p_object)
+{
+    p_object->remove_mark = true;
+}
+
+void GameObjects::destroy(Object* p_object)
 {
     p_object->delete_mark = true;
 }
@@ -48,7 +55,9 @@ void GameObjects::update()
     
     auto remove_if_lambda = [](Object* object)
     {
-        if (object->delete_mark)
+        if (object->remove_mark) return true;
+        
+        else if (object->delete_mark)
         {
             delete object;
             return true;
@@ -62,7 +71,7 @@ void GameObjects::update()
     {
         p_object->update_position();
     }
-
+    
     resolve_collisions();
 }
 

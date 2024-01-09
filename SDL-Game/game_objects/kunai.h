@@ -8,31 +8,32 @@
 #pragma once
 
 #include "texture.h"
+#include "player.h"
 #include "object.h"
 #include <SDL2/SDL.h>
 
 class Kunai : public Object
 {
 public:
-    static const ObjectName NAME = KUNAI;
-    static constexpr float SCALE_FACTOR = 1.2;
+    static constexpr ObjectName NAME = KUNAI;
+    static constexpr float SCALE_FACTOR = 1;
     static constexpr float WIDTH = 31*SCALE_FACTOR;
     static constexpr float HEIGHT = 15*SCALE_FACTOR;
     
 public:
-    Kunai();
+    Kunai(Player& player);
     static Texture& get_texture();
+    Player& get_player();
     
     ObjectName get_name() override;
-    int get_width() override;
-    float get_scale_factor() override;
     void update_position() override;
-    void update_colliders() override;
     void resolve_collision(Object* p_other) override;
     void render() override;
     ~Kunai() override;
 
 private:
     static Texture m_texture;
+    Player& m_player;
+    void update_colliders();
 };
 

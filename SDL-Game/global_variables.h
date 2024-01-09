@@ -32,6 +32,7 @@ extern SDL_Renderer* gp_renderer;
 extern GameObjects g_game_objects;
 
 extern TTF_Font* gp_arial_font;
+extern TTF_Font* gp_crayon_font;
 
 extern Mix_Music* gp_background_music;
 extern Mix_Chunk* gp_shuriken_sound;

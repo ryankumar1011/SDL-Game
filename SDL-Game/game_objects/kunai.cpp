@@ -18,15 +18,16 @@ Texture& Kunai::get_texture()
     return m_texture;
 }
 
-Kunai::Kunai()
+Kunai::Kunai(Player& player)
+    : m_player(player)
 {
-    m_position_x = 0;
-    m_position_y = 0;
-    m_velocity_x = 0;
-    m_velocity_y = 0;
-    m_acceleration_x = 0;
-    m_acceleration_y = 0;
-
+    m_position.x = 0;
+    m_position.y = 0;
+    m_velocity.x = 0;
+    m_velocity.y = 0;
+    m_acceleration.x = 0;
+    m_acceleration.y = 0;
+    
     m_colliders.resize(8);
 
     m_colliders[0].w = 3;
@@ -53,7 +54,7 @@ Kunai::Kunai()
     m_colliders[7].w = 6;
     m_colliders[7].h = 3;
     
-    scale_colliders();
+    scale_colliders(SCALE_FACTOR);
     update_colliders();
     
     std::cout << "Kunai created\n";
@@ -66,33 +67,28 @@ ObjectName Kunai::get_name()
     return NAME;
 }
 
-int Kunai::get_width()
+Player& Kunai::get_player()
 {
-    return WIDTH;
-}
-
-float Kunai::get_scale_factor()
-{
-    return SCALE_FACTOR;
+    return m_player;
 }
 
 void Kunai::update_position()
 {
-    m_position_x += m_velocity_x;
-    m_position_y += m_velocity_y;
+    m_position.x += m_velocity.x;
+    m_position.y += m_velocity.y;
 
-    if (((m_position_x + WIDTH) > SCREEN_WIDTH) || (m_position_x < 0))
+    if (((m_position.x + WIDTH) > SCREEN_WIDTH) || (m_position.x < 0))
     {
-        m_position_x -= m_velocity_x;
-        m_velocity_x = -m_velocity_x;
+        m_position.x -= m_velocity.x;
+        m_velocity.x = -m_velocity.x;
     }
     
-    if (m_velocity_x > 0)
+    if (m_velocity.x > 0)
     {
         m_flip_state = SDL_FLIP_NONE;
     }
     
-    else if (m_velocity_x < 0)
+    else if (m_velocity.x < 0)
     {
         m_flip_state = SDL_FLIP_HORIZONTAL;
     }
@@ -103,35 +99,35 @@ void Kunai::update_position()
 
 void Kunai::update_colliders()
 {
-    m_colliders[0].x = m_position_x + 0;
-    m_colliders[0].y = m_position_y + 5;
+    m_colliders[0].x = m_position.x + 0;
+    m_colliders[0].y = m_position.y + 5;
  
-    m_colliders[1].x = m_position_x + 3;
-    m_colliders[1].y = m_position_y + 3;
+    m_colliders[1].x = m_position.x + 3;
+    m_colliders[1].y = m_position.y + 3;
     
-    m_colliders[2].x = m_position_x + 8;
-    m_colliders[2].y = m_position_y + 5;
+    m_colliders[2].x = m_position.x + 8;
+    m_colliders[2].y = m_position.y + 5;
     
-    m_colliders[3].x = m_position_x + 13;
-    m_colliders[3].y = m_position_y + 5;
+    m_colliders[3].x = m_position.x + 13;
+    m_colliders[3].y = m_position.y + 5;
     
-    m_colliders[4].x = m_position_x + 13;
-    m_colliders[4].y = m_position_y + 10;
+    m_colliders[4].x = m_position.x + 13;
+    m_colliders[4].y = m_position.y + 10;
     
-    m_colliders[5].x = m_position_x + 15;
-    m_colliders[5].y = m_position_y + 12;
+    m_colliders[5].x = m_position.x + 15;
+    m_colliders[5].y = m_position.y + 12;
     
-    m_colliders[6].x = m_position_x + 13;
-    m_colliders[6].y = m_position_y + 3;
+    m_colliders[6].x = m_position.x + 13;
+    m_colliders[6].y = m_position.y + 3;
     
-    m_colliders[7].x = m_position_x + 15;
-    m_colliders[7].y = m_position_y + 0;
+    m_colliders[7].x = m_position.x + 15;
+    m_colliders[7].y = m_position.y + 0;
     
-    update_colliders_scaled();
+    update_scaled_colliders(SCALE_FACTOR);
 
     if (m_flip_state == SDL_FLIP_HORIZONTAL)
     {
-        flip_colliders();
+        flip_colliders(WIDTH);
     }
 }
 void Kunai::resolve_collision(Object* p_other)
@@ -141,29 +137,35 @@ void Kunai::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case PLAYER:
-            g_game_objects.remove(this);
+            g_game_objects.destroy(this);
             std::cout << "Kunai hit player\n";
-            if (!(static_cast<Player*>(p_other))->get_hearts().pop_color())
+            if (!(static_cast<Player*>(p_other))->get_hearts().pop())
             {
               std::cout << "you loose\n";
             }
             break;
             
+        case SHIELD:
+            g_game_objects.destroy(this);
+            std::cout << "Kunai hit shield\n";
+            break;
+            
         case KUNAI:
-            g_game_objects.remove(this);
-            g_game_objects.remove(p_other);
+            g_game_objects.destroy(this);
+            g_game_objects.destroy(p_other);
             std::cout << "Kunai hit kunai\n";
             break;
             
         case APPLE:
-            g_game_objects.remove(p_other);
+            g_game_objects.destroy(p_other);
+            get_player().get_kunai_counter().increase_count(3);
             std::cout << "Kunai hit apple\n";
             break;
     }
 }
 void Kunai::render()
 {
-    m_texture.render(m_position_x, m_position_y, nullptr, SCALE_FACTOR, m_flip_state);
+    m_texture.render(m_position.x, m_position.y, nullptr, SCALE_FACTOR, m_flip_state);
 }
 
 Kunai::~Kunai()

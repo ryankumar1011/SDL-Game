@@ -5,6 +5,8 @@
 //  Created by Ryan Kumar on 26/12/23.
 //
 
+#include "kunai.h"
+#include "apple.h"
 #include "player.h"
 #include "game_objects.h"
 #include "global_variables.h"
@@ -35,13 +37,13 @@ m_clips[11] = {26, 303, 129-26, 434-303};
 }
 
 Player::Player()
-{    
-    m_position_x = 0;
-    m_position_y = 0;
-    m_velocity_x = 0;
-    m_velocity_y = 0;
-    m_acceleration_x = 0;
-    m_acceleration_y = GRAVITY_ACCELERATION;
+{
+    m_position.x = 0;
+    m_position.y = 0;
+    m_velocity.x = 0;
+    m_velocity.y = 0;
+    m_acceleration.x = 0;
+    m_acceleration.y = GRAVITY_ACCELERATION;
         
     m_colliders.resize(2);
 
@@ -51,10 +53,11 @@ Player::Player()
     m_colliders[1].w = 71;
     m_colliders[1].h = 75;
     
-    scale_colliders();
+    scale_colliders(SCALE_FACTOR);
     update_colliders();
     
     m_frame = -1;
+    m_shield.set_state(false);
     
     std::cout << "player created\n";
 }
@@ -65,14 +68,9 @@ ObjectName Player::get_name()
     return NAME;
 }
 
-int Player::get_width()
+float Player::get_mass()
 {
-    return WIDTH;
-}
-
-float Player::get_scale_factor()
-{
-    return SCALE_FACTOR;
+    return MASS;
 }
 
 Hearts& Player::get_hearts()
@@ -80,25 +78,56 @@ Hearts& Player::get_hearts()
     return m_hearts;
 }
 
+KunaiCounter& Player::get_kunai_counter()
+{
+    return m_kunai_counter;
+}
+
 void Player::create_kunai()
 {
-    Kunai* p_kunai = new Kunai;
-    
-    if (m_flip_state == SDL_FLIP_NONE)
+    if (m_kunai_counter.reduce_count())
     {
-        if (m_position_x + 107 + Kunai::WIDTH > SCREEN_WIDTH) p_kunai->set_position(SCREEN_WIDTH - Kunai::WIDTH, m_position_y + 64.5);
-        else p_kunai->set_position(m_position_x + 107, m_position_y + 64.5);
-        p_kunai->set_velocity(6, 0);
+        Kunai* p_kunai = new Kunai(*this);
+        
+        SDL_FPoint& kunai_position = p_kunai->get_position();
+        SDL_FPoint& kunai_velocity = p_kunai->get_velocity();
+        
+        kunai_velocity.y = 0;
+        
+        if (m_flip_state == SDL_FLIP_NONE)
+        {
+            if (m_position.x + SCALE_FACTOR*104 + Kunai::WIDTH > SCREEN_WIDTH)
+            {
+                kunai_position.x = SCREEN_WIDTH - Kunai::WIDTH;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::WIDTH/2;
+            }
+            else
+            {
+                kunai_position.x = m_position.x + SCALE_FACTOR*104;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::HEIGHT/2;
+            }
+            
+            kunai_velocity.x = 6;
+        }
+        
+        else
+        {
+            if (m_position.x - 1 - Kunai::WIDTH < 0)
+            {
+                kunai_position.x = 0;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::WIDTH/2;
+            }
+            else
+            {
+                kunai_position.x = m_position.x - 1 - Kunai::WIDTH;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::HEIGHT/2;
+            }
+            
+            kunai_velocity.x = -6;
+        }
+        
+        g_game_objects.insert(p_kunai);
     }
-    
-    else
-    {
-        if (m_position_x + 70 - 107 - Kunai::WIDTH < 0) p_kunai->set_position(0, m_position_y + 64.5);
-        else p_kunai->set_position(m_position_x + 70 - 107, m_position_y + 64.5);
-        p_kunai->set_velocity(-6, 0);
-    }
-    
-    g_game_objects.insert(p_kunai);
 }
 
 void Player::handle_event(SDL_Event& event)
@@ -109,20 +138,24 @@ void Player::handle_event(SDL_Event& event)
     {
         if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
         {
-            m_acceleration_x = -MAX_ACCELERATION_X;
-            //change_var(m_acceleration_x, -0.15, -MAX_ACCELERATION_X); //acts more like player has inertia
+            m_acceleration.x = -MAX_ACCELERATION_X;
             m_flip_state = SDL_FLIP_HORIZONTAL;
         }
         
         if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
         {
-            m_acceleration_x = MAX_ACCELERATION_X;
-            //change_var(m_acceleration_x, 0.15, MAX_ACCELERATION_X); //acts more will act like player has inertia
+            m_acceleration.x = MAX_ACCELERATION_X;
             m_flip_state = SDL_FLIP_NONE;
         }
         
         if (key_states[SDL_SCANCODE_T] && (event.key.repeat == 0))
         {
+            if (m_shield.get_state())
+            {
+                m_shield.set_state(false);
+                g_game_objects.remove(&m_shield);
+            }
+            
             if (m_frame == -1) m_frame = 0; //start the animation
             
             if (m_frame > 24) //cut the animation short
@@ -132,10 +165,17 @@ void Player::handle_event(SDL_Event& event)
                 m_frame = 0; //and start again
             }
         }
+        
+        if (key_states[SDL_SCANCODE_F] && ((m_frame == -1) || (m_frame > 24)) && (!m_shield.get_state()) && (event.key.repeat == 0))
+        {
+            if (m_frame > 24) m_frame = 0;
+            m_shield.set_state(true);
+            g_game_objects.insert(&m_shield);
+        }
 
         if (key_states[SDL_SCANCODE_SPACE] && (event.key.repeat == 0))
         {
-            m_velocity_y = -JUMP_VELOCITY_Y;
+            m_velocity.y = -JUMP_VELOCITY_Y;
         }
     }
         
@@ -143,73 +183,102 @@ void Player::handle_event(SDL_Event& event)
     {
         //these handle the cases when switching from pressing left to pressing right and vice versa
         
-        if ((key_states[SDL_SCANCODE_A] == 0) && (key_states[SDL_SCANCODE_LEFT] == 0) && (m_acceleration_x < 0))
+        if ((key_states[SDL_SCANCODE_A] == 0) && (key_states[SDL_SCANCODE_LEFT] == 0) && (m_acceleration.x < 0))
         {
-            m_acceleration_x = 0;
-            if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT]) 
+            m_acceleration.x = 0;
+            if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
             {
                 m_flip_state = SDL_FLIP_NONE;
-                m_acceleration_x = MAX_ACCELERATION_X;
+                m_acceleration.x = MAX_ACCELERATION_X;
             }
         }
         
-        if ((key_states[SDL_SCANCODE_D] == 0) && (key_states[SDL_SCANCODE_RIGHT] == 0) && (m_acceleration_x > 0))
+        if ((key_states[SDL_SCANCODE_D] == 0) && (key_states[SDL_SCANCODE_RIGHT] == 0) && (m_acceleration.x > 0))
         {
-            m_acceleration_x = 0;
+            m_acceleration.x = 0;
             if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
             {
                 m_flip_state = SDL_FLIP_HORIZONTAL;
-                m_acceleration_x = -MAX_ACCELERATION_X;
+                m_acceleration.x = -MAX_ACCELERATION_X;
             }
 
         }
+        
+        if (key_states[SDL_SCANCODE_F] && (key_states[SDL_SCANCODE_T] == 0))
+        {
+            if (m_frame > 24) m_frame = -1;
+            m_shield.set_state(true);
+            g_game_objects.insert(&m_shield);
+        }
+        
+        if (key_states[SDL_SCANCODE_T] && (key_states[SDL_SCANCODE_F] == 0))
+        {
+            if (m_frame == -1) m_frame = 0; //start the animation
+            
+        }
+    
+        if (key_states[SDL_SCANCODE_F] == 0)
+        {
+            m_shield.set_state(false);
+            g_game_objects.remove(&m_shield);
+        }
+        
     }
 }
 
 void Player::update_position()
 {
-    m_position_x += m_velocity_x;
-    m_position_y += m_velocity_y;
+    m_position.x += m_velocity.x;
+    m_position.y += m_velocity.y;
     
-    if (((m_position_x + WIDTH) > SCREEN_WIDTH) || (m_position_x < 0))
+    if (((m_position.x + WIDTH) > SCREEN_WIDTH) || (m_position.x < 0))
     {
-        m_position_x -= m_velocity_x;
-        m_velocity_x = 0;
-        m_acceleration_x = 0;
+        m_position.x -= m_velocity.x;
+        m_velocity.x = 0;
+        m_acceleration.x = 0;
     }
     
-    if (((m_position_y + HEIGHT) > SCREEN_HEIGHT) || (m_position_y < 0))
+    if (((m_position.y + HEIGHT) > SCREEN_HEIGHT) || (m_position.y < 0))
     {
-        m_position_y -= m_velocity_y;
-        m_velocity_y = 0;
-        m_acceleration_y = 0;
+        m_position.y -= m_velocity.y;
+        m_velocity.y = 0;
+        m_acceleration.y = 0;
         
     }
     else
     {
-        m_acceleration_y = GRAVITY_ACCELERATION;
+        m_acceleration.y = GRAVITY_ACCELERATION;
     }
     
-    change_var(m_velocity_x, m_acceleration_x - FRICTION_MULTIPLIER*m_velocity_x, MAX_VELOCITY_X);
-    change_var(m_velocity_y, m_acceleration_y - AIR_RESISTANCE*m_velocity_y, MAX_VELOCITY_Y);
-   
+    change_var(m_velocity.x, m_acceleration.x - FRICTION_MULTIPLIER*m_velocity.x, MAX_VELOCITY_X);
+    change_var(m_velocity.y, m_acceleration.y - AIR_RESISTANCE*m_velocity.y, MAX_VELOCITY_Y);
+    
     update_colliders();
+    
+    if (m_flip_state == SDL_FLIP_NONE)
+    {
+        m_shield.update_position({m_position.x + SCALE_FACTOR*82, m_position.y + SCALE_FACTOR*55});
+    }
+    if (m_flip_state == SDL_FLIP_HORIZONTAL)
+    {
+        m_shield.update_position({m_position.x + SCALE_FACTOR*5, m_position.y + SCALE_FACTOR*55});
+    }
         
 }
 
 void Player::update_colliders()
 {
-    m_colliders[0].x = m_position_x + 3;
-    m_colliders[0].y = m_position_y + 1;
+    m_colliders[0].x = m_position.x + 3;
+    m_colliders[0].y = m_position.y + 1;
     
-    m_colliders[1].x = m_position_x + 13;
-    m_colliders[1].y = m_position_y + 57;
+    m_colliders[1].x = m_position.x + 13;
+    m_colliders[1].y = m_position.y + 57;
     
-    update_colliders_scaled();
+    update_scaled_colliders(SCALE_FACTOR);
     
     if (m_flip_state == SDL_FLIP_HORIZONTAL)
     {
-        flip_colliders();
+        flip_colliders(WIDTH);
     }
 }
 
@@ -220,18 +289,19 @@ void Player::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case KUNAI:
-            g_game_objects.remove(p_other);
+            g_game_objects.destroy(p_other);
             std::cout << "Kunai hit player\n";
-            if (!get_hearts().pop_color())
+            if (!get_hearts().pop())
             {
                 std::cout << "you loose\n";
             }
             break;
             
         case APPLE:
-            g_game_objects.remove(p_other);
+            collide(p_other);
             std::cout << "Apple hit player\n";
-            if (!get_hearts().pop_color())
+        
+            if (!get_hearts().pop())
             {
                 std::cout << "you loose\n";
             }
@@ -242,14 +312,15 @@ void Player::resolve_collision(Object* p_other)
 void Player::render()
 {
     m_hearts.render();
+    m_kunai_counter.render();
     
     if (m_frame < 0)
     {
-        m_sprite.render(m_position_x, m_position_y, &m_clips[0], SCALE_FACTOR, m_flip_state);
+        m_sprite.render(m_position.x, m_position.y, &m_clips[0], SCALE_FACTOR, m_flip_state);
     }
     else
     {
-        m_sprite.render(m_position_x, m_position_y, &m_clips[m_frame/4], SCALE_FACTOR, m_flip_state, WIDTH);
+        m_sprite.render(m_position.x, m_position.y, &m_clips[m_frame/4], SCALE_FACTOR, m_flip_state, WIDTH);
         
         m_frame++;
     }

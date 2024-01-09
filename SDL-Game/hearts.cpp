@@ -62,7 +62,7 @@ void Hearts::set_number(int number)
     }
 }
 
-bool Hearts::pop_color()
+bool Hearts::pop()
 {
     for (int i = m_number-1; i >= 0; i--)
     {

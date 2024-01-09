@@ -29,7 +29,7 @@ public:
     static Texture& get_texture();
     void set_position(float x, float y);
     void set_number(int number);
-    bool pop_color();
+    bool pop();
     void render();
     
 private:

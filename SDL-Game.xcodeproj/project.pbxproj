@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E22E3462B3CB36600BF7A0B /* hearts.cpp */; };
 		0E3735072B3F614D009E373D /* game_objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3735052B3F614D009E373D /* game_objects.cpp */; };
+		0E3B1A882B44F21B004AF32A /* kunai_counter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */; };
+		0E3B1A8B2B452749004AF32A /* shield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3B1A892B452749004AF32A /* shield.cpp */; };
 		0E4CE6DE2B41FDA800BA8796 /* frame_rate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E4CE6DC2B41FDA800BA8796 /* frame_rate.cpp */; };
 		0E65303A2B3AE828004487DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E6530382B3AE828004487DA /* object.cpp */; };
 		0E65303D2B3AEFD5004487DA /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E65303B2B3AEFD5004487DA /* player.cpp */; };
@@ -46,6 +48,10 @@
 		0E3735062B3F614D009E373D /* game_objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game_objects.h; sourceTree = "<group>"; };
 		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
+		0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kunai_counter.cpp; sourceTree = "<group>"; };
+		0E3B1A872B44F21B004AF32A /* kunai_counter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kunai_counter.h; sourceTree = "<group>"; };
+		0E3B1A892B452749004AF32A /* shield.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shield.cpp; sourceTree = "<group>"; };
+		0E3B1A8A2B452749004AF32A /* shield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shield.h; sourceTree = "<group>"; };
 		0E4CE6DC2B41FDA800BA8796 /* frame_rate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = frame_rate.cpp; sourceTree = "<group>"; };
 		0E4CE6DD2B41FDA800BA8796 /* frame_rate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frame_rate.h; sourceTree = "<group>"; };
 		0E6530382B3AE828004487DA /* object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
@@ -99,6 +105,8 @@
 				0E964C0E2AF861F7003AA09E /* kunai.h */,
 				0EFA07AF2B4380C300AED262 /* apple.cpp */,
 				0EFA07B02B4380C300AED262 /* apple.h */,
+				0E3B1A892B452749004AF32A /* shield.cpp */,
+				0E3B1A8A2B452749004AF32A /* shield.h */,
 			);
 			path = game_objects;
 			sourceTree = "<group>";
@@ -127,6 +135,8 @@
 				0E65303E2B3AEFFF004487DA /* game_objects */,
 				0E22E3462B3CB36600BF7A0B /* hearts.cpp */,
 				0E22E3472B3CB36600BF7A0B /* hearts.h */,
+				0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */,
+				0E3B1A872B44F21B004AF32A /* kunai_counter.h */,
 				0E4CE6DC2B41FDA800BA8796 /* frame_rate.cpp */,
 				0E4CE6DD2B41FDA800BA8796 /* frame_rate.h */,
 				0EB97F9E2B396F5C00CC9236 /* texture.cpp */,
@@ -211,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E3B1A8B2B452749004AF32A /* shield.cpp in Sources */,
 				0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */,
 				0E4CE6DE2B41FDA800BA8796 /* frame_rate.cpp in Sources */,
 				0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */,
@@ -222,6 +233,7 @@
 				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,
 				0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */,
 				0EFA07B12B4380C300AED262 /* apple.cpp in Sources */,
+				0E3B1A882B44F21B004AF32A /* kunai_counter.cpp in Sources */,
 				0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */,
 				0EB97FA82B3983F900CC9236 /* init.cpp in Sources */,
 			);

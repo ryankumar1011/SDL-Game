@@ -15,6 +15,7 @@
 #include "kunai.h"
 #include "player.h"
 #include "hearts.h"
+#include "kunai_counter.h"
 #include "object.h"
 #include "game_objects.h"
 #include "init.h"
@@ -34,8 +35,23 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
 
+//normalize vector
+//position velocity acceleration SDLFPoint
+//add massess, momentum
+//clean up Object methods
+//kunai throw recoil
+//apple hit shield bounce
+//resizable window (with vsync), escape for resizing
 
-//call kunai count
+//fix player scaling issue
+//make constant for default values like angle = 0, pass by reference or value?
+//if shield used lower movement speed? increase shield size?
+
+//two players
+//music (kunai hit, apple hit, kunai release (loss of kunai))
+//menu with buttons, controls, scrolling background
+//menu resizing options (customizable)
+//ground, tiles, divider
 
 int generate_random_number(int min, int max)
 {
@@ -64,11 +80,21 @@ int main(int argc, char* args[])
        else
        {
            Player player_1;
-           player_1.set_position(600, 300);
-           player_1.get_hearts().set_position(5, 5);
-           player_1.get_hearts().set_number(50);
+           player_1.get_position() = {300, 300};
+           player_1.get_hearts().set_position(15, 35);
+           player_1.get_hearts().set_number(5);
+           player_1.get_kunai_counter().set_position(15, 60);
+           player_1.get_kunai_counter().set_count(10);
            
+           Player player_2;
+           player_2.get_position() = {600, 300};
+           player_2.get_hearts().set_position(900, 35);
+           player_2.get_hearts().set_number(5);
+           player_2.get_kunai_counter().set_position(900, 60);
+           player_2.get_kunai_counter().set_count(10);
+        
            g_game_objects.insert(&player_1);
+           //g_game_objects.insert(&player_2);
 
            FrameRate frame_rate_text;
     
@@ -104,6 +130,7 @@ int main(int argc, char* args[])
                   }
                       
                  player_1.handle_event(event);
+                 player_2.handle_event(event);
                   
                   if (event.type == SDL_KEYUP)
                   {
@@ -154,7 +181,7 @@ int main(int argc, char* args[])
               if (frame == 0)
               {
                   Apple* apple = new Apple;
-                  apple->set_position(generate_random_number(300, 600), 0);
+                  apple->get_position().x = generate_random_number(300, 600);
                   g_game_objects.insert(apple);
               }
               
@@ -175,7 +202,7 @@ int main(int argc, char* args[])
               SDL_RenderClear(gp_renderer);
               
               frame_rate_text.render();
-              
+                            
               g_game_objects.render();
               
               SDL_RenderPresent(gp_renderer);
@@ -1082,7 +1109,14 @@ text_time_texture.render_texture(240, 270);
      
              }
      }
- }
- */
+ }relative_velocity.x = m_velocity.x +
+ /*
+  m_velocity.x -= 2 * dotProduct * m_penetration.x;
+  m_velocity.y -= 2 * dotProduct * m_penetration.y;
+  
+  if (m_velocity_x > 5) m_velocity.x = 5;
+  if (m_velocity_y > 5) m_velocity.y = 5;
+  */
+ 
  
  
