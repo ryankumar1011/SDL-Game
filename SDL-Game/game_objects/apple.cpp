@@ -9,6 +9,7 @@
 #include "kunai.h"
 #include "player.h"
 #include "game_objects.h"
+#include "music_handler.h"
 #include "global_variables.h"
 
 Texture Apple::m_texture;
@@ -71,32 +72,32 @@ void Apple::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case PLAYER:
-            collide(p_other);
-            std::cout << "Apple hit player\n";
-            if (!static_cast<Player*>(p_other)->get_hearts().pop())
-            {
-                std::cout << "you loose\n";
-            }
-            
+            collide(p_other);           
             break;
             
         case SHIELD:
-            g_game_objects.destroy(this);
-            std::cout << "Apple hit shield\n";
+            collide(p_other);
             break;
             
         case KUNAI:
             g_game_objects.destroy(this);
-            std::cout << "Kunai hit apple\n";
             static_cast<Kunai*>(p_other)->get_player().get_kunai_counter().increase_count(3);
+            MusicHandler::play_apple_hit();
             break;
             
         case APPLE:
             g_game_objects.destroy(this);
             g_game_objects.destroy(p_other);
-            std::cout << "Apple hit apple\n";
             break;
     }
+}
+void Apple::render()
+{
+    m_texture.render(m_position.x, m_position.y, &m_clip, SCALE_FACTOR, m_angle, nullptr, m_flip_state);
+    
+    m_angle += m_angular_velocity;
+    
+    if (m_angle > 360) m_angle = 0;
 }
 
 /*
@@ -140,15 +141,6 @@ void collide()
     
 }
 */
-void Apple::render()
-{
-    m_texture.render(m_position.x, m_position.y, &m_clip, SCALE_FACTOR, m_angle, nullptr, m_flip_state);
-    
-    m_angle += m_angle_velocity;
-    
-    if (m_angle > 360) m_angle = 0;
-}
-
 /*
  float penetration_length = std::sqrt(m_penetration.x * m_penetration.x + m_penetration.y * m_penetration.y);
              if (penetration_length > 0)

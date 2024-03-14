@@ -15,6 +15,7 @@ public:
     void remove(Object* p_object);
     void destroy(Object* p_object);
     void resolve_collisions();
+    void handle_event(SDL_Event);
     void update();
     void render();
     

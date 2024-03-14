@@ -8,9 +8,12 @@
 //All headers in this project include everything they need to compile, they can compile on their own
 //Header files:
 #include "texture.h"
-#include "mouse_button.h"
 #include "timers.h"
 #include "frame_rate.h"
+#include "menu_button.h"
+#include "controls_button.h"
+#include "music_button.h"
+#include "button.h"
 #include "apple.h"
 #include "kunai.h"
 #include "player.h"
@@ -18,7 +21,11 @@
 #include "kunai_counter.h"
 #include "object.h"
 #include "game_objects.h"
+#include "game_buttons.h"
 #include "init.h"
+#include "music_handler.h"
+#include "event_handler.h"
+#include "renderer.h"
 #include "global_variables.h"
 
 //C++ libraries:
@@ -35,21 +42,15 @@
 #include <SDL2_ttf/SDL_ttf.h>
 #include <SDL2_mixer/SDL_mixer.h>
 
-//normalize vector
-//position velocity acceleration SDLFPoint
-//add massess, momentum
 //clean up Object methods
-//kunai throw recoil
-//apple hit shield bounce
 //resizable window (with vsync), escape for resizing
 
-//fix player scaling issue
-//make constant for default values like angle = 0, pass by reference or value?
-//if shield used lower movement speed? increase shield size?
+//play button click sfx
+//getting hit sfx
+//resizable window (with vsync), escape for resizing
+//2nd player controls
 
-//two players
-//music (kunai hit, apple hit, kunai release (loss of kunai))
-//menu with buttons, controls, scrolling background
+//scrolling background
 //menu resizing options (customizable)
 //ground, tiles, divider
 
@@ -60,6 +61,25 @@ int generate_random_number(int min, int max)
     std::uniform_int_distribution<int> distribution(min, max);
 
     return distribution(generator);
+}
+
+void set_object_positions(Player& player_1, Player& player_2, MenuButton& menu_button, MusicButton& music_button, ControlsButton& controls_button)
+{
+    player_1.get_position() = {300, 300};
+    player_1.get_hearts().set_position(5, 37);
+    player_1.get_hearts().set_number(5);
+    player_1.get_kunai_counter().set_position(5, 60);
+    player_1.get_kunai_counter().set_count(10);
+    
+    player_2.get_position() = {600, 300};
+    player_2.get_hearts().set_position(900, 37);
+    player_2.get_hearts().set_number(5);
+    player_2.get_kunai_counter().set_position(900, 60);
+    player_2.get_kunai_counter().set_count(10);
+    
+    menu_button.set_position(5, 5);
+    music_button.set_position (35, 6);
+    controls_button.set_position(62, 6);
 }
 
 int main(int argc, char* args[])
@@ -80,21 +100,19 @@ int main(int argc, char* args[])
        else
        {
            Player player_1;
-           player_1.get_position() = {300, 300};
-           player_1.get_hearts().set_position(15, 35);
-           player_1.get_hearts().set_number(5);
-           player_1.get_kunai_counter().set_position(15, 60);
-           player_1.get_kunai_counter().set_count(10);
-           
            Player player_2;
-           player_2.get_position() = {600, 300};
-           player_2.get_hearts().set_position(900, 35);
-           player_2.get_hearts().set_number(5);
-           player_2.get_kunai_counter().set_position(900, 60);
-           player_2.get_kunai_counter().set_count(10);
+           MenuButton menu_button;
+           MusicButton music_button;
+           ControlsButton controls_button;
+           
+           set_object_positions(player_1, player_2, menu_button, music_button, controls_button);
         
            g_game_objects.insert(&player_1);
-           //g_game_objects.insert(&player_2);
+           g_game_objects.insert(&player_2);
+           
+           g_game_buttons.insert(&menu_button);
+           g_game_buttons.insert(&music_button);
+           g_game_buttons.insert(&controls_button);
 
            FrameRate frame_rate_text;
     
@@ -114,69 +132,13 @@ int main(int argc, char* args[])
            SDL_Event event;
 
            while (quit != true)
-              
-          {
+           {
               cap_timer.start();
-              
-              //Events
-              
-              while (SDL_PollEvent(&event) != 0)
-                  {
-        
-                  if (event.type == SDL_QUIT)
-                      
-                  {
-                      quit = true;
-                  }
-                      
-                 player_1.handle_event(event);
-                 player_2.handle_event(event);
-                  
-                  if (event.type == SDL_KEYUP)
-                  {
-                      switch (event.key.keysym.sym)
-                      {
-                              
-                          case SDLK_m:
-        
-                              if (Mix_PlayingMusic() == 0)
-                              {
-                                  Mix_PlayMusic(gp_background_music, -1);
-                              }
-                              
-                              else if (Mix_PausedMusic() == 1)
-                              {
-                                  Mix_ResumeMusic();
-                              }
-                        
-                              else Mix_PauseMusic();
-                              
-                              break;
-                              
-                          case SDLK_v:
-                              Mix_PlayChannel(-1, gp_shuriken_sound, 0);
-                              break;
-                              
-                          case SDLK_b:
-                              Mix_PlayChannel(-1, gp_apple_hit_sound, 0);
-                              break;
-                              
-                          case SDLK_n:
-                              if (game_timer.is_started()) game_timer.stop();
-                              game_timer.start();
-                              break;
-                              
-                          case SDLK_p:
-                              if (game_timer.is_paused()) game_timer.unpause();
-                              else game_timer.pause();
-                              break;
-                              
-                      }
-                      
-                  }
-                    
-              }
-              
+               
+               //Events
+               
+              quit = EventHandler::handle_events(event);
+
               //Logic
               if (frame == 0)
               {
@@ -185,7 +147,12 @@ int main(int argc, char* args[])
                   g_game_objects.insert(apple);
               }
               
-              g_game_objects.update();
+              if (!g_menu_state && !g_controls_manual_state)
+              {
+                  g_game_objects.update();
+              }
+               
+              g_game_buttons.update();
         
               
               //Frame rate is only updated once per second for performance (updating it requires loading a new texture with different text)
@@ -195,20 +162,16 @@ int main(int argc, char* args[])
                   frame_rate_text.update(frame_rate);
               }
 
-                            
               //Rendering
-              
-              SDL_SetRenderDrawColor(gp_renderer, 0xE7, 0xFF, 0xCE, 0xFF);
-              SDL_RenderClear(gp_renderer);
-              
+               
+              Renderer::render_all();
+               
               frame_rate_text.render();
-                            
-              g_game_objects.render();
-              
+               
               SDL_RenderPresent(gp_renderer);
-              
+               
               frame++;
-              
+               
               if (frame > 60)
               {
                   frame = 0;
@@ -230,10 +193,15 @@ int main(int argc, char* args[])
            }
        }
    }
-    
     close();
     return 0;
 }
+
+
+
+
+
+
 
 // Ommited code written during practice, can be used later:
 
@@ -1110,7 +1078,7 @@ text_time_texture.render_texture(240, 270);
              }
      }
  }relative_velocity.x = m_velocity.x +
- /*
+ 
   m_velocity.x -= 2 * dotProduct * m_penetration.x;
   m_velocity.y -= 2 * dotProduct * m_penetration.y;
   
@@ -1118,5 +1086,329 @@ text_time_texture.render_texture(240, 270);
   if (m_velocity_y > 5) m_velocity.y = 5;
   */
  
+/*
+ SDL_FPoint linear_impulse;
+ SDL_FPoint relative_velocity;
+
+ SDL_FPoint& other_position = p_other->get_position();
+ SDL_FPoint& other_velocity = p_other->get_velocity();
+
+ m_position.x -= m_penetration.x * 0.1;
+ m_position.y -= m_penetration.y * 0.1;
+
+ other_position.x += m_penetration.x * 0.1;
+ other_position.y += m_penetration.y * 0.1;
+
+ float m1_inverse = 1.0 / get_mass();
+ float m2_inverse = 1.0 / p_other->get_mass();
+
+ relative_velocity.x = m_velocity.x - other_velocity.x;
+ relative_velocity.y = m_velocity.y - other_velocity.y;
+
+ linear_impulse.x = relative_velocity.x * (1.0 / (m1_inverse + m2_inverse));
+ linear_impulse.y = relative_velocity.y * (1.0 / (m1_inverse + m2_inverse));
+
+ m_velocity.x -= linear_impulse.x / get_mass();
+ m_velocity.y -= linear_impulse.y / get_mass();
+
+ other_velocity.x += linear_impulse.x / p_other->get_mass();
+ other_velocity.y += linear_impulse.y / p_other->get_mass();
+ 
+ else if ((other_left > m_left) && (other_right < m_right) && (other_bottom < m_top) && (other_top > m_bottom))
+ {
+     if (other_left-m_left < other_right-m_right)
+     {
+         other_penetration.x = other_left-m_left;
+     }
+     else other_penetration.x = -(other_right-m_right);
+     
+     if (other_top-m_top < m_bottom-other_bottom)
+     {
+         other_penetration.y = other_top-m_top ;
+     }
+     else other_penetration.y = -(m_bottom-other_bottom);
+ }
+ */
+/*
+ if (((m_left > other_left) && (m_right < other_right) && (m_bottom < other_bottom) && (m_top > other_top)) || ((other_left > m_left) && (other_right < m_right) && (other_bottom < m_bottom) && (other_top > m_top)))
+ {
+     
+     m_penetration.x =  (other_left + other_right)/2 - (m_left + m_right)/2;
+     m_penetration.y = (other_top + other_bottom)/2 - (m_top + m_bottom)/2;
+     
+     float magnitude = sqrt(m_penetration.x*m_penetration.x + m_penetration.y*m_penetration.y);
+     m_penetration.x /= magnitude;
+     m_penetration.y /= magnitude;
+     
+     other_penetration.x = -m_penetration.x;
+     other_penetration.y = -m_penetration.y;
+     
+     return true;
+ }
+ 
+ linear_impulse.x = (-2.0 * get_mass() * p_other->get_mass()) / (get_mass() + p_other->get_mass()) * dot_product;
+ linear_impulse.y = (-2.0 * get_mass() * p_other->get_mass()) / (get_mass() + p_other->get_mass()) * dot_product;
+ 
+ m_velocity.x = m_velocity.x + (linear_impulse.x / get_mass()) * m_penetration.x;
+ m_velocity.y = m_velocity.y + (linear_impulse.y / get_mass()) * m_penetration.y;
+ 
+ other_velocity.x = other_velocity.x - (linear_impulse.x / p_other->get_mass()) * m_penetration.x;
+ other_velocity.y = other_velocity.y - (linear_impulse.y / p_other->get_mass()) * m_penetration.y;
+ SDL_FPoint linear_impulse;
+ 
+ SDL_FPoint relative_velocity;
+ SDL_FPoint normalized_penetration;
+ float penetration_norm;
+ float penetration_magnitude;
+ float impulse_magnitude;
+     
+ SDL_FPoint& other_position = p_other->get_position();
+ SDL_FPoint& other_velocity = p_other->get_velocity();
+ 
+ float m1_inverse = 1.0/get_mass();
+ float m2_inverse = 1.0/p_other->get_mass();
+ 
+ relative_velocity.x = m_velocity.x - other_velocity.x;
+ relative_velocity.y = m_velocity.y - other_velocity.y;
+  
+ penetration_magnitude = relative_velocity.x*m_penetration.x + relative_velocity.y*m_penetration.y;
+ impulse_magnitude = penetration_magnitude*(1.0 / (m1_inverse + m2_inverse));
+ 
+ penetration_norm = sqrt(m_penetration.x*m_penetration.x + m_penetration.y*m_penetration.y);
+ normalized_penetration.x = m_penetration.x/penetration_norm;
+ normalized_penetration.y = m_penetration.y/penetration_norm;
+ 
+ linear_impulse.x = impulse_magnitude*m_penetration.x;
+ linear_impulse.y = impulse_magnitude*m_penetration.y;
+ 
+ m_position.x -= m_penetration.x*1.01;
+ m_position.y -= m_penetration.y*1.01;
+     
+ other_position.x += m_penetration.x*1.01;
+ other_position.y += m_penetration.y*1.01;
+ 
+ m_velocity.x = m_velocity.x + (linear_impulse.x / get_mass()) * m_penetration.x;
+ m_velocity.y = m_velocity.y + (linear_impulse.y / get_mass()) * m_penetration.y;
+ 
+ other_velocity.x = other_velocity.x - (linear_impulse.x / p_other->get_mass()) * m_penetration.x;
+ other_velocity.y = other_velocity.y - (linear_impulse.y / p_other->get_mass()) * m_penetration.y;
+    
+std::cout << "m_position: (" << m_position.x << ", " << m_position.y << ")" << std::endl;
+std::cout << "other_position: (" << other_position.x << ", " << other_position.y << ")" << std::endl;
+std::cout << "relative_velocity: (" << relative_velocity.x << ", " << relative_velocity.y << ")" << std::endl;
+std::cout << "linear_impulse: (" << linear_impulse.x << ", " << linear_impulse.y << ")" << std::endl;
+std::cout << "normalized_penetration: (" << normalized_penetration.x << ", " << normalized_penetration.y << ")" << std::endl;
+
+std::cout << "penetration_norm: " << penetration_norm << std::endl;
+std::cout << "penetration_magnitude: " << penetration_magnitude << std::endl;
+std::cout << "impulse_magnitude: " << impulse_magnitude << std::endl;
+
+std::cout << "new m_velocity: (" << m_velocity.x << ", " << m_velocity.y << ")" << std::endl;
+std::cout << "new other_velocity: (" << other_velocity.x << ", " << other_velocity.y << ")" << std::endl;
+ 
+ m_penetration.x /= magnitude;
+ m_penetration.y /= magnitude;
  
  
+ 
+ if ((m_right > other_left) && (m_left < other_right))
+ {
+     m_penetration.x = m_right - other_left;
+ }
+ 
+ else if ((other_right > m_left) && (other_left < m_right))
+ {
+     m_penetration.x = -(other_right - m_left);
+ }
+ 
+ else m_penetration.x = 0;
+ 
+ if ((m_bottom > other_top) && (m_top < other_bottom)) //m going down
+ {
+     m_penetration.y = m_bottom - other_top;
+ }
+ 
+ else if ((other_bottom > m_top) && (other_top < m_bottom))
+ {
+     m_penetration.y = -(other_bottom - m_top);
+ }
+ 
+ else m_penetration.y = 0;
+ 
+ float magnitude = sqrt(m_penetration.x*m_penetration.x + m_penetration.y*m_penetration.y);
+ m_penetration.x /= magnitude;
+ m_penetration.y /= magnitude;
+ 
+ 
+ if ((overlap_right == m_right) && (overlap_left == m_left) && (overlap_top == m_top) && (overlap_bottom == m_bottom))
+ {
+     if (m_right - other_left < other_right - m_left)
+     {
+         m_penetration.x = m_right - other_left;
+     }
+     
+     else m_penetration.x = - (other_right - m_left);
+     
+     if (m_bottom - other_top < other_bottom - m_top)
+     {
+         m_penetration.y = m_bottom - other_top;
+     }
+     
+     else m_penetration.y = - (other_bottom - m_top);
+     
+ }
+ else if ((overlap_right == other_right) && (overlap_left == other_left) && (other_top == other_top) && (other_bottom == other_bottom))
+ {
+     if (other_right - m_left < m_right - other_left)
+     {
+         m_penetration.x = - (other_right - m_left);
+     }
+     
+     else m_penetration.x = m_right - other_left;
+     
+     if (other_bottom - m_top < m_bottom - other_top)
+     {
+         m_penetration.y = -(other_bottom - m_top);
+     }
+     
+     else m_penetration.y = m_bottom - other_top;
+ }
+ 
+ 
+ std::cout << "Debug Info:" << std::endl;
+ std::cout << "m_position: (" << m_position.x << ", " << m_position.y << ")" << std::endl;
+ std::cout << "other_position: " << other_position.x << ", " << other_position.y << ")" << std::endl;
+ std::cout << "m_velocity: (" << m_velocity.x << ", " << m_velocity.y << ")" << std::endl;
+ std::cout << "other_velocity: " << other_velocity.x << ", " << other_velocity.y << ")" << std::endl;
+ std::cout << "mass 1: " << 1/m1_inverse << std::endl;
+ std::cout << "mass 2: " << 1/m2_inverse << std::endl;
+ 
+ 
+ std::cout << "Normal: (" << m_normal.x << ", " << m_normal.y << ")" << std::endl;
+ std::cout << "Penetration: (" << m_penetration.x << ", " << m_penetration.y << ")" << std::endl;
+ std::cout << "Dot Product: " << dot_product << std::endl;
+ std::cout << "Linear Impulse: " << linear_impulse << std::endl;
+ std::cout << "new m_velocity: (" << m_velocity.x << ", " << m_velocity.y << ")" << std::endl;
+ std::cout << "new other_velocity: " << other_velocity.x << ", " << other_velocity.y << ")" << std::endl;
+ */
+
+ 
+/*
+ void Object::calc_penetration(Object* other, float m_left, float m_right, float m_top, float m_bottom, float other_left, float other_right, float other_top, float other_bottom)
+ {
+     SDL_FPoint& other_penetration = other->get_penetration();
+
+     float overlap_left;
+     float overlap_right;
+     float overlap_top;
+     float overlap_bottom;
+     
+     overlap_left = std::max(m_left, other_left);
+     overlap_top = std::max(m_top, other_top);
+     overlap_right = std::min(m_right, other_right);
+     overlap_bottom = std::min(m_bottom, other_bottom);
+     
+     if ((overlap_right == m_right) && (overlap_left == m_left) && (overlap_top == m_top) && (overlap_bottom == m_bottom))
+     {
+         m_penetration.x = std::min(m_right - other_left, other_right - m_left);
+         m_penetration.y = std::min(m_bottom - other_top, other_bottom - m_top);
+     }
+     
+     else if ((overlap_right == other_right) && (overlap_left == other_left) && (overlap_top == other_top) && (overlap_bottom == other_bottom))
+     {
+         m_penetration.x = std::min(other_right - m_left, m_right - other_left);
+         m_penetration.y = std::min(other_bottom - m_top, m_bottom - other_top);
+     }
+     
+     else
+     {
+         if (((overlap_right == m_right) && (overlap_left == m_left)) || ((overlap_right == other_right) && (overlap_left == other_left)))
+         {
+             m_penetration.x = 0;
+         }
+         else
+         {
+             if (overlap_right == m_right)
+             {
+                 m_penetration.x = overlap_right - overlap_left;
+             }
+             else
+             {
+                 m_penetration.x = overlap_left - overlap_right;
+             }
+         }
+         
+         if (((overlap_top == m_top) && (overlap_bottom == m_bottom)) || ((overlap_top == other_top) && (overlap_bottom == other_bottom)))
+         {
+             m_penetration.y = 0;
+         }
+         else
+         {
+             if (overlap_bottom == m_bottom)
+             {
+                 m_penetration.y = overlap_bottom - overlap_top;
+             }
+             else
+             {
+                 m_penetration.y = overlap_top - overlap_bottom;
+             }
+         }
+     }
+     
+     if (m_penetration.x == other_right - m_left) m_penetration.x = -m_penetration.x;
+     if (m_penetration.y == other_bottom - m_top) m_penetration.y = -m_penetration.y;
+     
+     other_penetration.x = -m_penetration.x;
+     other_penetration.y = -m_penetration.y;
+ }
+
+ /*
+ if ((overlap_x == m_right - m_left) || (overlap_x == other_right - other_left))
+ {
+     overlap_x = 0;
+ }
+
+ if ((overlap_y == m_bottom - m_top) || (overlap_y == other_bottom - other_top))
+ {
+     overlap_y = 0;
+ }
+
+
+ void Object::calc_penetration(Object* other, float m_left, float m_right, float m_top, float m_bottom, float other_left, float other_right, float other_top, float other_bottom)
+ {
+     // Calculate horizontal overlap
+     float horizontal_overlap = std::min(m_right - other_left, other_right - m_left);
+     horizontal_overlap = std::max(horizontal_overlap, 0.0f);
+
+     // Calculate vertical overlap
+     float vertical_overlap = std::min(m_bottom - other_top, other_bottom - m_top);
+     vertical_overlap = std::max(vertical_overlap, 0.0f);
+     
+     // Calculate penetration depth
+     float penetration = std::min(horizontal_overlap, vertical_overlap);
+
+     // Now, 'penetration' holds the depth of penetration between the objects
+ }
+
+ void Object::calc_penetration(Object* other, float m_left, float m_right, float m_top, float m_bottom, float other_left, float other_right, float other_top, float other_bottom)
+ {
+     // Calculate horizontal overlap
+     float horizontal_overlap = std::min(m_right - other_left, other_right - m_left);
+     horizontal_overlap = std::max(horizontal_overlap, 0.0f); // Ensure non-negative value
+
+     // Calculate vertical overlap
+     float vertical_overlap = std::min(m_bottom - other_top, other_bottom - m_top);
+     vertical_overlap = std::max(vertical_overlap, 0.0f); // Ensure non-negative value
+
+     // Calculate penetration depth
+     float penetration = std::min(horizontal_overlap, vertical_overlap);
+
+     // Now, 'penetration' holds the depth of penetration between the objects
+ }
+
+ */
+ 
+//When object initialized, size of m_colliders is set and then scale_colliders(SCALE_FACTOR) an update_colliders() is called.
+//update_colliders() will update position of colliders. It will flip_colliders() depending on m_flip_state and call update_scaled_colliders(scale_factor).
+//update_colliders() will be called every time position is updated
+

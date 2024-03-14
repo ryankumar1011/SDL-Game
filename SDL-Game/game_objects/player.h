@@ -18,13 +18,13 @@ class Player : public Object
 {
 public:
     static constexpr ObjectName NAME = PLAYER;
-    static constexpr float MASS = 70;
+    static constexpr float MASS = 60;
     static constexpr float SCALE_FACTOR = 1;
     static constexpr float WIDTH = 89*SCALE_FACTOR;
     static constexpr float HEIGHT = 132*SCALE_FACTOR;
     static constexpr float MAX_VELOCITY_X = 10;
     static constexpr float MAX_VELOCITY_Y = 15;
-    static constexpr float MAX_ACCELERATION_X = 0.35; //Note: floats are required to be constexpr
+    static constexpr float MAX_ACCELERATION_X = 0.35; //Note: static floats are required to be constexpr
     static constexpr float JUMP_VELOCITY_Y = 11.5;
     
 public:

@@ -33,11 +33,13 @@ public:
     
     void set_height(int height);
     
+    void reload();
+    
     int get_height();
         
     int get_width();
     
-    SDL_Texture* get_texture();
+    SDL_Texture& get_texture();
     
     void render(float x = 0, float y = 0, SDL_Rect* p_clip = nullptr, float scale_factor = 1, SDL_RendererFlip flip_state = SDL_FLIP_NONE, float center_width = 0);
 

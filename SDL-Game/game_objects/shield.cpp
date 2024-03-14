@@ -15,6 +15,10 @@ Shield::Shield()
 {
     m_position.x = 0;
     m_position.y = 0;
+    m_velocity.x = 0;
+    m_velocity.y = 0;
+    m_acceleration.x = 0;
+    m_acceleration.y = 0;;
     
     m_colliders.resize(1);
 }
@@ -58,12 +62,10 @@ void Shield::resolve_collision(Object* p_other)
     {
         case KUNAI:
             g_game_objects.destroy(p_other);
-            std::cout << "Kunai hit shield\n";
             break;
             
         case APPLE:
-            g_game_objects.destroy(p_other);
-            std::cout << "Apple hit shield\n";
+            collide(p_other);
             break;
     }
 }
@@ -75,7 +77,7 @@ void Shield::update_position(SDL_FPoint center)
         m_position.x = center.x - m_width/2;
         m_position.y = center.y - m_height/2;
     
-        change_var(m_scale_factor, 0.1, MAX_SCALE_FACTOR);
+        change_var_capped(m_scale_factor, 0.1, MAX_SCALE_FACTOR);
         
         m_width = 33*m_scale_factor;
         m_height = 70*m_scale_factor;

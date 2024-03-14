@@ -12,6 +12,13 @@
 FrameRate::FrameRate()
 {
     m_text.set_alpha_mod(0xAA);
+    m_position.x = SCREEN_WIDTH-40;
+    m_position.y = 5;
+}
+void FrameRate::set_position(float x, float y)
+{
+    m_position.x = x;
+    m_position.y = y;
 }
 
 bool FrameRate::load_texture()
@@ -31,8 +38,9 @@ void FrameRate::update(int frame_rate)
 
 void FrameRate::render()
 {
-    m_text.render(SCREEN_WIDTH-40, 5, nullptr);
+    m_text.render(m_position.x, m_position.y, nullptr);
 }
+
 FrameRate::~FrameRate()
 {
     m_text.free();

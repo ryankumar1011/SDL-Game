@@ -9,6 +9,7 @@
 #include "player.h"
 #include "texture.h"
 #include "game_objects.h"
+#include "music_handler.h"
 #include "global_variables.h"
 
 Texture Kunai::m_texture;
@@ -138,7 +139,6 @@ void Kunai::resolve_collision(Object* p_other)
     {
         case PLAYER:
             g_game_objects.destroy(this);
-            std::cout << "Kunai hit player\n";
             if (!(static_cast<Player*>(p_other))->get_hearts().pop())
             {
               std::cout << "you loose\n";
@@ -147,19 +147,17 @@ void Kunai::resolve_collision(Object* p_other)
             
         case SHIELD:
             g_game_objects.destroy(this);
-            std::cout << "Kunai hit shield\n";
             break;
             
         case KUNAI:
             g_game_objects.destroy(this);
             g_game_objects.destroy(p_other);
-            std::cout << "Kunai hit kunai\n";
             break;
             
         case APPLE:
             g_game_objects.destroy(p_other);
             get_player().get_kunai_counter().increase_count(3);
-            std::cout << "Kunai hit apple\n";
+            MusicHandler::play_apple_hit();
             break;
     }
 }

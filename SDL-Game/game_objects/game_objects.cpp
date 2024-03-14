@@ -16,7 +16,7 @@
 void GameObjects::insert(Object* p_object)
 {
     p_object->remove_mark = false;
-    p_object->delete_mark = false;
+    p_object->destroy_mark = false;
     mp_added_objects.push_back(p_object);
 }
 
@@ -27,7 +27,7 @@ void GameObjects::remove(Object* p_object)
 
 void GameObjects::destroy(Object* p_object)
 {
-    p_object->delete_mark = true;
+    p_object->destroy_mark = true;
 }
     
 void GameObjects::resolve_collisions()
@@ -44,6 +44,14 @@ void GameObjects::resolve_collisions()
     }
 }
 
+void GameObjects::handle_event(SDL_Event event)
+{
+    for (Object* p_object : mp_objects)
+    {
+        p_object->handle_event(event);
+    }
+}
+
 void GameObjects::update()
 {
     for (Object* p_added_object : mp_added_objects)
@@ -57,7 +65,7 @@ void GameObjects::update()
     {
         if (object->remove_mark) return true;
         
-        else if (object->delete_mark)
+        else if (object->destroy_mark)
         {
             delete object;
             return true;

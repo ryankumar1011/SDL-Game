@@ -8,6 +8,7 @@
 #include "kunai.h"
 #include "apple.h"
 #include "player.h"
+#include "music_handler.h"
 #include "game_objects.h"
 #include "global_variables.h"
 
@@ -56,6 +57,8 @@ Player::Player()
     scale_colliders(SCALE_FACTOR);
     update_colliders();
     
+    m_flip_state = SDL_FLIP_NONE;
+    
     m_frame = -1;
     m_shield.set_state(false);
     
@@ -85,7 +88,7 @@ KunaiCounter& Player::get_kunai_counter()
 
 void Player::create_kunai()
 {
-    if (m_kunai_counter.reduce_count())
+    if (m_kunai_counter.decrease_count())
     {
         Kunai* p_kunai = new Kunai(*this);
         
@@ -99,7 +102,7 @@ void Player::create_kunai()
             if (m_position.x + SCALE_FACTOR*104 + Kunai::WIDTH > SCREEN_WIDTH)
             {
                 kunai_position.x = SCREEN_WIDTH - Kunai::WIDTH;
-                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::WIDTH/2;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::HEIGHT/2;
             }
             else
             {
@@ -115,7 +118,7 @@ void Player::create_kunai()
             if (m_position.x - 1 - Kunai::WIDTH < 0)
             {
                 kunai_position.x = 0;
-                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::WIDTH/2;
+                kunai_position.y = m_position.y + SCALE_FACTOR*72 - Kunai::HEIGHT/2;
             }
             else
             {
@@ -127,6 +130,7 @@ void Player::create_kunai()
         }
         
         g_game_objects.insert(p_kunai);
+        MusicHandler::play_kunai();
     }
 }
 
@@ -166,9 +170,9 @@ void Player::handle_event(SDL_Event& event)
             }
         }
         
-        if (key_states[SDL_SCANCODE_F] && ((m_frame == -1) || (m_frame > 24)) && (!m_shield.get_state()) && (event.key.repeat == 0))
+        if (key_states[SDL_SCANCODE_F] && ((m_frame == -1) || (m_frame > 24)) && (!m_shield.get_state()))
         {
-            if (m_frame > 24) m_frame = 0;
+            if (m_frame > 24) m_frame = -1;
             m_shield.set_state(true);
             g_game_objects.insert(&m_shield);
         }
@@ -201,28 +205,17 @@ void Player::handle_event(SDL_Event& event)
                 m_flip_state = SDL_FLIP_HORIZONTAL;
                 m_acceleration.x = -MAX_ACCELERATION_X;
             }
-
         }
-        
-        if (key_states[SDL_SCANCODE_F] && (key_states[SDL_SCANCODE_T] == 0))
-        {
-            if (m_frame > 24) m_frame = -1;
-            m_shield.set_state(true);
-            g_game_objects.insert(&m_shield);
-        }
-        
-        if (key_states[SDL_SCANCODE_T] && (key_states[SDL_SCANCODE_F] == 0))
+        if (key_states[SDL_SCANCODE_T])
         {
             if (m_frame == -1) m_frame = 0; //start the animation
-            
         }
-    
+        //throw key is pressed but shield key is not
         if (key_states[SDL_SCANCODE_F] == 0)
         {
             m_shield.set_state(false);
             g_game_objects.remove(&m_shield);
         }
-        
     }
 }
 
@@ -250,8 +243,8 @@ void Player::update_position()
         m_acceleration.y = GRAVITY_ACCELERATION;
     }
     
-    change_var(m_velocity.x, m_acceleration.x - FRICTION_MULTIPLIER*m_velocity.x, MAX_VELOCITY_X);
-    change_var(m_velocity.y, m_acceleration.y - AIR_RESISTANCE*m_velocity.y, MAX_VELOCITY_Y);
+    change_var_capped(m_velocity.x, m_acceleration.x - FRICTION_MULTIPLIER*m_velocity.x, MAX_VELOCITY_X);
+    change_var_capped(m_velocity.y, m_acceleration.y - AIR_RESISTANCE*m_velocity.y, MAX_VELOCITY_Y);
     
     update_colliders();
     
@@ -263,6 +256,8 @@ void Player::update_position()
     {
         m_shield.update_position({m_position.x + SCALE_FACTOR*5, m_position.y + SCALE_FACTOR*55});
     }
+    
+    m_shield.get_velocity() = {m_velocity.x, m_velocity.y};
         
 }
 
@@ -290,7 +285,6 @@ void Player::resolve_collision(Object* p_other)
     {
         case KUNAI:
             g_game_objects.destroy(p_other);
-            std::cout << "Kunai hit player\n";
             if (!get_hearts().pop())
             {
                 std::cout << "you loose\n";
@@ -299,12 +293,6 @@ void Player::resolve_collision(Object* p_other)
             
         case APPLE:
             collide(p_other);
-            std::cout << "Apple hit player\n";
-        
-            if (!get_hearts().pop())
-            {
-                std::cout << "you loose\n";
-            }
             break;
     }
 }

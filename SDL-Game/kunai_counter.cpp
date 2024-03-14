@@ -14,13 +14,14 @@ Texture KunaiCounter::m_trans_kunai = Kunai::get_texture();
 KunaiCounter::KunaiCounter()
 {
     m_count = 0;
+    m_color = {0x00, 0x00, 0x00};
     update_count();
 }
 
 void KunaiCounter::set_position(float x, float y)
 {
-    m_position_x = x;
-    m_position_y = y;
+    m_position.x = x;
+    m_position.y = y;
 }
 void KunaiCounter::set_count(int count)
 {
@@ -28,7 +29,7 @@ void KunaiCounter::set_count(int count)
     update_count();
 }
 
-bool KunaiCounter::reduce_count(int amount)
+bool KunaiCounter::decrease_count(int amount)
 {
     m_count -= amount;
     
@@ -66,12 +67,12 @@ void KunaiCounter::render()
     if (m_count <= 0)
     {
         Kunai::get_texture().set_alpha_mod(0xAA);
-        Kunai::get_texture().render(m_position_x, m_position_y, nullptr, SCALE_FACTOR);
+        Kunai::get_texture().render(m_position.x, m_position.y, nullptr, SCALE_FACTOR);
         Kunai::get_texture().set_alpha_mod(0xFF);
     }
-    else Kunai::get_texture().render(m_position_x, m_position_y, nullptr, SCALE_FACTOR);
+    else Kunai::get_texture().render(m_position.x, m_position.y, nullptr, SCALE_FACTOR);
     
-    m_text.render(m_position_x + 32, m_position_y - 1.5, nullptr);
+    m_text.render(m_position.x + 32, m_position.y - 1.5, nullptr);
 
 }
 

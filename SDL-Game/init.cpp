@@ -10,6 +10,9 @@
 #include "player.h"
 #include "kunai.h"
 #include "apple.h"
+#include "menu_button.h"
+#include "controls_button.h"
+#include "music_button.h"
 #include "global_variables.h"
 
 #include <SDL2/SDL.h>
@@ -99,7 +102,6 @@ bool load_media()
     
     if (!load_images()) success = false;
     if (!load_fonts()) success = false;
-    if (!load_texts()) success = false;
     if (!load_audio()) success = false;
     
     initialize_media();
@@ -137,7 +139,40 @@ bool load_images()
     if (!Shield::get_texture().load_from_file("Images/shield.png"))
     {
         success = false;
-        printf("Failed to load apple image\n");
+        printf("Failed to load shield image\n");
+    }
+    if (!MenuButton::get_texture().load_from_file("Images/home_icon.png"))
+    {
+        success = false;
+        printf("Failed to load home icon image\n");
+    }
+    
+    if (!MusicButton::get_texture_on().load_from_file("Images/sound_on_icon.png"))
+    {
+        success = false;
+        printf("Failed to load sound on image\n");
+    }
+    
+    if (!MusicButton::get_texture_off().load_from_file("Images/sound_off_icon.png"))
+    {
+        success = false;
+        printf("Failed to load sound off image\n");
+    }
+    
+    if (!ControlsButton::get_texture().load_from_file("Images/controls_button.png"))
+    {
+        success = false;
+        printf("Failed to load controls button image\n");
+    }
+    if (!g_controls_manual.load_from_file("Images/game_manual.png"))
+    {
+        success = false;
+        printf("Failed to load controls menu \n");
+    }
+    if (!g_menu.load_from_file("Images/menu_in_progress.png"))
+    {
+        success = false;
+        printf("Failed to load controls menu \n");
     }
     
     return success;
@@ -184,23 +219,6 @@ TTF_Font* load_font_from_file(const std::string& font_path, int font_size)
     
 }
 
-bool load_texts()
-{
-    bool success = true;
-    
-    //SDL_Color text_color = {0x50, 0x00, 0x00};
-    
-    /*
-    if (!button_text.load_from_font(gp_arial_font, "Move over buttons to change color!", text_color))
-    {
-        success = false;
-    }
-    */
-    
-    return success;
-    
-}
-
 bool load_audio()
 {
     bool success = true;
@@ -213,9 +231,9 @@ bool load_audio()
         printf("Failed to load background music\n");
     }
     
-    gp_shuriken_sound = Mix_LoadWAV("Audio/shuriken2.wav");
+    gp_kunai_sound = Mix_LoadWAV("Audio/shuriken2.wav");
     
-    if (gp_shuriken_sound == nullptr)
+    if (gp_kunai_sound == nullptr)
     {
         success = false;
         printf("Failed to load shuriken audio\n");
@@ -228,28 +246,20 @@ bool load_audio()
         printf("Failed to load apple hit audio\n");
     }
     
+    
     return success;
 }
 
 void initialize_media()
 {
-    set_up_buttons();
     set_texture_clips();
-    set_texture_size();
-}
-
-void set_up_buttons()
-{
-
+    //set_up_buttons();
+    //set_texture_size();
 }
 
 void set_texture_clips()
 {
     Player::set_clips();
-}
-
-void set_texture_size()
-{
 }
 
 void close()
@@ -261,13 +271,19 @@ void close()
     Hearts::get_texture().free();
     Apple::get_texture().free();
     Shield::get_texture().free();
+    MenuButton::get_texture().free();
+    MusicButton::get_texture_on().free();
+    MusicButton::get_texture_off().free();
+    ControlsButton::get_texture().free();
+    g_controls_manual.free();
+    g_menu.free();
     
     //we need to close a font that is opened from TTF_OpenFont
     TTF_CloseFont(gp_arial_font);
     TTF_CloseFont(gp_crayon_font);
 
     Mix_FreeMusic(gp_background_music);
-    Mix_FreeChunk(gp_shuriken_sound);
+    Mix_FreeChunk(gp_kunai_sound);
     Mix_FreeChunk(gp_apple_hit_sound);
     
     // Destroy Windows and Renderer, set pointers to NULL

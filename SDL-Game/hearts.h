@@ -33,11 +33,11 @@ public:
     void render();
     
 private:
-    int m_number;
+    static Texture m_sprite;
     std::vector<SDL_FPoint> m_positions;
     std::vector<HeartColor> m_colors;
     static SDL_Rect m_red_clip;
     static SDL_Rect m_white_clip;
-    static Texture m_sprite;
+    int m_number;
 };
 

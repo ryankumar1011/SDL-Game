@@ -7,20 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E17AC422BA178F2002AA9E3 /* music_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E17AC402BA178F2002AA9E3 /* music_button.cpp */; };
+		0E17AC452BA18209002AA9E3 /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E17AC432BA18209002AA9E3 /* event_handler.cpp */; };
+		0E17AC482BA1821F002AA9E3 /* renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E17AC462BA1821F002AA9E3 /* renderer.cpp */; };
+		0E17AC4D2BA186D1002AA9E3 /* game_buttons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E17AC4B2BA186D1002AA9E3 /* game_buttons.cpp */; };
 		0E22E3482B3CB36600BF7A0B /* hearts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E22E3462B3CB36600BF7A0B /* hearts.cpp */; };
 		0E3735072B3F614D009E373D /* game_objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3735052B3F614D009E373D /* game_objects.cpp */; };
 		0E3B1A882B44F21B004AF32A /* kunai_counter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */; };
 		0E3B1A8B2B452749004AF32A /* shield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3B1A892B452749004AF32A /* shield.cpp */; };
+		0E3EB6A82B4E5BF8007B69E2 /* button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3EB6A62B4E5BF8007B69E2 /* button.cpp */; };
+		0E3EB6AB2B4E5C4C007B69E2 /* menu_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E3EB6A92B4E5C4C007B69E2 /* menu_button.cpp */; };
 		0E4CE6DE2B41FDA800BA8796 /* frame_rate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E4CE6DC2B41FDA800BA8796 /* frame_rate.cpp */; };
 		0E65303A2B3AE828004487DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E6530382B3AE828004487DA /* object.cpp */; };
 		0E65303D2B3AEFD5004487DA /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E65303B2B3AEFD5004487DA /* player.cpp */; };
 		0E7561012AF16B5A001F16CA /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */; };
 		0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E8A25162B39A920009C0B44 /* global_variables.cpp */; };
+		0E93E5EC2BA1942D00BF4A22 /* music_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0E93E5EA2BA1942D00BF4A22 /* music_handler.cpp */; };
 		0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EAA2BAC2AE5334B0034B5E8 /* main.cpp */; };
 		0EAA2BB52AE533760034B5E8 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB42AE533760034B5E8 /* SDL2.framework */; };
 		0EAA2BB72AE533870034B5E8 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */; };
+		0EAE07FD2BA2E81A00F253AF /* controls_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EAE07FB2BA2E81A00F253AF /* controls_button.cpp */; };
 		0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97F9E2B396F5C00CC9236 /* texture.cpp */; };
-		0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA02B39702A00CC9236 /* mouse_button.cpp */; };
 		0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA22B39703A00CC9236 /* timers.cpp */; };
 		0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA42B3983E900CC9236 /* kunai.cpp */; };
 		0EB97FA82B3983F900CC9236 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0EB97FA62B3983F900CC9236 /* init.cpp */; };
@@ -42,16 +49,28 @@
 
 /* Begin PBXFileReference section */
 		0E0D194E2AF5FA38000C5DAA /* global_variables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_variables.h; sourceTree = "<group>"; };
+		0E17AC402BA178F2002AA9E3 /* music_button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = music_button.cpp; sourceTree = "<group>"; };
+		0E17AC412BA178F2002AA9E3 /* music_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = music_button.h; sourceTree = "<group>"; };
+		0E17AC432BA18209002AA9E3 /* event_handler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = event_handler.cpp; sourceTree = "<group>"; };
+		0E17AC442BA18209002AA9E3 /* event_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = event_handler.h; sourceTree = "<group>"; };
+		0E17AC462BA1821F002AA9E3 /* renderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = renderer.cpp; sourceTree = "<group>"; };
+		0E17AC472BA1821F002AA9E3 /* renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = renderer.h; sourceTree = "<group>"; };
+		0E17AC4B2BA186D1002AA9E3 /* game_buttons.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_buttons.cpp; sourceTree = "<group>"; };
+		0E17AC4C2BA186D1002AA9E3 /* game_buttons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game_buttons.h; sourceTree = "<group>"; };
+		0E17AC4E2BA18C60002AA9E3 /* button_state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = button_state.h; sourceTree = "<group>"; };
 		0E22E3462B3CB36600BF7A0B /* hearts.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hearts.cpp; sourceTree = "<group>"; };
 		0E22E3472B3CB36600BF7A0B /* hearts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hearts.h; sourceTree = "<group>"; };
 		0E3735052B3F614D009E373D /* game_objects.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_objects.cpp; sourceTree = "<group>"; };
 		0E3735062B3F614D009E373D /* game_objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game_objects.h; sourceTree = "<group>"; };
-		0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mouse_button.h; sourceTree = "<group>"; };
 		0E3ACE7D2AF2FCF100F702CD /* timers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
 		0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kunai_counter.cpp; sourceTree = "<group>"; };
 		0E3B1A872B44F21B004AF32A /* kunai_counter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kunai_counter.h; sourceTree = "<group>"; };
 		0E3B1A892B452749004AF32A /* shield.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shield.cpp; sourceTree = "<group>"; };
 		0E3B1A8A2B452749004AF32A /* shield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shield.h; sourceTree = "<group>"; };
+		0E3EB6A62B4E5BF8007B69E2 /* button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = button.cpp; sourceTree = "<group>"; };
+		0E3EB6A72B4E5BF8007B69E2 /* button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = button.h; sourceTree = "<group>"; };
+		0E3EB6A92B4E5C4C007B69E2 /* menu_button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = menu_button.cpp; sourceTree = "<group>"; };
+		0E3EB6AA2B4E5C4C007B69E2 /* menu_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = menu_button.h; sourceTree = "<group>"; };
 		0E4CE6DC2B41FDA800BA8796 /* frame_rate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = frame_rate.cpp; sourceTree = "<group>"; };
 		0E4CE6DD2B41FDA800BA8796 /* frame_rate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = frame_rate.h; sourceTree = "<group>"; };
 		0E6530382B3AE828004487DA /* object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
@@ -60,13 +79,16 @@
 		0E65303C2B3AEFD5004487DA /* player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = player.h; sourceTree = "<group>"; };
 		0E7561002AF16B5A001F16CA /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		0E8A25162B39A920009C0B44 /* global_variables.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = global_variables.cpp; sourceTree = "<group>"; };
+		0E93E5EA2BA1942D00BF4A22 /* music_handler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = music_handler.cpp; sourceTree = "<group>"; };
+		0E93E5EB2BA1942D00BF4A22 /* music_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = music_handler.h; sourceTree = "<group>"; };
 		0E964C0E2AF861F7003AA09E /* kunai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kunai.h; sourceTree = "<group>"; };
 		0EAA2BA92AE5334B0034B5E8 /* SDL-Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "SDL-Game"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EAA2BAC2AE5334B0034B5E8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0EAA2BB42AE533760034B5E8 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		0EAA2BB62AE533870034B5E8 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = /Library/Frameworks/SDL2_image.framework; sourceTree = "<absolute>"; };
+		0EAE07FB2BA2E81A00F253AF /* controls_button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = controls_button.cpp; sourceTree = "<group>"; };
+		0EAE07FC2BA2E81A00F253AF /* controls_button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = controls_button.h; sourceTree = "<group>"; };
 		0EB97F9E2B396F5C00CC9236 /* texture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
-		0EB97FA02B39702A00CC9236 /* mouse_button.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mouse_button.cpp; sourceTree = "<group>"; };
 		0EB97FA22B39703A00CC9236 /* timers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = timers.cpp; sourceTree = "<group>"; };
 		0EB97FA42B3983E900CC9236 /* kunai.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kunai.cpp; sourceTree = "<group>"; };
 		0EB97FA62B3983F900CC9236 /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
@@ -92,6 +114,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E17AC4A2BA1860B002AA9E3 /* game_buttons */ = {
+			isa = PBXGroup;
+			children = (
+				0E17AC4B2BA186D1002AA9E3 /* game_buttons.cpp */,
+				0E17AC4C2BA186D1002AA9E3 /* game_buttons.h */,
+				0E3EB6A62B4E5BF8007B69E2 /* button.cpp */,
+				0E3EB6A72B4E5BF8007B69E2 /* button.h */,
+				0E3EB6A92B4E5C4C007B69E2 /* menu_button.cpp */,
+				0E3EB6AA2B4E5C4C007B69E2 /* menu_button.h */,
+				0E17AC402BA178F2002AA9E3 /* music_button.cpp */,
+				0E17AC412BA178F2002AA9E3 /* music_button.h */,
+				0EAE07FB2BA2E81A00F253AF /* controls_button.cpp */,
+				0EAE07FC2BA2E81A00F253AF /* controls_button.h */,
+				0E17AC4E2BA18C60002AA9E3 /* button_state.h */,
+			);
+			path = game_buttons;
+			sourceTree = "<group>";
+		};
 		0E65303E2B3AEFFF004487DA /* game_objects */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,7 +172,14 @@
 			isa = PBXGroup;
 			children = (
 				0EAA2BAC2AE5334B0034B5E8 /* main.cpp */,
+				0E17AC432BA18209002AA9E3 /* event_handler.cpp */,
+				0E17AC442BA18209002AA9E3 /* event_handler.h */,
+				0E93E5EA2BA1942D00BF4A22 /* music_handler.cpp */,
+				0E93E5EB2BA1942D00BF4A22 /* music_handler.h */,
+				0E17AC462BA1821F002AA9E3 /* renderer.cpp */,
+				0E17AC472BA1821F002AA9E3 /* renderer.h */,
 				0E65303E2B3AEFFF004487DA /* game_objects */,
+				0E17AC4A2BA1860B002AA9E3 /* game_buttons */,
 				0E22E3462B3CB36600BF7A0B /* hearts.cpp */,
 				0E22E3472B3CB36600BF7A0B /* hearts.h */,
 				0E3B1A862B44F21B004AF32A /* kunai_counter.cpp */,
@@ -141,8 +188,6 @@
 				0E4CE6DD2B41FDA800BA8796 /* frame_rate.h */,
 				0EB97F9E2B396F5C00CC9236 /* texture.cpp */,
 				0EE4F58E2AEAB5880069B47C /* texture.h */,
-				0EB97FA02B39702A00CC9236 /* mouse_button.cpp */,
-				0E3ACE7C2AF2FC6B00F702CD /* mouse_button.h */,
 				0EB97FA22B39703A00CC9236 /* timers.cpp */,
 				0E3ACE7D2AF2FCF100F702CD /* timers.h */,
 				0EB97FA62B3983F900CC9236 /* init.cpp */,
@@ -222,14 +267,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E3B1A8B2B452749004AF32A /* shield.cpp in Sources */,
+				0E17AC422BA178F2002AA9E3 /* music_button.cpp in Sources */,
+				0E93E5EC2BA1942D00BF4A22 /* music_handler.cpp in Sources */,
 				0EAA2BAD2AE5334B0034B5E8 /* main.cpp in Sources */,
 				0E4CE6DE2B41FDA800BA8796 /* frame_rate.cpp in Sources */,
-				0EB97FA12B39702A00CC9236 /* mouse_button.cpp in Sources */,
+				0EAE07FD2BA2E81A00F253AF /* controls_button.cpp in Sources */,
 				0E65303D2B3AEFD5004487DA /* player.cpp in Sources */,
 				0E65303A2B3AE828004487DA /* object.cpp in Sources */,
+				0E3EB6AB2B4E5C4C007B69E2 /* menu_button.cpp in Sources */,
 				0EB97F9F2B396F5C00CC9236 /* texture.cpp in Sources */,
+				0E3EB6A82B4E5BF8007B69E2 /* button.cpp in Sources */,
+				0E17AC4D2BA186D1002AA9E3 /* game_buttons.cpp in Sources */,
 				0E8A25172B39A920009C0B44 /* global_variables.cpp in Sources */,
 				0E3735072B3F614D009E373D /* game_objects.cpp in Sources */,
+				0E17AC482BA1821F002AA9E3 /* renderer.cpp in Sources */,
+				0E17AC452BA18209002AA9E3 /* event_handler.cpp in Sources */,
 				0EB97FA52B3983E900CC9236 /* kunai.cpp in Sources */,
 				0EB97FA32B39703A00CC9236 /* timers.cpp in Sources */,
 				0EFA07B12B4380C300AED262 /* apple.cpp in Sources */,

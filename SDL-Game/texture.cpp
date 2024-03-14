@@ -131,9 +131,9 @@ int Texture::get_width()
   return m_width;
 }
 
-SDL_Texture* Texture::get_texture()
+SDL_Texture& Texture::get_texture()
 {
-    return mp_texture;
+    return *mp_texture;
 }
 
 void Texture::set_height(int height)

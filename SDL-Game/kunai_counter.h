@@ -22,17 +22,17 @@ public:
     void set_position(float x, float y);
     void set_count(int count);
     void increase_count(int amount = 1);
-    bool reduce_count(int amount = 1);
+    bool decrease_count(int amount = 1);
     void update_count();
     void render();
     ~KunaiCounter();
 private:
-    float m_position_x;
-    float m_position_y;
-    int m_count;
-    SDL_Color m_color = {0x00, 0x00, 0x00};
-    std::stringstream m_text_stream;
     static Texture m_trans_kunai;
     Texture m_text;
+    SDL_FPoint m_position;
+    SDL_Color m_color;
+    std::stringstream m_text_stream;
+    int m_count;
+    
     void load_texture();
 };
