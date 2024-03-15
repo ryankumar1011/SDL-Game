@@ -32,9 +32,7 @@ public:
     void set_width(int width);
     
     void set_height(int height);
-    
-    void reload();
-    
+        
     int get_height();
         
     int get_width();

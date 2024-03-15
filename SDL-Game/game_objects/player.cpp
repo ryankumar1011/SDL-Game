@@ -37,8 +37,10 @@ m_clips[10] = {435, 168, 531-435, 298-168};
 m_clips[11] = {26, 303, 129-26, 434-303};
 }
 
-Player::Player()
+Player::Player(int type)
 {
+    m_type = type;
+    
     m_position.x = 0;
     m_position.y = 0;
     m_velocity.x = 0;
@@ -57,7 +59,11 @@ Player::Player()
     scale_colliders(SCALE_FACTOR);
     update_colliders();
     
-    m_flip_state = SDL_FLIP_NONE;
+    if (type == 1)
+    {
+        m_flip_state = SDL_FLIP_HORIZONTAL;
+    }
+    else m_flip_state = SDL_FLIP_NONE;
     
     m_frame = -1;
     m_shield.set_state(false);
@@ -88,6 +94,8 @@ KunaiCounter& Player::get_kunai_counter()
 
 void Player::create_kunai()
 {
+    MusicHandler::play_kunai_throw();
+
     if (m_kunai_counter.decrease_count())
     {
         Kunai* p_kunai = new Kunai(*this);
@@ -130,29 +138,72 @@ void Player::create_kunai()
         }
         
         g_game_objects.insert(p_kunai);
-        MusicHandler::play_kunai();
     }
 }
 
 void Player::handle_event(SDL_Event& event)
 {
+    int key_up;
+    
+    int key_down;
+    
+    int key_left;
+    
+    int key_right;
+    
+    int key_throw;
+    
+    int key_shield;
+    
+    if (m_type == 1)
+    {
+        
+        key_up = SDL_SCANCODE_UP;
+        
+        key_down = SDL_SCANCODE_DOWN;
+        
+        key_left = SDL_SCANCODE_LEFT;
+        
+        key_right = SDL_SCANCODE_RIGHT;
+        
+        key_throw = SDL_SCANCODE_L;
+        
+        key_shield = SDL_SCANCODE_M;
+    }
+    
+    else
+    {
+        key_up = SDL_SCANCODE_W;
+        
+        key_down = SDL_SCANCODE_S;
+        
+        key_left = SDL_SCANCODE_A;
+        
+        key_right = SDL_SCANCODE_D;
+        
+        key_throw = SDL_SCANCODE_C;
+        
+        key_shield = SDL_SCANCODE_F;
+        
+    }
+    
     const uint8_t* key_states = SDL_GetKeyboardState(nullptr);
     
     if (event.type == SDL_KEYDOWN)
     {
-        if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
+        if (key_states[key_left])
         {
             m_acceleration.x = -MAX_ACCELERATION_X;
             m_flip_state = SDL_FLIP_HORIZONTAL;
         }
         
-        if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
+        if (key_states[key_right])
         {
             m_acceleration.x = MAX_ACCELERATION_X;
             m_flip_state = SDL_FLIP_NONE;
         }
         
-        if (key_states[SDL_SCANCODE_T] && (event.key.repeat == 0))
+        if (key_states[key_throw] && (event.key.repeat == 0))
         {
             if (m_shield.get_state())
             {
@@ -170,14 +221,14 @@ void Player::handle_event(SDL_Event& event)
             }
         }
         
-        if (key_states[SDL_SCANCODE_F] && ((m_frame == -1) || (m_frame > 24)) && (!m_shield.get_state()))
+        if (key_states[key_shield] && ((m_frame == -1) || (m_frame > 24)) && (!m_shield.get_state()))
         {
             if (m_frame > 24) m_frame = -1;
             m_shield.set_state(true);
             g_game_objects.insert(&m_shield);
         }
 
-        if (key_states[SDL_SCANCODE_SPACE] && (event.key.repeat == 0))
+        if (key_states[key_up] && (event.key.repeat == 0))
         {
             m_velocity.y = -JUMP_VELOCITY_Y;
         }
@@ -187,31 +238,31 @@ void Player::handle_event(SDL_Event& event)
     {
         //these handle the cases when switching from pressing left to pressing right and vice versa
         
-        if ((key_states[SDL_SCANCODE_A] == 0) && (key_states[SDL_SCANCODE_LEFT] == 0) && (m_acceleration.x < 0))
+        if ((key_states[key_left] == 0) && (m_acceleration.x < 0))
         {
             m_acceleration.x = 0;
-            if (key_states[SDL_SCANCODE_D] || key_states[SDL_SCANCODE_RIGHT])
+            if (key_states[key_right])
             {
                 m_flip_state = SDL_FLIP_NONE;
                 m_acceleration.x = MAX_ACCELERATION_X;
             }
         }
         
-        if ((key_states[SDL_SCANCODE_D] == 0) && (key_states[SDL_SCANCODE_RIGHT] == 0) && (m_acceleration.x > 0))
+        if ((key_states[key_right] == 0) && (m_acceleration.x > 0))
         {
             m_acceleration.x = 0;
-            if (key_states[SDL_SCANCODE_A] || key_states[SDL_SCANCODE_LEFT])
+            if (key_states[key_left] || key_states[key_left])
             {
                 m_flip_state = SDL_FLIP_HORIZONTAL;
                 m_acceleration.x = -MAX_ACCELERATION_X;
             }
         }
-        if (key_states[SDL_SCANCODE_T])
+        if (key_states[key_throw])
         {
             if (m_frame == -1) m_frame = 0; //start the animation
         }
         //throw key is pressed but shield key is not
-        if (key_states[SDL_SCANCODE_F] == 0)
+        if (key_states[key_shield] == 0)
         {
             m_shield.set_state(false);
             g_game_objects.remove(&m_shield);
@@ -284,6 +335,7 @@ void Player::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case KUNAI:
+            MusicHandler::play_kunai_hit();
             g_game_objects.destroy(p_other);
             if (!get_hearts().pop())
             {
@@ -312,7 +364,7 @@ void Player::render()
         
         m_frame++;
     }
-    if (m_frame > 44)
+    if (m_frame > 33)
     {
         m_frame = -1; //stop animation
         

@@ -45,7 +45,6 @@
 //clean up Object methods
 //resizable window (with vsync), escape for resizing
 
-//play button click sfx
 //getting hit sfx
 //resizable window (with vsync), escape for resizing
 //2nd player controls
@@ -65,16 +64,16 @@ int generate_random_number(int min, int max)
 
 void set_object_positions(Player& player_1, Player& player_2, MenuButton& menu_button, MusicButton& music_button, ControlsButton& controls_button)
 {
-    player_1.get_position() = {300, 300};
-    player_1.get_hearts().set_position(5, 37);
+    player_1.get_position() = {600, 300};
+    player_1.get_hearts().set_position(900, 37);
     player_1.get_hearts().set_number(5);
-    player_1.get_kunai_counter().set_position(5, 60);
+    player_1.get_kunai_counter().set_position(900, 60);
     player_1.get_kunai_counter().set_count(10);
     
-    player_2.get_position() = {600, 300};
-    player_2.get_hearts().set_position(900, 37);
+    player_2.get_position() = {300, 300};
+    player_2.get_hearts().set_position(5, 37);
     player_2.get_hearts().set_number(5);
-    player_2.get_kunai_counter().set_position(900, 60);
+    player_2.get_kunai_counter().set_position(5, 60);
     player_2.get_kunai_counter().set_count(10);
     
     menu_button.set_position(5, 5);
@@ -99,8 +98,8 @@ int main(int argc, char* args[])
        
        else
        {
-           Player player_1;
-           Player player_2;
+           Player player_1(1);
+           Player player_2(2);
            MenuButton menu_button;
            MusicButton music_button;
            ControlsButton controls_button;
@@ -135,7 +134,7 @@ int main(int argc, char* args[])
            {
               cap_timer.start();
                
-               //Events
+              //Events
                
               quit = EventHandler::handle_events(event);
 
@@ -1362,7 +1361,6 @@ std::cout << "new other_velocity: (" << other_velocity.x << ", " << other_veloci
      other_penetration.y = -m_penetration.y;
  }
 
- /*
  if ((overlap_x == m_right - m_left) || (overlap_x == other_right - other_left))
  {
      overlap_x = 0;

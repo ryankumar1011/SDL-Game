@@ -6,6 +6,7 @@
 //
 
 #include "menu_button.h"
+#include "music_handler.h"
 #include "global_variables.h"
 
 Texture MenuButton::m_texture;
@@ -35,6 +36,8 @@ void MenuButton::update()
 {
     if (m_state == MOUSE_PRESS_DOWN)
     {
+        MusicHandler::play_click();
+        
         if (g_controls_manual_state)
         {
             g_controls_manual_state = false;

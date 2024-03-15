@@ -6,6 +6,7 @@
 //
 
 #include "controls_button.h"
+#include "music_handler.h"
 #include "global_variables.h"
 
 Texture ControlsButton::m_texture;
@@ -35,6 +36,8 @@ void ControlsButton::update()
 {
     if (m_state == MOUSE_PRESS_DOWN)
     {
+        MusicHandler::play_click();
+        
         if (g_menu_state)
         {
             g_menu_state = false;

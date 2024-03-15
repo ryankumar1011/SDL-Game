@@ -72,17 +72,18 @@ void Apple::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case PLAYER:
-            collide(p_other);           
+            collide(p_other);
             break;
             
         case SHIELD:
+            MusicHandler::play_shield_hit();
             collide(p_other);
             break;
             
         case KUNAI:
+            MusicHandler::play_kunai_hit();
             g_game_objects.destroy(this);
             static_cast<Kunai*>(p_other)->get_player().get_kunai_counter().increase_count(3);
-            MusicHandler::play_apple_hit();
             break;
             
         case APPLE:

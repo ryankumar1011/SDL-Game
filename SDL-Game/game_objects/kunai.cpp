@@ -138,6 +138,7 @@ void Kunai::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case PLAYER:
+            MusicHandler::play_kunai_hit();
             g_game_objects.destroy(this);
             if (!(static_cast<Player*>(p_other))->get_hearts().pop())
             {
@@ -146,6 +147,7 @@ void Kunai::resolve_collision(Object* p_other)
             break;
             
         case SHIELD:
+            MusicHandler::play_shield_hit();
             g_game_objects.destroy(this);
             break;
             
@@ -155,9 +157,9 @@ void Kunai::resolve_collision(Object* p_other)
             break;
             
         case APPLE:
+            MusicHandler::play_kunai_hit();
             g_game_objects.destroy(p_other);
             get_player().get_kunai_counter().increase_count(3);
-            MusicHandler::play_apple_hit();
             break;
     }
 }

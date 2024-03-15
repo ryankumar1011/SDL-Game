@@ -12,21 +12,21 @@
 #include <SDL2_mixer/SDL_mixer.h>
 #include <SDL2/SDL.h>
 
- class Texture;
- class MouseButton;
- class Weapons;
- class SDLTimer;
- class ChronoTimer;
- class FrameRate;
- class Object;
- class Player;
- class Kunai;
- class Hearts;
- class Shield;
- class MenuButton;
- class MusicButton;
- class GameObjects;
- class GameButtons;
+class Texture;
+class MouseButton;
+class Weapons;
+class SDLTimer;
+class ChronoTimer;
+class FrameRate;
+class Object;
+class Player;
+class Kunai;
+class Hearts;
+class Shield;
+class MenuButton;
+class MusicButton;
+class GameObjects;
+class GameButtons;
  
 
 extern const int SCREEN_WIDTH;
@@ -48,5 +48,7 @@ extern TTF_Font* gp_arial_font;
 extern TTF_Font* gp_crayon_font;
 
 extern Mix_Music* gp_background_music;
-extern Mix_Chunk* gp_kunai_sound;
-extern Mix_Chunk* gp_apple_hit_sound;
+extern Mix_Chunk* gp_kunai_throw_sound;
+extern Mix_Chunk* gp_kunai_hit_sound;
+extern Mix_Chunk* gp_click_sound;
+extern Mix_Chunk* gp_shield_hit_sound;

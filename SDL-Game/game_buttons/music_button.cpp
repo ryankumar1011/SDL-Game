@@ -55,6 +55,7 @@ void MusicButton::update()
     
     if (m_state == MOUSE_PRESS_UP)
     {
+        MusicHandler::play_click();
         MusicHandler::toggle_music();
         m_sound = !(m_sound);
         m_state = MOUSE_OVER;

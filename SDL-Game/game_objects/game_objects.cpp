@@ -89,7 +89,6 @@ void GameObjects::render()
     {
         p_object->render();
         p_object->render_colliders();
-        
     }
 }
 

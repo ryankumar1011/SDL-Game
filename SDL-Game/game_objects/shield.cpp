@@ -7,6 +7,7 @@
 
 #include "shield.h"
 #include "game_objects.h"
+#include "music_handler.h"
 #include "global_variables.h"
 
 Texture Shield::m_texture;
@@ -61,10 +62,12 @@ void Shield::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case KUNAI:
+            MusicHandler::play_shield_hit();
             g_game_objects.destroy(p_other);
             break;
             
         case APPLE:
+            MusicHandler::play_shield_hit();
             collide(p_other);
             break;
     }

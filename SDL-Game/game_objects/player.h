@@ -28,7 +28,7 @@ public:
     static constexpr float JUMP_VELOCITY_Y = 11.5;
     
 public:
-    Player();
+    Player(int type);
     static Texture& get_texture();
     float get_mass() override;
     static void set_clips();
@@ -46,6 +46,7 @@ public:
 private:
     static Texture m_sprite;
     static SDL_Rect m_clips[12];
+    int m_type;
     int m_frame;
     Hearts m_hearts;
     KunaiCounter m_kunai_counter;

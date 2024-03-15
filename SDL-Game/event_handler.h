@@ -11,6 +11,6 @@
 
 namespace EventHandler
 {
-    bool handle_events(SDL_Event event);
+bool handle_events(SDL_Event event);
 }
 

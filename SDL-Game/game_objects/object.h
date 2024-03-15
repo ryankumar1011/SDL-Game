@@ -44,7 +44,7 @@ public:
     virtual ~Object() = default;
 
 protected:
-    SDL_FPoint m_position;
+    SDL_FPoint m_position; //SDL_FPoint is a struct with two values: x and y. It is convenient to use here
     SDL_FPoint m_velocity;
     SDL_FPoint m_acceleration;
     SDL_FPoint m_normal;
@@ -81,5 +81,4 @@ protected:
     //->depending on m_flip_state, flip_colliders() is called
 
     //update_colliders() called again every time object position is updated
-    
 };

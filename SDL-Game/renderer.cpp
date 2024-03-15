@@ -20,6 +20,8 @@ namespace Renderer
                 
         if (g_menu_state)
         {
+            SDL_SetRenderDrawColor(gp_renderer, 0xd3, 0xd3, 0xd3, 0xd3);
+            SDL_RenderClear(gp_renderer);
             g_menu.render();
         }
         

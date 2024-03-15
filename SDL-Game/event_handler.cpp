@@ -15,28 +15,28 @@
 
 namespace EventHandler
 {
-    bool handle_events(SDL_Event event)
+bool handle_events(SDL_Event event)
+{
+    bool quit {false};
+    
+    while (SDL_PollEvent(&event) != 0)
     {
-        bool quit {false};
-        
-        while (SDL_PollEvent(&event) != 0)
+        if (event.type == SDL_QUIT)
+            
         {
-            if (event.type == SDL_QUIT)
-                
-            {
-                quit = true;
-            }
-            
-            if (!g_menu_state && !g_controls_manual_state)
-            {
-                g_game_objects.handle_event(event);
-            }
-            
-            g_game_buttons.handle_event(event);
-            
-            MusicHandler::handle_event(event);
-            
+            quit = true;
         }
-        return quit;
+        
+        if (!g_menu_state && !g_controls_manual_state)
+        {
+            g_game_objects.handle_event(event);
+        }
+        
+        g_game_buttons.handle_event(event);
+        
+        MusicHandler::handle_event(event);
+        
     }
+    return quit;
+}
 }

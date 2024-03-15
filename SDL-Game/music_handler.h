@@ -7,20 +7,20 @@
 
 #pragma once
 
-#include "global_variables.h"
-#include <SDL2/SDL.h>
 #include <SDL2_mixer/SDL_mixer.h>
+#include <SDL2/SDL.h>
 
 namespace MusicHandler
 {
-    void play_kunai();
+void play_kunai_throw();
 
-    void play_apple_hit();
+void play_kunai_hit();
 
-    void toggle_music();
+void play_click();
 
-    void handle_event(SDL_Event event);
-}
+void toggle_music();
 
+void play_shield_hit();
 
-
+void handle_event(SDL_Event event); //to change music with key input
+};

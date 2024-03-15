@@ -4,6 +4,7 @@
 //
 //  Created by Ryan Kumar on 25/12/23.
 //
+
 #include "texture.h"
 #include "game_objects.h"
 #include "game_buttons.h"
@@ -30,8 +31,12 @@ TTF_Font* gp_crayon_font = nullptr;
 
 //Chunks and music from SDL mixer
 Mix_Music* gp_background_music = nullptr;
-Mix_Chunk* gp_kunai_sound = nullptr;
-Mix_Chunk* gp_apple_hit_sound = nullptr;
+Mix_Chunk* gp_kunai_throw_sound = nullptr;
+Mix_Chunk* gp_kunai_hit_sound = nullptr;
+Mix_Chunk* gp_click_sound = nullptr;
+Mix_Chunk* gp_shield_hit_sound = nullptr;
+
+
 
 //Notes:
 
