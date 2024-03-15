@@ -1,12 +1,12 @@
 # About this project
 
-This project is a simple multiplayer combat game made in  C++, using only SDL2 libraries such as SDL_Image, SDL_mixer and SDL_ttf. I’m hoping it gives me a taste of game design and supplements my learning of C++ during my course. Huge thanks to Lazy Foo’s online tutorials (add link) for guiding me with using these libraries.
+This project is a simple multiplayer combat game made in  C++, using only SDL2 libraries such as SDL_Image, SDL_mixer and SDL_ttf. I’m hoping it gives me a taste of game design and supplements my learning of C++ during my course. Huge thanks to [Lazy Foo’s online tutorials](https://lazyfoo.net/tutorials/SDL/) for guiding me with using these libraries.
 
 # How to download 
 ~ I will soon add the .exec file
 
 # Gameplay and Controls 
-Below is the in game controls information screen in the game. 
+Below is the in-game controls information screen. 
 
 ![game_manual](https://github.com/ryankumar1011/SDL-Game/assets/65263492/1bad5add-06be-4459-8d54-90b6d69d8929)
 
