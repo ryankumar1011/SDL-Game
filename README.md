@@ -27,7 +27,7 @@ I’ve spent too long making this 2 second animation for it to not have its own 
 
 https://github.com/ryankumar1011/SDL-Game/assets/65263492/01fdc510-faf0-4bbb-acfa-6cd3907c632f
 
-Here’s the sprite sheet
+Here’s the sprite sheet.
 
 ![player_animations2](https://github.com/ryankumar1011/SDL-Game/assets/65263492/1539fce8-20e9-479b-a170-04acc2508886)
 
@@ -39,9 +39,15 @@ I’ve also added visual and sound effects for button clicks and collisions, tha
 
 <img width="368" alt="Screenshot 2024-03-15 at 7 06 48 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/078acfb0-8e02-4e5b-9602-deef25abefb2">
 
-And we see can the results here 
+And we see can the results here.
 
 <img width="998" alt="Screenshot 2024-03-15 at 7 12 04 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/a4321571-3934-4378-98f7-57986a9e85c4">
+
+The colliders are stored as a std::vector of SDL_FRects. Here's the order they are written in the code.
+
+<img width="121" alt="Screenshot 2023-12-26 at 8 48 17 PM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/a8a212ee-cc71-4106-bf41-d01ad147868b">
+
+<img width="650" alt="Screenshot 2023-12-26 at 5 46 45 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/d03251d5-4e97-496a-abcc-646596003204">
 
 
 # Code structure
