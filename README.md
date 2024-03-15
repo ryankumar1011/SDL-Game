@@ -35,17 +35,13 @@ Here’s how deploying the shield looks like. I’m just changing its scale fact
 
 https://github.com/ryankumar1011/SDL-Game/assets/65263492/e08c9ed4-c1df-400a-8b94-d4c922fa0b3f
 
-I’ve also added visual and sound effects for button clicks and collisions, that can be seen in the game
-
-
-Every visual element and object can be easily resized using a different scale factor. I’ve made sure the colliders, animations and collision system automatically account for this. For testing, the colliders can be rendered by uncommenting the below line of code.
+I’ve also added visual and sound effects for button clicks and collisions, that can be seen in the game. Every visual element and object can be easily resized using a different scale factor. I’ve made sure the colliders, animations and collision system automatically account for this. For testing, the colliders can be rendered by uncommenting the below line of code.
 
 <img width="368" alt="Screenshot 2024-03-15 at 7 06 48 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/078acfb0-8e02-4e5b-9602-deef25abefb2">
 
-And we can the results here 
+And we see can the results here 
 
 <img width="998" alt="Screenshot 2024-03-15 at 7 12 04 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/a4321571-3934-4378-98f7-57986a9e85c4">
-
 
 
 # Code structure
