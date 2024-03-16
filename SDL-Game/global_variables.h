@@ -52,3 +52,7 @@ extern Mix_Chunk* gp_kunai_throw_sound;
 extern Mix_Chunk* gp_kunai_hit_sound;
 extern Mix_Chunk* gp_click_sound;
 extern Mix_Chunk* gp_shield_hit_sound;
+extern Mix_Chunk* gp_apple_hit_sound;
+
+
+

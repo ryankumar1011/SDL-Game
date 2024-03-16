@@ -72,6 +72,7 @@ void Apple::resolve_collision(Object* p_other)
     switch(other_name)
     {
         case PLAYER:
+            MusicHandler::play_apple_hit();
             collide(p_other);
             break;
             

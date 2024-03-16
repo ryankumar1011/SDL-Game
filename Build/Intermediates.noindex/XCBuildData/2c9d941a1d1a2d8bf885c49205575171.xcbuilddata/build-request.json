@@ -1,0 +1,56 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildAndRun"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "0b14d213025313a226c8c793287223b8ad2021fb060032ca72971d0631ba7d49"
+    }
+  ],
+  "containerPath" : "/Users/ryankumar/Desktop/Projects/SDL-Game/SDL-Game.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "arm64",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "platform" : "macosx",
+      "sdk" : "macosx14.2",
+      "sdkVariant" : "macos",
+      "supportedArchitectures" : [
+        "arm64e",
+        "arm64",
+        "x86_64"
+      ],
+      "targetArchitecture" : "arm64"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/ryankumar/Desktop/Projects/SDL-Game/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/ryankumar/Desktop/Projects/SDL-Game/Build/Products",
+      "derivedDataPath" : "/Users/ryankumar/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/ryankumar/Library/Developer/Xcode/DerivedData/SDL-Game-aozydktewrnhkqhfenabtwdkrjgn/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/ryankumar/Library/Developer/Xcode/DerivedData/SDL-Game-aozydktewrnhkqhfenabtwdkrjgn/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/ryankumar/Desktop/Projects/SDL-Game/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Release",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "NO"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

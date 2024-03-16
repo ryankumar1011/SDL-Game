@@ -25,6 +25,11 @@ void MusicHandler::play_shield_hit()
     Mix_PlayChannel(-1, gp_shield_hit_sound, 0);
 }
 
+void MusicHandler::play_apple_hit()
+{
+    Mix_PlayChannel(-1, gp_apple_hit_sound, 0);
+}
+
 void MusicHandler::toggle_music()
 {
     if (Mix_PlayingMusic() == 0)

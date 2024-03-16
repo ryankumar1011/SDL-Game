@@ -344,6 +344,7 @@ void Player::resolve_collision(Object* p_other)
             break;
             
         case APPLE:
+            MusicHandler::play_apple_hit();
             collide(p_other);
             break;
     }

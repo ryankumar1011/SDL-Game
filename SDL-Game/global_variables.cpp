@@ -35,6 +35,8 @@ Mix_Chunk* gp_kunai_throw_sound = nullptr;
 Mix_Chunk* gp_kunai_hit_sound = nullptr;
 Mix_Chunk* gp_click_sound = nullptr;
 Mix_Chunk* gp_shield_hit_sound = nullptr;
+Mix_Chunk* gp_apple_hit_sound = nullptr;
+
 
 
 

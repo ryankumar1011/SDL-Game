@@ -16,6 +16,8 @@ void play_kunai_throw();
 
 void play_kunai_hit();
 
+void play_apple_hit();
+
 void play_click();
 
 void toggle_music();
@@ -24,3 +26,4 @@ void play_shield_hit();
 
 void handle_event(SDL_Event event); //to change music with key input
 };
+

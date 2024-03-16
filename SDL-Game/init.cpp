@@ -235,14 +235,14 @@ bool load_audio()
     if (gp_kunai_throw_sound == nullptr)
     {
         success = false;
-        printf("Failed to load kunai audio\n");
+        printf("Failed to load kunai throw audio\n");
     }
-    gp_kunai_hit_sound = Mix_LoadWAV("Audio/apple_hit2.wav");
+    gp_kunai_hit_sound = Mix_LoadWAV("Audio/kunai_hit.wav");
     
     if (gp_kunai_hit_sound == nullptr)
     {
         success = false;
-        printf("Failed to load click audio\n");
+        printf("Failed to load kunai hit audio\n");
     }
     
     gp_click_sound = Mix_LoadWAV("Audio/click.wav");
@@ -258,7 +258,15 @@ bool load_audio()
     if (gp_shield_hit_sound == nullptr)
     {
         success = false;
-        printf("Failed to load click audio\n");
+        printf("Failed to load shield hit audio\n");
+    }
+    
+    gp_apple_hit_sound = Mix_LoadWAV("Audio/apple_hit.wav");
+    
+    if (gp_apple_hit_sound == nullptr)
+    {
+        success = false;
+        printf("Failed to load apple hit audio\n");
     }
     
     return success;
@@ -301,6 +309,7 @@ void close()
     Mix_FreeChunk(gp_kunai_hit_sound);
     Mix_FreeChunk(gp_click_sound);
     Mix_FreeChunk(gp_shield_hit_sound);
+    Mix_FreeChunk(gp_apple_hit_sound);
     
     // Destroy Windows and Renderer, set pointers to NULL
     SDL_DestroyWindow(gp_window);
