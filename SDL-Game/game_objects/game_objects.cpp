@@ -88,7 +88,7 @@ void GameObjects::render()
     for (Object* p_object : mp_objects)
     {
         p_object->render();
-        p_object->render_colliders();
+       //p_object->render_colliders();
     }
 }
 
