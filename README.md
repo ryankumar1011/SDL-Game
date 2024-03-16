@@ -2,8 +2,12 @@
 
 This project is a simple multiplayer combat game made in  C++, using only SDL2 libraries such as SDL_Image, SDL_mixer and SDL_ttf. I’m hoping it gives me a taste of game design and supplements my learning of C++ during my course. Huge thanks to [Lazy Foo’s online tutorials](https://lazyfoo.net/tutorials/SDL/) for guiding me with using these libraries.
 
-# How to download 
-~ I will soon add the .exec file
+# How to download
+I haven't made a cmake file to add cross platform compatobality... the game can currently be only run on mac. For mac users, dowload the SDL_Game_Install.zip and follow the instruction given in the readme file. If you can't access the file, here they are:
+
+To run the program, the contents of SDL_2, SDL2_image, SDL2_ttf and SDL2_mixer .dmg files must first be moves into /Library/Frameworks/. This can be done from the desktop by pressing go->go to folder->/Library/Frameworks/ and then dragging the files. This is done to dynamically link the library.
+
+Next press the .exe file to run the program. If it says it can't download the file because it is from an unidentified developer, press cntrl + click and then open or go to Privacy and Secutiy in System Settings to allow the file to download.
 
 # Gameplay and Controls 
 Below is the in-game controls information screen. 
