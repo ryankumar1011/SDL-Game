@@ -7,6 +7,11 @@ Since SDL is a dynamically linked library, i'm having trouble making installatio
 
 To run the program, the contents of SDL_2, SDL2_image, SDL2_ttf and SDL2_mixer .dmg files must first be moves into /Library/Frameworks/. This can be done from the desktop by pressing go->go to folder->/Library/Frameworks/ and then dragging the files. This is done to link the SDL library. Next press the SDL_Game.exe file to run the program. If it says it can't download the file because it is from an unidentified developer, press cntrl + click and then open or go to Privacy and Security in System Settings to allow files from unknown developers to download.
 
+
+# Game Demo
+
+https://github.com/ryankumar1011/SDL-Game/assets/65263492/a49fa790-4f25-4aa4-8edf-d068edb3b4f3
+
 # Gameplay and Controls 
 Below is the in-game controls information screen. 
 
@@ -67,11 +72,6 @@ The MusicHandler class stores pointers to the background music and sound effects
 The init.cpp file contains functions for initializing SDL and its libraries. It gets the pointers for SDL_Window and SDL_Renderer and loads all images, fonts and audio. It also sets the clips for all used sprites. Before the main game loop, SDL is initialized and media is loaded using functions from init.cpp.
 
 The main game loop is separated into the event handling, logic and rendering. These are separated into different files and called as functions for clarity. The global variables g_menu and g_controls_menu determine what texture to update and render.
-
-# Game Demo
-
-https://github.com/ryankumar1011/SDL-Game/assets/65263492/a49fa790-4f25-4aa4-8edf-d068edb3b4f3
-
 
 
 
