@@ -9,8 +9,7 @@ To run the program, the contents of SDL_2, SDL2_image, SDL2_ttf and SDL2_mixer .
 
 
 # Game Demo
-
-https://github.com/ryankumar1011/SDL-Game/assets/65263492/a49fa790-4f25-4aa4-8edf-d068edb3b4f3
+https://github.com/ryankumar1011/SDL-Game/assets/65263492/bc31f0e1-d3e5-4ed3-8351-da067ef5a8e3
 
 # Gameplay and Controls 
 Below is the in-game controls information screen. 
