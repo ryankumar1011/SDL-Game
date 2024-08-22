@@ -3,7 +3,7 @@
 This project is a simple multiplayer combat game made in  C++, using only SDL2 libraries such as SDL_Image, SDL_mixer and SDL_ttf. I’m hoping it gives me a taste of game design and supplements my learning of C++ during my course. Huge thanks to [Lazy Foo’s online tutorials](https://lazyfoo.net/tutorials/SDL/) for guiding me with using these libraries.
 
 # How to download
-Since SDL is a dynamically linked library, i'm having trouble making installation as simple as clicking a .dmg file. Mac users can dowload the SDL_Game_Install.zip file and follow the below instructions to run the game.
+ Mac users can dowload the SDL_Game_Install.zip file and follow the below instructions to run the game.
 
 To run the program, the contents of SDL_2, SDL2_image, SDL2_ttf and SDL2_mixer .dmg files must first be moves into /Library/Frameworks/. This can be done from the desktop by pressing go->go to folder->/Library/Frameworks/ and then dragging the files. This is done to link the SDL library. Next press the SDL_Game.exe file to run the program. If it says it can't download the file because it is from an unidentified developer, press cntrl + click and then open or go to Privacy and Security in System Settings to allow files from unknown developers to download.
 
@@ -16,20 +16,20 @@ Below is the in-game controls information screen.
 
 ![game_manual](https://github.com/ryankumar1011/SDL-Game/assets/65263492/1bad5add-06be-4459-8d54-90b6d69d8929)
 
-In the case my drawings are worse than I think they are, it goes something like this:
+The game consists of two avatars controlled by each player, and they fight each other by throwing weapons called kunais. The rules of the game are as follows:
 * Getting hit by a kunai decreases a player’s health by 1
-* Hitting an apple with a kunai gives a Player three additional kunai
-* Throwing a kunai loses the player a kunai (duh..)
+* Hitting an apple with a kunai gives a player three additional kunais
+* Throwing a kunai decreases a player's count by 1
 * A player loses the game when they have no health left
 
 Apples are harmless objects that randomly fall somewhere in the middle of the screen. The counters for kunai and health left are shown at the top corners of the screen, as seen below.
 
 <img width="999" alt="Screenshot 2024-03-15 at 6 33 38 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/19f1fed7-34b5-4b5c-a97d-2cf7bd294924">
 
-I’ve also implemented a shield a player can use to block a kunai (why…?).
+I’ve also implemented a shield a player can use to block a kunai.
 
 # Animations and visual effects
-I’ve spent too long making this 2 second animation for it to not have its own section (again....why???)
+Here's the animation for the kunai throw I made.
 
 https://github.com/ryankumar1011/SDL-Game/assets/65263492/01fdc510-faf0-4bbb-acfa-6cd3907c632f
 
@@ -58,7 +58,7 @@ The colliders are stored as a std::vector of SDL_FRects. Here's the order they a
 
 # Code structure
 
-Sorry if the documentation in the code is scarce, I’m currently working on it. Here’s the rundown:
+The documentation is currently rather scarce, I’m working on it. Here’s the rundown:
 
 Global variables in this project are declared in global_variables.h using the extern keyword. I’ve tried to keep to a minimum. They include pointers to the structs SDL_Window and SDL_Renderer (used for rendering), the screen width and height, and an instance of classes GameObjects and GameButtons.
 
