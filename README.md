@@ -2,12 +2,6 @@
 
 This project is a simple multiplayer combat game made in  C++, using only SDL2 libraries such as SDL_Image, SDL_mixer and SDL_ttf. I’m hoping it gives me a taste of game design and supplements my learning of C++ during my course. Huge thanks to [Lazy Foo’s online tutorials](https://lazyfoo.net/tutorials/SDL/) for guiding me with using these libraries.
 
-# How to download
- Mac users can dowload the SDL_Game_Install.zip file and follow the below instructions to run the game.
-
-To run the program, the contents of SDL_2, SDL2_image, SDL2_ttf and SDL2_mixer .dmg files must first be moves into /Library/Frameworks/. This can be done from the desktop by pressing go->go to folder->/Library/Frameworks/ and then dragging the files. This is done to link the SDL library. Next press the SDL_Game.exe file to run the program. If it says it can't download the file because it is from an unidentified developer, press cntrl + click and then open or go to Privacy and Security in System Settings to allow files from unknown developers to download.
-
-
 # Game Demo
 https://github.com/ryankumar1011/SDL-Game/assets/65263492/bc31f0e1-d3e5-4ed3-8351-da067ef5a8e3
 
@@ -54,26 +48,6 @@ The colliders are stored as a std::vector of SDL_FRects. Here's the order they a
 <img width="121" alt="Screenshot 2023-12-26 at 8 48 17 PM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/a8a212ee-cc71-4106-bf41-d01ad147868b">
 
 <img width="650" alt="Screenshot 2023-12-26 at 5 46 45 AM" src="https://github.com/ryankumar1011/SDL-Game/assets/65263492/d03251d5-4e97-496a-abcc-646596003204">
-
-
-# Code structure
-
-The documentation is currently rather scarce, I’m working on it. Here’s the rundown:
-
-Global variables in this project are declared in global_variables.h using the extern keyword. I’ve tried to keep to a minimum. They include pointers to the structs SDL_Window and SDL_Renderer (used for rendering), the screen width and height, and an instance of classes GameObjects and GameButtons.
-
-The GameObjects and GameButtons instances are used to insert, remove, update and render the contents of two std::vectors containing pointers to all current instances of parent classes Object and Button respectively. Player, Kunai, Apple, and Shield are child classes of Object and MusicButton, ControlsButton, MenuButton are child classes of Button. This is how information and functionality for all objects and buttons is implemented.
-
-The Hearts, KunaiCounter, FrameRate classes are all used to update and render visual elements and so are not under objects. The player class contains an instance of Hearts and KunaiCounter to update them accordingly.
-
-The MusicHandler class stores pointers to the background music and sound effects. Its functions are called to play sound. The Texture class contains functionality on loading and rendering images and fonts as textures, with options for color keying, alpha modding, etc.
-
-The init.cpp file contains functions for initializing SDL and its libraries. It gets the pointers for SDL_Window and SDL_Renderer and loads all images, fonts and audio. It also sets the clips for all used sprites. Before the main game loop, SDL is initialized and media is loaded using functions from init.cpp.
-
-The main game loop is separated into the event handling, logic and rendering. These are separated into different files and called as functions for clarity. The global variables g_menu and g_controls_menu determine what texture to update and render.
-
-
-
 
 
 
